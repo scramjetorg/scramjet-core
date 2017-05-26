@@ -17,7 +17,6 @@ const decorateAsynchronously = (cb, chunk) => new Promise((res) => {
 });
 
 const decorateAsynchronouslyWithError = (cb, chunk) => {
-    debugger;
     if (chunk.val === 22) {
         return new Promise((res, rej) => {
             setTimeout(() => rej(new Error("Err")), 100);

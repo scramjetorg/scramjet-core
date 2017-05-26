@@ -105,35 +105,6 @@ module.exports = {
 
         }
     },
-    test_reduceNow: {
-        accumulator_tests(test) {
-
-            test.expect(3);
-
-            const comparable = {sum: 0, cnt: 0};
-            const ret = getStream()
-                .on("end",
-                    () => {
-                        test.equals(comparable.cnt, 100, "The method should get all 100 elements in the stream");
-                        test.equals(comparable.sum, 4950, "Sum should be equal to the sum of all streamed elements");
-                        test.done();
-                    }
-                )
-                .on("error",
-                    (e) => (console.log(e), test.ok(false, "Should not throw error: " + e))
-                )
-                .reduceNow(
-                    (acc, int) => (acc.sum += int.val, acc.cnt++, acc),
-                    comparable
-                );
-
-            test.ok(
-                comparable === ret,
-                "ReduceNow returns the passed object at once"
-            );
-
-        }
-    },
     test_map(test) {
         test.expect(3);
 
@@ -205,37 +176,6 @@ module.exports = {
             ).catch(
                 (e) => (console.log(e), test.ok(false, "Should not throw error: " + e))
             );
-    },
-    test_shift: {
-        from_begining(test) {
-            test.expect(4);
-
-            let shifted;
-            getStream()
-                .shift(3,
-                    (items) => {
-                        shifted = items;
-                    }
-                )
-                .reduce(
-                    (acc, item) => (acc.push(item), acc),
-                    []
-                )
-                .then(
-                    (items) => {
-                        test.equals(shifted.length, 3, "Shift should result in an array of a given number");
-                        test.equals(shifted[2].val, 2, "Shift should take the number of first items");
-                        test.equals(items[0].val, 3, "Shifted items should not appear in the stream");
-                        test.equals(items.length, 97, "All the non-shifted items should be in the stream");
-                        test.done();
-                    }
-                ).catch(
-                    (e) => (console.log(e), test.ok(false, "Should not throw error: " + e))
-                );
-        }
-    },
-    test_separate(test) {
-        test.done();
     },
     test_pipe: {
         pipes(test) {
