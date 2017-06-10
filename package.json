@@ -33,7 +33,7 @@
   "homepage": "http://scramjet.io/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/signicode/scramjet.git"
+    "url": "https://github.com/signicode/scramjet-core.git"
   },
   "engines": {
     "node": ">=6"
@@ -41,11 +41,9 @@
   "author": "Signicode / Michał Czapracki <cz@signicode.com>",
   "license": "MIT",
   "devDependencies": {
-    "freeport": "^1.0.5",
     "fs-promise": "^2.0.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
-    "gulp-exec": "^2.1.3",
     "gulp-jsdoc-to-markdown": "^1.2.2",
     "gulp-jshint": "^2.0.4",
     "gulp-nodeunit-runner": "^0.2.2",

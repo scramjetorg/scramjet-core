@@ -1,7 +1,15 @@
-[![Master Build Status](https://travis-ci.org/signicode/scramjet.svg?branch=master)](https://travis-ci.org/signicode/scramjet)
-[![Develop Build Status](https://travis-ci.org/signicode/scramjet.svg?branch=develop)](https://travis-ci.org/signicode/scramjet)
-[![Dependencies](https://david-dm.org/signicode/scramjet/status.svg)](https://david-dm.org/signicode/scramjet)
-[![Dev Dependencies](https://david-dm.org/signicode/scramjet/dev-status.svg)](https://david-dm.org/signicode/scramjet?type=dev)
+[![Master Build Status](https://travis-ci.org/signicode/scramjet-core.svg?branch=master)](https://travis-ci.org/signicode/scramjet-core)
+[![Develop Build Status](https://travis-ci.org/signicode/scramjet-core.svg?branch=develop)](https://travis-ci.org/signicode/scramjet-core)
+[![Dependencies](https://david-dm.org/signicode/scramjet-core/status.svg)](https://david-dm.org/signicode/scramjet-core)
+[![Dev Dependencies](https://david-dm.org/signicode/scramjet-core/dev-status.svg)](https://david-dm.org/signicode/scramjet-core?type=dev)
+
+Scramjet core
+---------------
+
+This is the minimal, dependency free version of [`scramjet`](https://github.com/signicode/scramjet) used as of Scramjet
+version 3.0.0 as a base for `scramjet` and scramjet plugins.
+
+Unless you are sure, you should be better off with using the main repo and module.
 
 ## What does it do?
 
@@ -60,29 +68,11 @@ The quick reference of the exposed classes:
 {{>stream-class}}
 {{/classes}}
 
-## Browserifying
-
-Scramjet works in the browser too, there's a nice, self-contained sample in here, just run it:
-
-```bash
-    git clone https://github.com/signicode/scramjet.git
-    cd scramjet
-    npm install .
-    cd samples/browser
-    npm start # point your browser to http://localhost:30035 and open console
-```
-
-If you need your scramjet version for the browser, grab browserify and just run:
-
-```bash
-    browserify lib/index -standalone scramjet -o /path/to/your/browserified-scramjet.js
-```
-
-With this you can run your transformations in the browser, use websockets to send them back and forth. If you do and fail for some reason, please remember to be issuing those issues - as no one person can test all the use cases and I am but one person.
-
 ## Usage
 
-Scramjet uses functional programming to run transformations on your data streams in a fashion very similar to the well known event-stream node module. Most transformations are done by passing a transform function. You can write your function in two ways:
+Scramjet uses functional programming to run transformations on your data streams in a fashion very similar to the well
+known event-stream node module. Most transformations are done by passing a transform function. You can write your
+function in two ways:
 
 1. Synchronous
 
@@ -111,9 +101,8 @@ Scramjet uses functional programming to run transformations on your data streams
     )
  ```
 
-The actual logic of this transform function is as if you passed your function
-to the ```then``` method of a Promise resolved with the data from the input
-stream.
+The actual logic of this transform function is as if you passed your function to the ```then``` method of a Promise
+resolved with the data from the input stream.
 
 ## License and contributions
 
