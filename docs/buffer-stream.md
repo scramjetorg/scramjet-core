@@ -6,6 +6,17 @@
 </dd>
 </dl>
 
+## Functions
+
+<dl>
+<dt><a href="#toStringStream">toStringStream()</a></dt>
+<dd><p>Alias for <a href="#BufferStream+stringify">stringify</a></p>
+</dd>
+<dt><a href="#toDataStream">toDataStream()</a></dt>
+<dd><p>Alias for <a href="#BufferStream+parse">parse</a></p>
+</dd>
+</dl>
+
 ## Typedefs
 
 <dl>
@@ -29,7 +40,7 @@ A factilitation stream created for easy splitting or parsing buffers
     * [.shift(chars, func)](#BufferStream+shift) ⇒ <code>[BufferStream](#BufferStream)</code>
     * [.split(splitter)](#BufferStream+split) ⇒ <code>[BufferStream](#BufferStream)</code>
     * [.breakup(number)](#BufferStream+breakup) ⇒ <code>[BufferStream](#BufferStream)</code>
-    * [.toStringStream(encoding)](#BufferStream+toStringStream) ⇒ <code>StringStream</code>
+    * [.stringify(encoding)](#BufferStream+stringify) ⇒ <code>StringStream</code>
     * [.parse(parser)](#BufferStream+parse) ⇒ <code>DataStream</code>
 
 <a name="new_BufferStream_new"></a>
@@ -99,9 +110,9 @@ Breaks up a stream apart into chunks of the specified length
 ```js
 [../samples/buffer-stream-breakup.js](../samples/buffer-stream-breakup.js)
 ```
-<a name="BufferStream+toStringStream"></a>
+<a name="BufferStream+stringify"></a>
 
-### bufferStream.toStringStream(encoding) ⇒ <code>StringStream</code>
+### bufferStream.stringify(encoding) ⇒ <code>StringStream</code>
 Creates a string stream from the given buffer streamStill it returns a DataStream derivative and isn't the typical node.jsstream so you can do all your transforms when you like.
 
 **Kind**: instance method of <code>[BufferStream](#BufferStream)</code>  
@@ -118,7 +129,7 @@ Creates a string stream from the given buffer streamStill it returns a DataStr
 <a name="BufferStream+parse"></a>
 
 ### bufferStream.parse(parser) ⇒ <code>DataStream</code>
-[Parallel] Parses every buffer to objectThe method MUST parse EVERY buffer into a single object, so the bufferstream here should already be splitted or broken up.
+Parses every buffer to objectThe method MUST parse EVERY buffer into a single object, so the bufferstream here should already be splitted or broken up.
 
 **Kind**: instance method of <code>[BufferStream](#BufferStream)</code>  
 **Returns**: <code>DataStream</code> - The parsed objects stream.  
@@ -131,6 +142,18 @@ Creates a string stream from the given buffer streamStill it returns a DataStr
 ```js
 [../samples/buffer-stream-parse.js](../samples/buffer-stream-parse.js)
 ```
+<a name="toStringStream"></a>
+
+## toStringStream()
+Alias for [stringify](#BufferStream+stringify)
+
+**Kind**: global function  
+<a name="toDataStream"></a>
+
+## toDataStream()
+Alias for [parse](#BufferStream+parse)
+
+**Kind**: global function  
 <a name="PopCallback"></a>
 
 ## PopCallback : <code>function</code>

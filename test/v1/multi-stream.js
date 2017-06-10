@@ -1,6 +1,5 @@
-const MultiStream = require('../../').MultiStream;
-const DataStream = require('../../').DataStream;
-const EventEmitter = require('events').EventEmitter;
+const {MultiStream, DataStream} = require('../../');
+const {EventEmitter} = require('events');
 
 const getStream = (n, z, k) => {
     z = z || 100;
@@ -48,8 +47,8 @@ module.exports = {
         const mux = new MultiStream(streams).mux();
         test.ok(mux instanceof DataStream, "Returns DataStream instance");
 
-        mux.accumulate(
-            (acc, item) => acc.push(item.val),
+        mux.reduce(
+            (acc, item) => (acc.push(item.val), acc),
             []
         ).then(
             (arr) => {
@@ -80,8 +79,8 @@ module.exports = {
             (reason) => console.log('Unhandled rejection: ' + (reason && reason.stack), test.fail(1, "Unhandled rejection"))
         );
 
-        mux.accumulate(
-            (acc, item) => acc.push(item.val),
+        mux.reduce(
+            (acc, item) => (acc.push(item.val), acc),
             []
         ).then(
             (arr) => {

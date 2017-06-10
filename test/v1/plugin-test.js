@@ -1,12 +1,9 @@
-#!/usr/bin/env node
-// method: plugin
-
 let xSymbol = Symbol("x");
 let cnt = 0;
 
 let addX = function addX(test) { test.equals(this[xSymbol], xSymbol, "this must point to the stream context"); return this; };
 
-const {DataStream, StringStream} = require('../').plugin(
+const {DataStream, StringStream} = require('../../').plugin(
     {
         DataStream: {
             constructor() {
@@ -18,29 +15,21 @@ const {DataStream, StringStream} = require('../').plugin(
         StringStream: {
             constructor({xSymbol: optionsX}) {
                 if (optionsX === xSymbol) {
-                    console.log("abc");
                     return {
                         x: xSymbol
                     };
-                } else {
-                    console.log("cba");
                 }
             }
         }
     }
 );
 
-exports.stream = () => DataStream.fromArray([1,2,3,4,5,6,7,8,9,10]);
-exports.stream2 = () => new StringStream({xSymbol});
-
-// ------- END EXAMPLE --------
-
-exports.test = (test) => {
+exports.test_plugin = (test) => {
     test.expect(5);
     cnt = 0;
 
-    const stream = exports.stream();
-    const stream2 = exports.stream2();
+    const stream = DataStream.fromArray([1,2,3,4,5,6,7,8,9,10]);
+    const stream2 = new StringStream({xSymbol});
 
     test.equals(stream[xSymbol], xSymbol, "DataStream must be extended");
     test.equals(stream2.x, xSymbol, "StringStream must be replaced by constructor");

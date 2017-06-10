@@ -10,7 +10,6 @@ An object consisting of multiple streams than can be refined or muxed.
     * [.streams](#MultiStream+streams) : <code>Array</code>
     * [.map(aFunc)](#MultiStream+map) ⇒ <code>[MultiStream](#MultiStream)</code>
     * [.filter(func)](#MultiStream+filter) ⇒ <code>[MultiStream](#MultiStream)</code>
-    * [.dedupe(cmp)](#MultiStream+dedupe) ⇒ <code>DataStream</code>
     * [.mux(cmp)](#MultiStream+mux) ⇒ <code>DataStream</code>
     * [.add(stream)](#MultiStream+add)
     * [.remove(stream)](#MultiStream+remove)
@@ -71,26 +70,6 @@ Filters the stream list and returns a new MultiStream with only thestreams for 
 **Example**  
 ```js
 [../samples/multi-stream-filter.js](../samples/multi-stream-filter.js)
-```
-<a name="MultiStream+dedupe"></a>
-
-### multiStream.dedupe(cmp) ⇒ <code>DataStream</code>
-Removes duplicate items from stream using the given hash function
-
-**Kind**: instance method of <code>[MultiStream](#MultiStream)</code>  
-**Returns**: <code>DataStream</code> - the deduplicated stream  
-**Todo**
-
-- [ ] Not yet implemented
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| cmp | <code>TransformFunction</code> | returns the object hash for comparison |
-
-**Example**  
-```js
-[../samples/multi-stream-dedupe.js](../samples/multi-stream-dedupe.js)
 ```
 <a name="MultiStream+mux"></a>
 

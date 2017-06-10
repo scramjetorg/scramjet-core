@@ -177,11 +177,16 @@ module.exports = {
         stream.ttt = "okok";
 
         test.ok(stream instanceof DataStream, "Should return data stream");
-        stream.pop(2, (data) => {
-            test.equals(data[0].symbol, "AAL", "Data should be parsed according to the function");
-            test.strictEqual(data[1].price, 110.06, "Data should be parsed according to the function");
-            test.done();
-        });
+        stream
+            .reduce(
+                (acc, data) => (acc.push(data), acc), []
+            )
+            .then(
+               (data) => {
+                    test.equals(data[0].symbol, "AAL", "Data should be parsed according to the function");
+                    test.strictEqual(data[1].price, 110.06, "Data should be parsed according to the function");
+                    test.done();
+                });
 
     }
 };

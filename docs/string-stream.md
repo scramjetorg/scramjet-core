@@ -6,6 +6,14 @@
 </dd>
 </dl>
 
+## Functions
+
+<dl>
+<dt><a href="#toDataStream">toDataStream()</a></dt>
+<dd><p>Alias for <a href="#StringStream+parse">parse</a></p>
+</dd>
+</dl>
+
 ## Typedefs
 
 <dl>
@@ -28,8 +36,6 @@ A stream of string objects for further transformation on top of DataStream.
     * _instance_
         * [.shift(bytes, func)](#StringStream+shift) ⇒ <code>[StringStream](#StringStream)</code>
         * [.split(splitter)](#StringStream+split) ⇒ <code>[StringStream](#StringStream)</code>
-        * [.append(arg)](#StringStream+append) ⇒ <code>[StringStream](#StringStream)</code>
-        * [.prepend(arg)](#StringStream+prepend) ⇒ <code>[StringStream](#StringStream)</code>
         * [.match(splitter)](#StringStream+match) ⇒ <code>[StringStream](#StringStream)</code>
         * [.toBufferStream()](#StringStream+toBufferStream) ⇒ <code>[StringStream](#StringStream)</code>
         * [.parse(parser)](#StringStream+parse) ⇒ <code>DataStream</code>
@@ -87,38 +93,6 @@ Splits the string stream by the specified regexp or string
 **Example**  
 ```js
 [../samples/string-stream-split.js](../samples/string-stream-split.js)
-```
-<a name="StringStream+append"></a>
-
-### stringStream.append(arg) ⇒ <code>[StringStream](#StringStream)</code>
-Appends given argument to all the items.
-
-**Kind**: instance method of <code>[StringStream](#StringStream)</code>  
-**Returns**: <code>[StringStream](#StringStream)</code> - the resulting stream  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| arg | <code>function</code> &#124; <code>String</code> | the argument to append. If function passed then it will be called and resolved                              and the resolution will be appended. |
-
-**Example**  
-```js
-[../samples/string-stream-append.js](../samples/string-stream-append.js)
-```
-<a name="StringStream+prepend"></a>
-
-### stringStream.prepend(arg) ⇒ <code>[StringStream](#StringStream)</code>
-Prepends given argument to all the items.
-
-**Kind**: instance method of <code>[StringStream](#StringStream)</code>  
-**Returns**: <code>[StringStream](#StringStream)</code> - the resulting stream  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| arg | <code>function</code> &#124; <code>String</code> | the argument to prepend. If function passed then it will be called and resolved                              and the resolution will be prepended. |
-
-**Example**  
-```js
-[../samples/string-stream-prepend.js](../samples/string-stream-prepend.js)
 ```
 <a name="StringStream+match"></a>
 
@@ -186,6 +160,12 @@ Creates a StringStream and writes a specific string.
 | str | <code>String</code> | the string to push the your stream |
 | encoding | <code>String</code> | optional encoding |
 
+<a name="toDataStream"></a>
+
+## toDataStream()
+Alias for [parse](#StringStream+parse)
+
+**Kind**: global function  
 <a name="ShiftCallback"></a>
 
 ## ShiftCallback : <code>function</code>

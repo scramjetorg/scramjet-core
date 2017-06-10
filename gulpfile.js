@@ -5,7 +5,6 @@ const gulpJsdoc2md = require("gulp-jsdoc-to-markdown");
 const rename = require("gulp-rename");
 const nodeunit_runner = require("gulp-nodeunit-runner");
 const jshint = require('gulp-jshint');
-const exec = require('gulp-exec');
 const execp = require('child_process').exec;
 
 gulp.task('lint', function() {
@@ -33,12 +32,6 @@ gulp.task("scm_clean", function(cb){
     });
 });
 
-gulp.task("test_samples", ['docs'], function() {
-    return gulp.src("test/samples/test-*.js")
-        .pipe(exec("node <%= file.path %>"))
-        .pipe(exec.reporter());
-});
-
 gulp.task("readme", function() {
     const fs = require('fs-then-native');
     const jsdoc2md = require('jsdoc-to-markdown');
@@ -64,6 +57,6 @@ gulp.task("docs", ["readme"], function() {
         .pipe(gulp.dest("docs/"));
 });
 
-gulp.task("test", ["test_legacy", "test_samples"]);
-gulp.task("default", ["readme", "docs", "test_legacy", "test_samples", "lint"]);
+gulp.task("test", ["test_legacy"]);
+gulp.task("default", ["readme", "lint", "docs", "test_legacy"]);
 gulp.task("prerelease", ["default", "scm_clean"]);

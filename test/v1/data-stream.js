@@ -1,4 +1,4 @@
-const DataStream = require('../../').DataStream;
+const {DataStream} = require('../../');
 
 require('longjohn');
 
@@ -112,8 +112,8 @@ module.exports = {
 
         let mapped = getStream()
             .tee(
-                (stream) => unmapped = stream.accumulate(
-                    (acc, item) => acc.push(item),
+                (stream) => unmapped = stream.reduce(
+                    (acc, item) => (acc.push(item), acc),
                     []
                 )
             )
@@ -126,8 +126,8 @@ module.exports = {
                 }
             )
             .on("error", (e) => test.ok(false, "Should not error " + (e && e.stack)))
-            .accumulate(
-                (acc, item) => acc.push(item),
+            .reduce(
+                (acc, item) => (acc.push(item), acc),
                 []
             );
 
