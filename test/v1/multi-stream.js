@@ -1,4 +1,4 @@
-const {MultiStream, DataStream} = require('../../');
+const {MultiStream, DataStream} = require(process.env.SCRAMJET_TEST_HOME || '../../');
 const {EventEmitter} = require('events');
 
 const getStream = (n, z, k) => {
