@@ -1,5 +1,4 @@
-const StringStream = require('../../').StringStream;
-const DataStream = require('../../').DataStream;
+const {StringStream, DataStream} = require(process.env.SCRAMJET_TEST_HOME || '../../');
 const Readable = require('stream').Readable;
 
 const getStream = (arr) => {

@@ -1,4 +1,4 @@
-const DataStream = require('../../').DataStream;
+const DataStream = require(process.env.SCRAMJET_TEST_HOME || '../../').DataStream;
 
 const getStream = () => {
     const ret = new DataStream();
