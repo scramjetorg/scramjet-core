@@ -19,10 +19,10 @@
         * _static_
             * [.fromArray(arr)](#module_ScramjetCore..DataStream.fromArray) ⇒ <code>DataStream</code>
             * [.fromIterator(iter)](#module_ScramjetCore..DataStream.fromIterator) ⇒ <code>DataStream</code>
-    * [~Stops merging transform callbacks at the current place in the command chain.()](#module_ScramjetCore..Stops merging transform callbacks at the current place in the command chain.)
-    * [~Reads a chunk from the stream and resolves the promise when read.()](#module_ScramjetCore..Reads a chunk from the stream and resolves the promise when read.) ⇒ <code>Promise.&lt;Object&gt;</code>
-    * [~Writes a chunk to the stream and returns a Promise resolved when more chunks can be written.()](#module_ScramjetCore..Writes a chunk to the stream and returns a Promise resolved when more chunks can be written.) ⇒ <code>Promise.&lt;Object&gt;</code>
-    * [~Allows resetting stream options.(options)](#module_ScramjetCore..Allows resetting stream options.) ↩︎
+    * [~tap()](#module_ScramjetCore..tap)
+    * [~whenRead()](#module_ScramjetCore..whenRead) ⇒ <code>Promise.&lt;Object&gt;</code>
+    * [~whenWrote()](#module_ScramjetCore..whenWrote) ⇒ <code>Promise.&lt;Object&gt;</code>
+    * [~setOptions(options)](#module_ScramjetCore..setOptions) ↩︎
     * [~toStringStream()](#module_ScramjetCore..toStringStream)
     * [~StreamOptions](#module_ScramjetCore..StreamOptions) : <code>Object</code>
     * [~TeeCallback](#module_ScramjetCore..TeeCallback) : <code>function</code>
@@ -250,27 +250,35 @@ Create a DataStream from an IteratorDoesn't end the stream until it reaches en
 ```js
 [../samples/data-stream-fromiterator.js](../samples/data-stream-fromiterator.js)
 ```
-<a name="module_ScramjetCore..Stops merging transform callbacks at the current place in the command chain."></a>
+<a name="module_ScramjetCore..tap"></a>
 
-### ScramjetCore~Stops merging transform callbacks at the current place in the command chain.()
+### ScramjetCore~tap()
+Stops merging transform callbacks at the current place in the command chain.
+
 **Kind**: inner method of <code>[ScramjetCore](#module_ScramjetCore)</code>  
 **Example**  
 ```js
 [../samples/data-stream-tap.js](../samples/data-stream-tap.js)
 ```
-<a name="module_ScramjetCore..Reads a chunk from the stream and resolves the promise when read."></a>
+<a name="module_ScramjetCore..whenRead"></a>
 
-### ScramjetCore~Reads a chunk from the stream and resolves the promise when read.() ⇒ <code>Promise.&lt;Object&gt;</code>
+### ScramjetCore~whenRead() ⇒ <code>Promise.&lt;Object&gt;</code>
+Reads a chunk from the stream and resolves the promise when read.
+
 **Kind**: inner method of <code>[ScramjetCore](#module_ScramjetCore)</code>  
 **Returns**: <code>Promise.&lt;Object&gt;</code> - the read item  
-<a name="module_ScramjetCore..Writes a chunk to the stream and returns a Promise resolved when more chunks can be written."></a>
+<a name="module_ScramjetCore..whenWrote"></a>
 
-### ScramjetCore~Writes a chunk to the stream and returns a Promise resolved when more chunks can be written.() ⇒ <code>Promise.&lt;Object&gt;</code>
+### ScramjetCore~whenWrote() ⇒ <code>Promise.&lt;Object&gt;</code>
+Writes a chunk to the stream and returns a Promise resolved when more chunks can be written.
+
 **Kind**: inner method of <code>[ScramjetCore](#module_ScramjetCore)</code>  
 **Returns**: <code>Promise.&lt;Object&gt;</code> - the read item  
-<a name="module_ScramjetCore..Allows resetting stream options."></a>
+<a name="module_ScramjetCore..setOptions"></a>
 
-### ScramjetCore~Allows resetting stream options.(options) ↩︎
+### ScramjetCore~setOptions(options) ↩︎
+Allows resetting stream options.
+
 **Kind**: inner method of <code>[ScramjetCore](#module_ScramjetCore)</code>  
 **Chainable**  
 
