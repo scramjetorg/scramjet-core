@@ -1,4 +1,4 @@
-const scramjet = require('../../');
+const scramjet = require(process.env.SCRAMJET_TEST_HOME || '../../');
 
 module.exports = {
     test_plugin(test) {

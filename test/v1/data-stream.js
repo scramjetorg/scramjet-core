@@ -1,4 +1,4 @@
-const {DataStream} = require('../../');
+const {DataStream} = require(process.env.SCRAMJET_TEST_HOME || '../../');
 
 require('longjohn');
 

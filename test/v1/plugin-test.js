@@ -3,7 +3,7 @@ let cnt = 0;
 
 let addX = function addX(test) { test.equals(this[xSymbol], xSymbol, "this must point to the stream context"); return this; };
 
-const {DataStream, StringStream} = require('../../').plugin(
+const {DataStream, StringStream} = require(process.env.SCRAMJET_TEST_HOME || '../../').plugin(
     {
         DataStream: {
             constructor() {
