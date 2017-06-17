@@ -20,7 +20,7 @@ gulp.task("test_legacy", function () {
     ;
 });
 
-gulp.task("scm_clean", function(cb){
+gulp.task("scm_clean", ["default"], function(cb){
     execp("git status --porcelain", (err, stdout) => {
         if (err) {
             cb(err);
@@ -59,4 +59,4 @@ gulp.task("docs", ["readme"], function() {
 
 gulp.task("test", ["test_legacy"]);
 gulp.task("default", ["readme", "lint", "docs", "test_legacy"]);
-gulp.task("prerelease", ["default", "scm_clean"]);
+gulp.task("prerelease", ["scm_clean"]);
