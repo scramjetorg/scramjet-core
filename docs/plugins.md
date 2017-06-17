@@ -38,6 +38,8 @@ module.exports = {
 All methods, getters/setters are copied upon scramjet stream prototype of the same name. The `constructor` method is
 called at the end of the constructor.
 
+If a scramjet stream of a specific name does not exist, it will be added as a new class.
+
 Testing plugins
 -----------------
 
