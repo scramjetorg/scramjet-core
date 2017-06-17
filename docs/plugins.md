@@ -12,6 +12,32 @@ that will be called in the stream constructor.
 
 A quick example can be the [scramjet-fini](https://www.npmjs.com/package/scramjet-fini) module on npm.
 
+A sample plugin
+-----------------
+
+Here's how a minimal plugin looks like:
+
+```javascript
+module.exports = {
+    DataStream = {
+        constructor(options) {
+            if (options.someValue) {
+                this.someData = true;
+            }
+        },
+        addId(func, prefix) {
+            const fin = fini(prefix || defaultPrefix.next().value);
+            return this.pipe(new this.constructor({
+                parallelTransform: (chunk) => func(chunk, fin.next().value)
+            }));
+        }
+    }
+};
+```
+
+All methods, getters/setters are copied upon scramjet stream prototype of the same name. The `constructor` method is
+called at the end of the constructor.
+
 Testing plugins
 -----------------
 
