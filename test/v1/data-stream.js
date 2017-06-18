@@ -146,9 +146,10 @@ module.exports = {
 
     },
     test_filter(test) {
-        test.expect(3);
+        test.expect(4);
 
         let unfiltered;
+        let mergeLeaks = 0;
         const filtered = getStream()
             .tee(
                 (stream) => unfiltered = stream.reduce(
@@ -157,6 +158,7 @@ module.exports = {
                 )
             )
             .filter((item) => item.val % 2 === 0)
+            .filter(() => (mergeLeaks++, true))
             .reduce(
                 (acc, item) => (acc.push(item), acc),
                 []
@@ -171,6 +173,7 @@ module.exports = {
                     test.deepEqual(filtered[1], unfiltered[2], "Even value objects must not be fitered out");
                     test.ok(filtered.indexOf(unfiltered[1]) === -1, "Odd value items must not exist in fitered streams");
                     test.equal(filtered.indexOf(unfiltered[8]), 4, "Every other item should be emitted in order");
+                    test.equal(mergeLeaks, 50, "On merged transform following filter the previously filtered elements should not show up");
                     test.done();
                 }
             ).catch(
