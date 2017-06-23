@@ -12,6 +12,8 @@
             * [.each(func)](#module_ScramjetCore..DataStream+each) ↩︎
             * [.map(func, Clazz)](#module_ScramjetCore..DataStream+map) ⇒ <code>DataStream</code>
             * [.filter(func)](#module_ScramjetCore..DataStream+filter) ⇒ <code>DataStream</code>
+            * [.while(func)](#module_ScramjetCore..DataStream+while) ⇒ <code>DataStream</code>
+            * [.until(func)](#module_ScramjetCore..DataStream+until) ⇒ <code>DataStream</code>
             * [.pipe(to, options)](#module_ScramjetCore..DataStream+pipe) ⇒ <code>Writable</code>
             * [.toBufferStream(serializer)](#module_ScramjetCore..DataStream+toBufferStream) ⇒ <code>BufferStream</code>
             * [.stringify(serializer)](#module_ScramjetCore..DataStream+stringify) ⇒ <code>StringStream</code>
@@ -45,6 +47,8 @@
         * [.each(func)](#module_ScramjetCore..DataStream+each) ↩︎
         * [.map(func, Clazz)](#module_ScramjetCore..DataStream+map) ⇒ <code>DataStream</code>
         * [.filter(func)](#module_ScramjetCore..DataStream+filter) ⇒ <code>DataStream</code>
+        * [.while(func)](#module_ScramjetCore..DataStream+while) ⇒ <code>DataStream</code>
+        * [.until(func)](#module_ScramjetCore..DataStream+until) ⇒ <code>DataStream</code>
         * [.pipe(to, options)](#module_ScramjetCore..DataStream+pipe) ⇒ <code>Writable</code>
         * [.toBufferStream(serializer)](#module_ScramjetCore..DataStream+toBufferStream) ⇒ <code>BufferStream</code>
         * [.stringify(serializer)](#module_ScramjetCore..DataStream+stringify) ⇒ <code>StringStream</code>
@@ -161,6 +165,30 @@ Filters object based on the function outcome, just likeArray.prototype.filter.
 ```js
 [../samples/data-stream-filter.js](../samples/data-stream-filter.js)
 ```
+<a name="module_ScramjetCore..DataStream+while"></a>
+
+#### dataStream.while(func) ⇒ <code>DataStream</code>
+Reads the stream while the function outcome is truthy.Stops reading and emits end as soon as it ends.
+
+**Kind**: instance method of <code>[DataStream](#module_ScramjetCore..DataStream)</code>  
+**Returns**: <code>DataStream</code> - the shortened stream  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| func | <code>FilterCallback</code> | The condition check |
+
+<a name="module_ScramjetCore..DataStream+until"></a>
+
+#### dataStream.until(func) ⇒ <code>DataStream</code>
+Reads the stream until the function outcome is truthy.Works oposite of while.
+
+**Kind**: instance method of <code>[DataStream](#module_ScramjetCore..DataStream)</code>  
+**Returns**: <code>DataStream</code> - the shortened stream  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| func | <code>FilterCallback</code> | The condition check |
+
 <a name="module_ScramjetCore..DataStream+pipe"></a>
 
 #### dataStream.pipe(to, options) ⇒ <code>Writable</code>
