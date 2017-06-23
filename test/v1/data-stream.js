@@ -12,9 +12,37 @@ const getStream = () => {
 };
 
 module.exports = {
-    test_group(test) {
-        test.ok(true, "Group is not implemented");
-        test.done();
+    test_while_until: {
+        while(test) {
+            const str = getStream();
+            test.expect(1);
+
+            str.while(
+                (data) => data.val < 50
+            )
+            .toArray()
+            .then(
+                (data) => {
+                    test.equals(data.length, 50, "Must not read beyond last matching item");
+                    test.done();
+                }
+            );
+        },
+        until(test) {
+            const str = getStream();
+            test.expect(1);
+
+            str.until(
+                (data) => data.val >= 50
+            )
+            .toArray()
+            .then(
+                (data) => {
+                    test.equals(data.length, 50, "Must not read beyond last not matching item");
+                    test.done();
+                }
+            );
+        }
     },
     test_tee: {
         standard(test) {
