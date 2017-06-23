@@ -57,6 +57,6 @@ gulp.task("docs", ["readme"], function() {
         .pipe(gulp.dest("docs/"));
 });
 
-gulp.task("test", ["test_legacy"]);
+gulp.task("test", ["lint", "test_legacy"]);
 gulp.task("default", ["readme", "lint", "docs", "test_legacy"]);
 gulp.task("prerelease", ["scm_clean"]);
