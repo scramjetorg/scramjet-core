@@ -83,6 +83,7 @@ Splits the buffer stream into buffer objects
 **Todo**
 
 - [ ] implement splitting by function
+- [ ] implement asynchronous splitter
 
 
 | Param | Type | Description |
@@ -179,3 +180,4 @@ Pop callback
 | Param | Type | Description |
 | --- | --- | --- |
 | chunk | <code>Buffer</code> | the transformed chunk |
+
