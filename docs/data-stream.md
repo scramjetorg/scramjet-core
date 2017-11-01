@@ -90,7 +90,9 @@ Calls the passed in place with the stream as first argument, returns result.
 <a name="module_ScramjetCore..DataStream+tee"></a>
 
 #### dataStream.tee(func) ⇒ <code>DataStream</code>
-Duplicate the streamCreates a duplicate stream instance and pases it to the callback.
+Duplicate the stream
+
+Creates a duplicate stream instance and pases it to the callback.
 
 **Kind**: instance method of <code>[DataStream](#module_ScramjetCore..DataStream)</code>  
 **Returns**: <code>DataStream</code> - self  
@@ -106,10 +108,18 @@ Duplicate the streamCreates a duplicate stream instance and pases it to the ca
 <a name="module_ScramjetCore..DataStream+reduce"></a>
 
 #### dataStream.reduce(func, into) ⇒ <code>Promise</code>
-Reduces the stream into a given accumulatorWorks similarily to Array.prototype.reduce, so whatever you return in theformer operation will be the first operand to the latter.This method is serial - meaning that any processing on an entry willoccur only after the previous entry is fully processed. This does meanit's much slower than parallel functions.
+Reduces the stream into a given accumulator
+
+Works similarily to Array.prototype.reduce, so whatever you return in the
+former operation will be the first operand to the latter.
+
+This method is serial - meaning that any processing on an entry will
+occur only after the previous entry is fully processed. This does mean
+it's much slower than parallel functions.
 
 **Kind**: instance method of <code>[DataStream](#module_ScramjetCore..DataStream)</code>  
-**Returns**: <code>Promise</code> - Promise resolved by the last object returned by thecall of the transform function  
+**Returns**: <code>Promise</code> - Promise resolved by the last object returned by the
+call of the transform function  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -123,7 +133,9 @@ Reduces the stream into a given accumulatorWorks similarily to Array.prototype
 <a name="module_ScramjetCore..DataStream+each"></a>
 
 #### dataStream.each(func) ↩︎
-Performs an operation on every chunk, without changing the streamThis is a shorthand for ```stream.on("data", func)```
+Performs an operation on every chunk, without changing the stream
+
+This is a shorthand for ```stream.on("data", func)```
 
 **Kind**: instance method of <code>[DataStream](#module_ScramjetCore..DataStream)</code>  
 **Chainable**  
@@ -135,7 +147,8 @@ Performs an operation on every chunk, without changing the streamThis is a sho
 <a name="module_ScramjetCore..DataStream+map"></a>
 
 #### dataStream.map(func, Clazz) ⇒ <code>DataStream</code>
-Transforms stream objects into new ones, just like Array.prototype.mapdoes.
+Transforms stream objects into new ones, just like Array.prototype.map
+does.
 
 **Kind**: instance method of <code>[DataStream](#module_ScramjetCore..DataStream)</code>  
 **Returns**: <code>DataStream</code> - mapped stream  
@@ -152,7 +165,8 @@ Transforms stream objects into new ones, just like Array.prototype.mapdoes.
 <a name="module_ScramjetCore..DataStream+filter"></a>
 
 #### dataStream.filter(func) ⇒ <code>DataStream</code>
-Filters object based on the function outcome, just likeArray.prototype.filter.
+Filters object based on the function outcome, just like
+Array.prototype.filter.
 
 **Kind**: instance method of <code>[DataStream](#module_ScramjetCore..DataStream)</code>  
 **Returns**: <code>DataStream</code> - filtered stream  
@@ -168,7 +182,9 @@ Filters object based on the function outcome, just likeArray.prototype.filter.
 <a name="module_ScramjetCore..DataStream+while"></a>
 
 #### dataStream.while(func) ⇒ <code>DataStream</code>
-Reads the stream while the function outcome is truthy.Stops reading and emits end as soon as it ends.
+Reads the stream while the function outcome is truthy.
+
+Stops reading and emits end as soon as it ends.
 
 **Kind**: instance method of <code>[DataStream](#module_ScramjetCore..DataStream)</code>  
 **Returns**: <code>DataStream</code> - the shortened stream  
@@ -180,7 +196,9 @@ Reads the stream while the function outcome is truthy.Stops reading and emits 
 <a name="module_ScramjetCore..DataStream+until"></a>
 
 #### dataStream.until(func) ⇒ <code>DataStream</code>
-Reads the stream until the function outcome is truthy.Works oposite of while.
+Reads the stream until the function outcome is truthy.
+
+Works oposite of while.
 
 **Kind**: instance method of <code>[DataStream](#module_ScramjetCore..DataStream)</code>  
 **Returns**: <code>DataStream</code> - the shortened stream  
@@ -192,7 +210,9 @@ Reads the stream until the function outcome is truthy.Works oposite of while.
 <a name="module_ScramjetCore..DataStream+pipe"></a>
 
 #### dataStream.pipe(to, options) ⇒ <code>Writable</code>
-Override of node.js Readable pipe.Except for calling overriden method it proxies errors to piped stream.
+Override of node.js Readable pipe.
+
+Except for calling overriden method it proxies errors to piped stream.
 
 **Kind**: instance method of <code>[DataStream](#module_ScramjetCore..DataStream)</code>  
 **Returns**: <code>Writable</code> - the `to` stream  
@@ -237,10 +257,13 @@ Creates a StringStream
 <a name="module_ScramjetCore..DataStream+toArray"></a>
 
 #### dataStream.toArray(initial) ⇒ <code>Promise</code>
-Aggregates the stream into a single ArrayIn fact it's just a shorthand for reducing the stream into an Array.
+Aggregates the stream into a single Array
+
+In fact it's just a shorthand for reducing the stream into an Array.
 
 **Kind**: instance method of <code>[DataStream](#module_ScramjetCore..DataStream)</code>  
-**Returns**: <code>Promise</code> - Promise resolved with the resulting array on stream                   end.  
+**Returns**: <code>Promise</code> - Promise resolved with the resulting array on stream
+                   end.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -265,7 +288,9 @@ Create a DataStream from an Array
 <a name="module_ScramjetCore..DataStream.fromIterator"></a>
 
 #### DataStream.fromIterator(iter) ⇒ <code>DataStream</code>
-Create a DataStream from an IteratorDoesn't end the stream until it reaches end of the iterator.
+Create a DataStream from an Iterator
+
+Doesn't end the stream until it reaches end of the iterator.
 
 **Kind**: static method of <code>[DataStream](#module_ScramjetCore..DataStream)</code>  
 **Returns**: <code>DataStream</code> - the resulting stream  
@@ -367,7 +392,8 @@ Standard options for scramjet streams.
 
 ### ScramjetCore~FilterCallback ⇒ <code>Promise</code> &#124; <code>Boolean</code>
 **Kind**: inner typedef of <code>[ScramjetCore](#module_ScramjetCore)</code>  
-**Returns**: <code>Promise</code> &#124; <code>Boolean</code> - information if the object should remain in                            the filtered stream.  
+**Returns**: <code>Promise</code> &#124; <code>Boolean</code> - information if the object should remain in
+                            the filtered stream.  
 
 | Param | Type | Description |
 | --- | --- | --- |

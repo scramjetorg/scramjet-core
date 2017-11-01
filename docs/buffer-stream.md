@@ -48,7 +48,10 @@ Creates the BufferStream
 <a name="module_ScramjetCore..BufferStream+shift"></a>
 
 #### bufferStream.shift(chars, func) ⇒ <code>BufferStream</code>
-Shift given number of bytes from the original streamWorks the same way as {@see DataStream.shift}, but in this case extractsthe given number of bytes.
+Shift given number of bytes from the original stream
+
+Works the same way as {@see DataStream.shift}, but in this case extracts
+the given number of bytes.
 
 **Kind**: instance method of <code>[BufferStream](#module_ScramjetCore..BufferStream)</code>  
 **Returns**: <code>BufferStream</code> - substream  
@@ -101,7 +104,10 @@ Breaks up a stream apart into chunks of the specified length
 <a name="module_ScramjetCore..BufferStream+stringify"></a>
 
 #### bufferStream.stringify(encoding) ⇒ <code>StringStream</code>
-Creates a string stream from the given buffer streamStill it returns a DataStream derivative and isn't the typical node.jsstream so you can do all your transforms when you like.
+Creates a string stream from the given buffer stream
+
+Still it returns a DataStream derivative and isn't the typical node.js
+stream so you can do all your transforms when you like.
 
 **Kind**: instance method of <code>[BufferStream](#module_ScramjetCore..BufferStream)</code>  
 **Returns**: <code>StringStream</code> - The converted stream.  
@@ -117,7 +123,10 @@ Creates a string stream from the given buffer streamStill it returns a DataStr
 <a name="module_ScramjetCore..BufferStream+parse"></a>
 
 #### bufferStream.parse(parser) ⇒ <code>DataStream</code>
-Parses every buffer to objectThe method MUST parse EVERY buffer into a single object, so the bufferstream here should already be splitted or broken up.
+Parses every buffer to object
+
+The method MUST parse EVERY buffer into a single object, so the buffer
+stream here should already be splitted or broken up.
 
 **Kind**: instance method of <code>[BufferStream](#module_ScramjetCore..BufferStream)</code>  
 **Returns**: <code>DataStream</code> - The parsed objects stream.  

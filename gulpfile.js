@@ -1,17 +1,28 @@
+/* eslint-disable node/no-unpublished-require */
 const gulp = require("gulp");
 const path = require("path");
 const gutil = require("gulp-util");
 const gulpJsdoc2md = require("gulp-jsdoc-to-markdown");
 const rename = require("gulp-rename");
 const nodeunit_runner = require("gulp-nodeunit-runner");
-const jshint = require('gulp-jshint');
 const execp = require('child_process').exec;
+const eslint = require('gulp-eslint');
 
-gulp.task('lint', function() {
-  return gulp.src('./lib/*.js')
-    .pipe(jshint())
-    .pipe(jshint.reporter('jshint-stylish'))
-    .pipe(jshint.reporter('fail'));
+gulp.task('lint', () => {
+    // ESLint ignores files with "node_modules" paths.
+    // So, it's best to have gulp ignore the directory as well.
+    // Also, Be sure to return the stream from the task;
+    // Otherwise, the task may end before the stream has finished.
+    return gulp.src(['**/*.js','!node_modules/**'])
+        // eslint() attaches the lint output to the "eslint" property
+        // of the file object so it can be used by other modules.
+        .pipe(eslint())
+        // eslint.format() outputs the lint results to the console.
+        // Alternatively use eslint.formatEach() (see Docs).
+        .pipe(eslint.format())
+        // To have the process exit with an error code (1) on
+        // lint error, return the stream and pipe to failAfterError last.
+        .pipe(eslint.failAfterError());
 });
 
 gulp.task("test_legacy", function () {

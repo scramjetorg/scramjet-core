@@ -1,3 +1,10 @@
+# Scramjet 4.x
+
+The aim of scramjet 4 is to bring full async-await style into all current transforms and provide multi-threaded
+processing.
+
+Currently work in progress.
+
 # Scramjet 2.x
 
 * The interface for the following classes is now considered stable:
