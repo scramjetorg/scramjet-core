@@ -9,14 +9,14 @@ const getStream = () => {
     return ret;
 };
 
-const decorateAsynchronously = (cb, chunk) => new Promise((res) => {
+const decorateAsynchronously = async (cb, chunk) => new Promise((res) => {
     setTimeout(
         () => (cb(chunk), res(Object.assign({ref: true}, chunk))),
         100+50*(chunk.val%4)
     );
 });
 
-const decorateAsynchronouslyWithError = (cb, chunk) => {
+const decorateAsynchronouslyWithError = async (cb, chunk) => {
     if (chunk.val === 22) {
         return new Promise((res, rej) => {
             setTimeout(() => rej(new Error("Err")), 100);
