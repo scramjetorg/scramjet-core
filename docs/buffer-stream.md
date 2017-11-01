@@ -1,39 +1,51 @@
-<a name="module_ScramjetCore"></a>
+## Classes
 
-## ScramjetCore
+<dl>
+<dt><a href="#BufferStream">BufferStream</a> ⇐ <code>DataStream</code></dt>
+<dd><p>A factilitation stream created for easy splitting or parsing buffers</p>
+</dd>
+</dl>
 
-* [ScramjetCore](#module_ScramjetCore)
-    * [~BufferStream](#module_ScramjetCore..BufferStream) ⇐ <code>DataStream</code>
-        * [new BufferStream(opts)](#new_module_ScramjetCore..BufferStream_new)
-        * [.shift(chars, func)](#module_ScramjetCore..BufferStream+shift) ⇒ <code>BufferStream</code>
-        * [.split(splitter)](#module_ScramjetCore..BufferStream+split) ⇒ <code>BufferStream</code>
-        * [.breakup(number)](#module_ScramjetCore..BufferStream+breakup) ⇒ <code>BufferStream</code>
-        * [.stringify(encoding)](#module_ScramjetCore..BufferStream+stringify) ⇒ <code>StringStream</code>
-        * [.parse(parser)](#module_ScramjetCore..BufferStream+parse) ⇒ <code>DataStream</code>
-    * [~toStringStream()](#module_ScramjetCore..toStringStream)
-    * [~toDataStream()](#module_ScramjetCore..toDataStream)
-    * [~PopCallback](#module_ScramjetCore..PopCallback) : <code>function</code>
-    * [~ParseCallback](#module_ScramjetCore..ParseCallback) ⇒ <code>Promise</code>
+## Functions
 
-<a name="module_ScramjetCore..BufferStream"></a>
+<dl>
+<dt><a href="#toStringStream">toStringStream()</a></dt>
+<dd><p>Alias for <a href="#BufferStream+stringify">stringify</a></p>
+</dd>
+<dt><a href="#toDataStream">toDataStream()</a></dt>
+<dd><p>Alias for <a href="#BufferStream+parse">parse</a></p>
+</dd>
+</dl>
 
-### ScramjetCore~BufferStream ⇐ <code>DataStream</code>
+## Typedefs
+
+<dl>
+<dt><a href="#ShiftCallback">ShiftCallback</a> : <code>function</code></dt>
+<dd><p>Pop callback</p>
+</dd>
+<dt><a href="#ParseCallback">ParseCallback</a> ⇒ <code>Promise</code></dt>
+<dd></dd>
+</dl>
+
+<a name="BufferStream"></a>
+
+## BufferStream ⇐ <code>DataStream</code>
 A factilitation stream created for easy splitting or parsing buffers
 
-**Kind**: inner class of <code>[ScramjetCore](#module_ScramjetCore)</code>  
-**Extends:** <code>DataStream</code>  
+**Kind**: global class  
+**Extends**: <code>DataStream</code>  
 
-* [~BufferStream](#module_ScramjetCore..BufferStream) ⇐ <code>DataStream</code>
-    * [new BufferStream(opts)](#new_module_ScramjetCore..BufferStream_new)
-    * [.shift(chars, func)](#module_ScramjetCore..BufferStream+shift) ⇒ <code>BufferStream</code>
-    * [.split(splitter)](#module_ScramjetCore..BufferStream+split) ⇒ <code>BufferStream</code>
-    * [.breakup(number)](#module_ScramjetCore..BufferStream+breakup) ⇒ <code>BufferStream</code>
-    * [.stringify(encoding)](#module_ScramjetCore..BufferStream+stringify) ⇒ <code>StringStream</code>
-    * [.parse(parser)](#module_ScramjetCore..BufferStream+parse) ⇒ <code>DataStream</code>
+* [BufferStream](#BufferStream) ⇐ <code>DataStream</code>
+    * [new BufferStream(opts)](#new_BufferStream_new)
+    * [.shift(chars, func)](#BufferStream+shift) ⇒ [<code>BufferStream</code>](#BufferStream)
+    * [.split(splitter)](#BufferStream+split) ⇒ [<code>BufferStream</code>](#BufferStream)
+    * [.breakup(number)](#BufferStream+breakup) ⇒ [<code>BufferStream</code>](#BufferStream)
+    * [.stringify(encoding)](#BufferStream+stringify) ⇒ <code>StringStream</code>
+    * [.parse(parser)](#BufferStream+parse) ⇒ <code>DataStream</code>
 
-<a name="new_module_ScramjetCore..BufferStream_new"></a>
+<a name="new_BufferStream_new"></a>
 
-#### new BufferStream(opts)
+### new BufferStream(opts)
 Creates the BufferStream
 
 
@@ -41,37 +53,33 @@ Creates the BufferStream
 | --- | --- | --- |
 | opts | <code>object</code> | Stream options passed to superclass |
 
-**Example**  
-```js
-[../samples/buffer-stream-constructor.js](../samples/buffer-stream-constructor.js)
-```
-<a name="module_ScramjetCore..BufferStream+shift"></a>
+<a name="BufferStream+shift"></a>
 
-#### bufferStream.shift(chars, func) ⇒ <code>BufferStream</code>
+### bufferStream.shift(chars, func) ⇒ [<code>BufferStream</code>](#BufferStream)
 Shift given number of bytes from the original stream
 
 Works the same way as {@see DataStream.shift}, but in this case extracts
 the given number of bytes.
 
-**Kind**: instance method of <code>[BufferStream](#module_ScramjetCore..BufferStream)</code>  
-**Returns**: <code>BufferStream</code> - substream  
+**Kind**: instance method of [<code>BufferStream</code>](#BufferStream)  
+**Returns**: [<code>BufferStream</code>](#BufferStream) - substream  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | chars | <code>Number</code> | The number of bytes to shift |
-| func | <code>PopCallback</code> | Function that receives a string of shifted bytes |
+| func | [<code>ShiftCallback</code>](#ShiftCallback) | Function that receives a string of shifted bytes |
 
 **Example**  
 ```js
 [../samples/string-stream-shift.js](../samples/string-stream-shift.js)
 ```
-<a name="module_ScramjetCore..BufferStream+split"></a>
+<a name="BufferStream+split"></a>
 
-#### bufferStream.split(splitter) ⇒ <code>BufferStream</code>
+### bufferStream.split(splitter) ⇒ [<code>BufferStream</code>](#BufferStream)
 Splits the buffer stream into buffer objects
 
-**Kind**: instance method of <code>[BufferStream](#module_ScramjetCore..BufferStream)</code>  
-**Returns**: <code>BufferStream</code> - the re-splitted buffer stream.  
+**Kind**: instance method of [<code>BufferStream</code>](#BufferStream)  
+**Returns**: [<code>BufferStream</code>](#BufferStream) - the re-splitted buffer stream.  
 **Todo**
 
 - [ ] implement splitting by function
@@ -79,19 +87,19 @@ Splits the buffer stream into buffer objects
 
 | Param | Type | Description |
 | --- | --- | --- |
-| splitter | <code>String</code> &#124; <code>Buffer</code> | the buffer or string that the stream                                  should be split by. |
+| splitter | <code>String</code> \| <code>Buffer</code> | the buffer or string that the stream                                  should be split by. |
 
 **Example**  
 ```js
 [../samples/buffer-stream-split.js](../samples/buffer-stream-split.js)
 ```
-<a name="module_ScramjetCore..BufferStream+breakup"></a>
+<a name="BufferStream+breakup"></a>
 
-#### bufferStream.breakup(number) ⇒ <code>BufferStream</code>
+### bufferStream.breakup(number) ⇒ [<code>BufferStream</code>](#BufferStream)
 Breaks up a stream apart into chunks of the specified length
 
-**Kind**: instance method of <code>[BufferStream](#module_ScramjetCore..BufferStream)</code>  
-**Returns**: <code>BufferStream</code> - the resulting buffer stream.  
+**Kind**: instance method of [<code>BufferStream</code>](#BufferStream)  
+**Returns**: [<code>BufferStream</code>](#BufferStream) - the resulting buffer stream.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -101,15 +109,15 @@ Breaks up a stream apart into chunks of the specified length
 ```js
 [../samples/buffer-stream-breakup.js](../samples/buffer-stream-breakup.js)
 ```
-<a name="module_ScramjetCore..BufferStream+stringify"></a>
+<a name="BufferStream+stringify"></a>
 
-#### bufferStream.stringify(encoding) ⇒ <code>StringStream</code>
+### bufferStream.stringify(encoding) ⇒ <code>StringStream</code>
 Creates a string stream from the given buffer stream
 
 Still it returns a DataStream derivative and isn't the typical node.js
 stream so you can do all your transforms when you like.
 
-**Kind**: instance method of <code>[BufferStream](#module_ScramjetCore..BufferStream)</code>  
+**Kind**: instance method of [<code>BufferStream</code>](#BufferStream)  
 **Returns**: <code>StringStream</code> - The converted stream.  
 
 | Param | Type | Description |
@@ -120,55 +128,54 @@ stream so you can do all your transforms when you like.
 ```js
 [../samples/buffer-stream-tostringstream.js](../samples/buffer-stream-tostringstream.js)
 ```
-<a name="module_ScramjetCore..BufferStream+parse"></a>
+<a name="BufferStream+parse"></a>
 
-#### bufferStream.parse(parser) ⇒ <code>DataStream</code>
+### bufferStream.parse(parser) ⇒ <code>DataStream</code>
 Parses every buffer to object
 
 The method MUST parse EVERY buffer into a single object, so the buffer
 stream here should already be splitted or broken up.
 
-**Kind**: instance method of <code>[BufferStream](#module_ScramjetCore..BufferStream)</code>  
+**Kind**: instance method of [<code>BufferStream</code>](#BufferStream)  
 **Returns**: <code>DataStream</code> - The parsed objects stream.  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| parser | <code>ParseCallback</code> | The transform function |
+| parser | [<code>ParseCallback</code>](#ParseCallback) | The transform function |
 
 **Example**  
 ```js
 [../samples/buffer-stream-parse.js](../samples/buffer-stream-parse.js)
 ```
-<a name="module_ScramjetCore..toStringStream"></a>
+<a name="toStringStream"></a>
 
-### ScramjetCore~toStringStream()
-Alias for [BufferStream#stringify](BufferStream#stringify)
+## toStringStream()
+Alias for [stringify](#BufferStream+stringify)
 
-**Kind**: inner method of <code>[ScramjetCore](#module_ScramjetCore)</code>  
-<a name="module_ScramjetCore..toDataStream"></a>
+**Kind**: global function  
+<a name="toDataStream"></a>
 
-### ScramjetCore~toDataStream()
-Alias for [BufferStream#parse](BufferStream#parse)
+## toDataStream()
+Alias for [parse](#BufferStream+parse)
 
-**Kind**: inner method of <code>[ScramjetCore](#module_ScramjetCore)</code>  
-<a name="module_ScramjetCore..PopCallback"></a>
+**Kind**: global function  
+<a name="ShiftCallback"></a>
 
-### ScramjetCore~PopCallback : <code>function</code>
+## ShiftCallback : <code>function</code>
 Pop callback
 
-**Kind**: inner typedef of <code>[ScramjetCore](#module_ScramjetCore)</code>  
+**Kind**: global typedef  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| popped | <code>Buffer</code> | popped bytes |
+| shifted | <code>Buffer</code> | shifted bytes |
 
-<a name="module_ScramjetCore..ParseCallback"></a>
+<a name="ParseCallback"></a>
 
-### ScramjetCore~ParseCallback ⇒ <code>Promise</code>
-**Kind**: inner typedef of <code>[ScramjetCore](#module_ScramjetCore)</code>  
+## ParseCallback ⇒ <code>Promise</code>
+**Kind**: global typedef  
 **Returns**: <code>Promise</code> - the promise should be resolved with the parsed object  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | chunk | <code>Buffer</code> | the transformed chunk |
-

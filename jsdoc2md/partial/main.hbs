@@ -12,11 +12,18 @@ version 3.0.0 as a base for `scramjet` and scramjet plugins.
 
 Unless you are sure, you should be better off with using the main repo and module.
 
+## Breaking changes
+
+Scramjet-4 will be released in coming weeks. The programming interface will change in order to aim simlicity in using
+async/await as much as possible.
+
+Backwards compatibility with promises will not be actively kept.
+
 ## What does it do?
 
-Scramjet is a powerful, yet simple functional stream programming framework written on top of node.js object streams that
+Scramjet is a fast and simple functional stream programming framework written on top of node.js object streams. It
 exposes a standards inspired javascript API and written fully in native ES6. Thanks to it some built in optimizations
-scramjet is much faster than similar frameworks in asynchronous operations (like for instance calling an API).
+scramjet is much faster and much much simpler than similar frameworks when using asynchronous operations.
 
 It is built upon the logic behind three well known javascript array operations - namingly map, filter and reduce. This
 means that if you've ever performed operations on an Array in JavaScript - you already know Scramjet like the back of

@@ -2,11 +2,15 @@
 const gulp = require("gulp");
 const path = require("path");
 const gutil = require("gulp-util");
-const gulpJsdoc2md = require("gulp-jsdoc-to-markdown");
+const {DataStream} = require('./');
 const rename = require("gulp-rename");
 const nodeunit_runner = require("gulp-nodeunit-runner");
-const execp = require('child_process').exec;
+const {exec: execp} = require('child_process');
 const eslint = require('gulp-eslint');
+const fs = require('fs-then-native');
+const jsdoc = require('jsdoc-api');
+const jsdocParse = require('jsdoc-parse');
+const dmd = require('dmd');
 
 gulp.task('lint', () => {
     // ESLint ignores files with "node_modules" paths.
@@ -43,24 +47,32 @@ gulp.task("scm_clean", ["default"], function(cb){
     });
 });
 
-gulp.task("readme", function() {
-    const fs = require('fs-then-native');
-    const jsdoc2md = require('jsdoc-to-markdown');
+const jsdoc2md = async ({files, plugin}) => {
 
-    return jsdoc2md.render({
-            files: ["lib/data-stream.js", "lib/string-stream.js", "lib/buffer-stream.js", "lib/multi-stream.js"],
-            plugin: "jsdoc2md/plugin.js"
-        })
-        .then(
-            (output) => fs.writeFile(path.join(__dirname, 'README.md'), output)
-        );
+    const data = await jsdoc.explain({files});
+    const parsed = await jsdocParse(data);
+    const output = await dmd.async(parsed, {plugin});
+
+    return output;
+};
+
+gulp.task("readme", async () => {
+    return fs.writeFile(
+        path.join(__dirname, 'README.md'),
+        await jsdoc2md({files: ["lib/data-stream.js", "lib/string-stream.js", "lib/buffer-stream.js", "lib/multi-stream.js"], plugin: "jsdoc2md/plugin.js"})
+    );
 });
 
 gulp.task("docs", ["readme"], function() {
   return gulp.src("lib/*.js")
-        .pipe(gulpJsdoc2md({}))
+        .pipe(new DataStream())
+        .map(async (file) => {
+            const output = await jsdoc2md({files: [file.path]});
+            file.contents = Buffer.from(output);
+            return file;
+        })
         .on("error", function(err) {
-            gutil.log(gutil.colors.red("jsdoc2md failed"), err.message);
+            gutil.log(gutil.colors.red("jsdoc2md failed"), err.stack);
         })
         .pipe(rename(function(path) {
             path.extname = ".md";

@@ -5,7 +5,7 @@
 * [ScramjetCore](#module_ScramjetCore)
     * [~MultiStream](#module_ScramjetCore..MultiStream)
         * [new MultiStream(streams, options)](#new_module_ScramjetCore..MultiStream_new)
-        * [.streams](#module_ScramjetCore..MultiStream.MultiStream+streams) : <code>Array</code>
+        * [.streams](#module_ScramjetCore..MultiStream+streams) : <code>Array</code>
         * [.map(aFunc)](#module_ScramjetCore..MultiStream+map) ⇒ <code>MultiStream</code>
         * [.filter(func)](#module_ScramjetCore..MultiStream+filter) ⇒ <code>MultiStream</code>
         * [.mux(cmp)](#module_ScramjetCore..MultiStream+mux) ⇒ <code>DataStream</code>
@@ -17,11 +17,11 @@
 ### ScramjetCore~MultiStream
 An object consisting of multiple streams than can be refined or muxed.
 
-**Kind**: inner class of <code>[ScramjetCore](#module_ScramjetCore)</code>  
+**Kind**: inner class of [<code>ScramjetCore</code>](#module_ScramjetCore)  
 
 * [~MultiStream](#module_ScramjetCore..MultiStream)
     * [new MultiStream(streams, options)](#new_module_ScramjetCore..MultiStream_new)
-    * [.streams](#module_ScramjetCore..MultiStream.MultiStream+streams) : <code>Array</code>
+    * [.streams](#module_ScramjetCore..MultiStream+streams) : <code>Array</code>
     * [.map(aFunc)](#module_ScramjetCore..MultiStream+map) ⇒ <code>MultiStream</code>
     * [.filter(func)](#module_ScramjetCore..MultiStream+filter) ⇒ <code>MultiStream</code>
     * [.mux(cmp)](#module_ScramjetCore..MultiStream+mux) ⇒ <code>DataStream</code>
@@ -39,16 +39,12 @@ Crates an instance of MultiStream with the specified stream list
 | streams | <code>Array.&lt;stream.Readable&gt;</code> | the list of readable streams (other                                     objects will be filtered out!) |
 | options | <code>Object</code> | Optional options for the super object. ;) |
 
-**Example**  
-```js
-[../samples/multi-stream-constructor.js](../samples/multi-stream-constructor.js)
-```
-<a name="module_ScramjetCore..MultiStream.MultiStream+streams"></a>
+<a name="module_ScramjetCore..MultiStream+streams"></a>
 
 #### multiStream.streams : <code>Array</code>
 Array of all streams
 
-**Kind**: instance property of <code>[MultiStream](#module_ScramjetCore..MultiStream)</code>  
+**Kind**: instance property of [<code>MultiStream</code>](#module_ScramjetCore..MultiStream)  
 <a name="module_ScramjetCore..MultiStream+map"></a>
 
 #### multiStream.map(aFunc) ⇒ <code>MultiStream</code>
@@ -58,7 +54,7 @@ Runs callback for every stream, returns a new MultiStream of mapped
 streams and creates a new multistream consisting of streams returned
 by the callback.
 
-**Kind**: instance method of <code>[MultiStream](#module_ScramjetCore..MultiStream)</code>  
+**Kind**: instance method of [<code>MultiStream</code>](#module_ScramjetCore..MultiStream)  
 **Returns**: <code>MultiStream</code> - the mapped instance  
 **Todo**
 
@@ -80,7 +76,7 @@ currently return the same instance!
 Filters the stream list and returns a new MultiStream with only the
 streams for which the callback returned true
 
-**Kind**: instance method of <code>[MultiStream](#module_ScramjetCore..MultiStream)</code>  
+**Kind**: instance method of [<code>MultiStream</code>](#module_ScramjetCore..MultiStream)  
 **Returns**: <code>MultiStream</code> - the filtered instance  
 
 | Param | Type | Description |
@@ -96,7 +92,7 @@ streams for which the callback returned true
 #### multiStream.mux(cmp) ⇒ <code>DataStream</code>
 Muxes the streams into a single one
 
-**Kind**: instance method of <code>[MultiStream](#module_ScramjetCore..MultiStream)</code>  
+**Kind**: instance method of [<code>MultiStream</code>](#module_ScramjetCore..MultiStream)  
 **Returns**: <code>DataStream</code> - The resulting DataStream  
 **Todo**
 
@@ -122,7 +118,7 @@ Adds a stream to the MultiStream
 If the stream was muxed, filtered or mapped, this stream will undergo the
 same transorms and conditions as if it was added in constructor.
 
-**Kind**: instance method of <code>[MultiStream](#module_ScramjetCore..MultiStream)</code>  
+**Kind**: instance method of [<code>MultiStream</code>](#module_ScramjetCore..MultiStream)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -140,7 +136,7 @@ Removes a stream from the MultiStream
 If the stream was muxed, filtered or mapped, it will be removed from same
 streams.
 
-**Kind**: instance method of <code>[MultiStream](#module_ScramjetCore..MultiStream)</code>  
+**Kind**: instance method of [<code>MultiStream</code>](#module_ScramjetCore..MultiStream)  
 
 | Param | Type | Description |
 | --- | --- | --- |
