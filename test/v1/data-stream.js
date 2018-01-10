@@ -1,7 +1,5 @@
 const {DataStream} = require(process.env.SCRAMJET_TEST_HOME || '../../');
 
-require('longjohn');
-
 const getStream = () => {
     const ret = new DataStream();
     let cnt = 0;

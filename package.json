@@ -56,7 +56,6 @@
     "jsdoc": "^3.5.5",
     "jsdoc-api": "^4.0.0",
     "jsdoc-parse": "^3.0.1",
-    "longjohn": "^0.2.12",
     "nodeunit": "^0.11.0",
     "through2": "^2.0.3"
   }
