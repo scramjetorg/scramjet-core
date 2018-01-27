@@ -18,6 +18,7 @@
             * [.toBufferStream(serializer)](#module_ScramjetCore..DataStream+toBufferStream) ⇒ <code>BufferStream</code>
             * [.stringify(serializer)](#module_ScramjetCore..DataStream+stringify) ⇒ <code>StringStream</code>
             * [.toArray(initial)](#module_ScramjetCore..DataStream+toArray) ⇒ <code>Promise</code>
+            * [.toGenerator()](#module_ScramjetCore..DataStream+toGenerator) ⇒ <code>Iterable.&lt;Promise.&lt;\*&gt;&gt;</code>
         * _static_
             * [.fromArray(arr)](#module_ScramjetCore..DataStream.fromArray) ⇒ <code>DataStream</code>
             * [.fromIterator(iter)](#module_ScramjetCore..DataStream.fromIterator) ⇒ <code>DataStream</code>
@@ -53,6 +54,7 @@
         * [.toBufferStream(serializer)](#module_ScramjetCore..DataStream+toBufferStream) ⇒ <code>BufferStream</code>
         * [.stringify(serializer)](#module_ScramjetCore..DataStream+stringify) ⇒ <code>StringStream</code>
         * [.toArray(initial)](#module_ScramjetCore..DataStream+toArray) ⇒ <code>Promise</code>
+        * [.toGenerator()](#module_ScramjetCore..DataStream+toGenerator) ⇒ <code>Iterable.&lt;Promise.&lt;\*&gt;&gt;</code>
     * _static_
         * [.fromArray(arr)](#module_ScramjetCore..DataStream.fromArray) ⇒ <code>DataStream</code>
         * [.fromIterator(iter)](#module_ScramjetCore..DataStream.fromIterator) ⇒ <code>DataStream</code>
@@ -265,6 +267,15 @@ In fact it's just a shorthand for reducing the stream into an Array.
 | --- | --- | --- |
 | initial | <code>Array</code> | Optional array to begin with. |
 
+<a name="module_ScramjetCore..DataStream+toGenerator"></a>
+
+#### dataStream.toGenerator() ⇒ <code>Iterable.&lt;Promise.&lt;\*&gt;&gt;</code>
+Returns an async generator
+
+Ready for https://github.com/tc39/proposal-async-iteration
+
+**Kind**: instance method of [<code>DataStream</code>](#module_ScramjetCore..DataStream)  
+**Returns**: <code>Iterable.&lt;Promise.&lt;\*&gt;&gt;</code> - Returns an iterator that returns a promise for each item.  
 <a name="module_ScramjetCore..DataStream.fromArray"></a>
 
 #### DataStream.fromArray(arr) ⇒ <code>DataStream</code>
