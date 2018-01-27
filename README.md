@@ -151,6 +151,7 @@ A factilitation stream created for easy splitting or parsing buffers
 | dataStream.toBufferStream(serializer) ⇒ [<code>BufferStream</code>](#BufferStream) | Creates a BufferStream | [toBufferStream example](../samples/data-stream-tobufferstream.js) |
 | dataStream.stringify(serializer) ⇒ <code>StringStream</code> | Creates a StringStream | [stringify example](../samples/data-stream-tostringstream.js) |
 | dataStream.toArray(initial) ⇒ <code>Promise</code> | Aggregates the stream into a single Array |  |
+| dataStream.toGenerator() ⇒ <code>Iterable.&lt;Promise.&lt;\*&gt;&gt;</code> | Returns an async generator |  |
 | DataStream.fromArray(arr) ⇒ <code>DataStream</code> | Create a DataStream from an Array | [fromArray example](../samples/data-stream-fromarray.js) |
 | DataStream.fromIterator(iter) ⇒ <code>DataStream</code> | Create a DataStream from an Iterator | [fromIterator example](../samples/data-stream-fromiterator.js) |
 
