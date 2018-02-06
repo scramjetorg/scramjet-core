@@ -24,7 +24,8 @@
             * [.fromIterator(iter)](#module_ScramjetCore..DataStream.fromIterator) ⇒ <code>DataStream</code>
     * [~tap()](#module_ScramjetCore..tap)
     * [~whenRead()](#module_ScramjetCore..whenRead) ⇒ <code>Promise.&lt;Object&gt;</code>
-    * [~whenWrote()](#module_ScramjetCore..whenWrote) ⇒ <code>Promise.&lt;Object&gt;</code>
+    * [~whenWrote()](#module_ScramjetCore..whenWrote) ⇒ <code>Promise</code>
+    * [~whenDrained()](#module_ScramjetCore..whenDrained) ⇒ <code>Promise</code>
     * [~setOptions(options)](#module_ScramjetCore..setOptions) ↩︎
     * [~toStringStream()](#module_ScramjetCore..toStringStream)
     * [~StreamOptions](#module_ScramjetCore..StreamOptions) : <code>Object</code>
@@ -329,11 +330,16 @@ Reads a chunk from the stream and resolves the promise when read.
 **Returns**: <code>Promise.&lt;Object&gt;</code> - the read item  
 <a name="module_ScramjetCore..whenWrote"></a>
 
-### ScramjetCore~whenWrote() ⇒ <code>Promise.&lt;Object&gt;</code>
+### ScramjetCore~whenWrote() ⇒ <code>Promise</code>
 Writes a chunk to the stream and returns a Promise resolved when more chunks can be written.
 
 **Kind**: inner method of [<code>ScramjetCore</code>](#module_ScramjetCore)  
-**Returns**: <code>Promise.&lt;Object&gt;</code> - the read item  
+<a name="module_ScramjetCore..whenDrained"></a>
+
+### ScramjetCore~whenDrained() ⇒ <code>Promise</code>
+Returns a promise that resolves when the stream is drained/
+
+**Kind**: inner method of [<code>ScramjetCore</code>](#module_ScramjetCore)  
 <a name="module_ScramjetCore..setOptions"></a>
 
 ### ScramjetCore~setOptions(options) ↩︎
