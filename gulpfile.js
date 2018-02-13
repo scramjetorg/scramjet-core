@@ -7,10 +7,11 @@ const rename = require("gulp-rename");
 const nodeunit_runner = require("gulp-nodeunit-runner");
 const {exec: execp} = require('child_process');
 const eslint = require('gulp-eslint');
-const fs = require('fs-then-native');
 const jsdoc = require('jsdoc-api');
 const jsdocParse = require('jsdoc-parse');
 const dmd = require('dmd');
+const {promisify} = require('util');
+const fs = require('fs');
 
 gulp.task('lint', () => {
     // ESLint ignores files with "node_modules" paths.
@@ -57,7 +58,7 @@ const jsdoc2md = async ({files, plugin}) => {
 };
 
 gulp.task("readme", async () => {
-    return fs.writeFile(
+    return promisify(fs.writeFile)(
         path.join(__dirname, 'README.md'),
         await jsdoc2md({files: ["lib/data-stream.js", "lib/string-stream.js", "lib/buffer-stream.js", "lib/multi-stream.js"], plugin: "jsdoc2md/plugin.js"})
     );

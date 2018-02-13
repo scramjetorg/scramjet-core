@@ -43,7 +43,7 @@ module.exports = {
                         a[1].val === 1 &&
                         a[2].val === 2 &&
                         a[3].val === 3,
-                        "Order should be preserved"
+                        "Order should be preserved " + JSON.stringify(a[3])
                     );
                     test.done();
                 }
