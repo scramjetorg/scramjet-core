@@ -115,7 +115,23 @@ The quick reference of the exposed classes:
 <a name="BufferStream"></a>
 ### BufferStream ⇐ DataStream
 
-A factilitation stream created for easy splitting or parsing buffers
+A factilitation stream created for easy splitting or parsing buffers.
+
+Useful for working on built-in Node.js streams from files, parsing binary formats etc.
+
+A simple use case would be:
+
+```javascript
+ fs.createReadStream('pixels.rgba')
+     .pipe(new BufferStream)         // pipe a buffer stream into scramjet
+     .breakup(4)                     // split into 4 byte fragments
+     .parse(buf => [
+         buf.readInt8(0),            // the output is a stream of R,G,B and Alpha
+         buf.readInt8(1),            // values from 0-255 in an array.
+         buf.readInt8(2),
+         buf.readInt8(3)
+     ]);
+```
 
 [Detailed BufferStream docs here](docs/buffer-stream.md)
 
@@ -139,19 +155,21 @@ A factilitation stream created for easy splitting or parsing buffers
 | Method | Description | Example
 |--------|-------------|---------
 | new DataStream(opts) | Create the DataStream. |  |
-| dataStream.use(func) ⇒ <code>\*</code> | Calls the passed in place with the stream as first argument, returns result. | [use example](../samples/data-stream-use.js) |
-| dataStream.tee(func) ⇒ <code>DataStream</code> | Duplicate the stream | [tee example](../samples/data-stream-tee.js) |
-| dataStream.reduce(func, into) ⇒ <code>Promise</code> | Reduces the stream into a given accumulator | [reduce example](../samples/data-stream-reduce.js) |
-| dataStream.each(func) ↩︎ | Performs an operation on every chunk, without changing the stream |  |
 | dataStream.map(func, Clazz) ⇒ <code>DataStream</code> | Transforms stream objects into new ones, just like Array.prototype.map | [map example](../samples/data-stream-map.js) |
 | dataStream.filter(func) ⇒ <code>DataStream</code> | Filters object based on the function outcome, just like | [filter example](../samples/data-stream-filter.js) |
+| dataStream.reduce(func, into) ⇒ <code>Promise</code> | Reduces the stream into a given accumulator | [reduce example](../samples/data-stream-reduce.js) |
+| dataStream.use(func) ⇒ <code>\*</code> | Calls the passed in place with the stream as first argument, returns result. | [use example](../samples/data-stream-use.js) |
+| dataStream.tee(func) ⇒ <code>DataStream</code> | Duplicate the stream | [tee example](../samples/data-stream-tee.js) |
+| dataStream.each(func) ↩︎ | Performs an operation on every chunk, without changing the stream |  |
 | dataStream.while(func) ⇒ <code>DataStream</code> | Reads the stream while the function outcome is truthy. |  |
 | dataStream.until(func) ⇒ <code>DataStream</code> | Reads the stream until the function outcome is truthy. |  |
+| dataStream.catch(callback) ↩︎ | Provides an way to catch errors in chanined streams. |  |
 | dataStream.pipe(to, options) ⇒ <code>Writable</code> | Override of node.js Readable pipe. |  |
-| dataStream.toBufferStream(serializer) ⇒ [<code>BufferStream</code>](#BufferStream) | Creates a BufferStream | [toBufferStream example](../samples/data-stream-tobufferstream.js) |
+| dataStream.bufferify(serializer) ⇒ [<code>BufferStream</code>](#BufferStream) | Creates a BufferStream | [bufferify example](../samples/data-stream-tobufferstream.js) |
 | dataStream.stringify(serializer) ⇒ <code>StringStream</code> | Creates a StringStream | [stringify example](../samples/data-stream-tostringstream.js) |
 | dataStream.toArray(initial) ⇒ <code>Promise</code> | Aggregates the stream into a single Array |  |
 | dataStream.toGenerator() ⇒ <code>Iterable.&lt;Promise.&lt;\*&gt;&gt;</code> | Returns an async generator |  |
+| dataStream._selfInstance() ⇒ <code>DataStream</code> | Returns a new instance of self. | [_selfInstance example](../samples/data-stream-selfinstance.js) |
 | DataStream.fromArray(arr) ⇒ <code>DataStream</code> | Create a DataStream from an Array | [fromArray example](../samples/data-stream-fromarray.js) |
 | DataStream.fromIterator(iter) ⇒ <code>DataStream</code> | Create a DataStream from an Iterator | [fromIterator example](../samples/data-stream-fromiterator.js) |
 

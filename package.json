@@ -30,7 +30,7 @@
     "test": "gulp test",
     "preversion": "gulp prerelease"
   },
-  "homepage": "http://scramjet.eu/",
+  "homepage": "https://scramjet.eu/",
   "repository": {
     "type": "git",
     "url": "https://github.com/signicode/scramjet-core.git"
@@ -45,8 +45,6 @@
     "eslint": "^4.17.0",
     "eslint-config-defaults": "^9.0.0",
     "eslint-plugin-node": "^6.0.0",
-    "fs-promise": "^2.0.0",
-    "fs-then-native": "^2.0.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
     "gulp-eslint": "^4.0.2",
@@ -56,8 +54,7 @@
     "jsdoc": "^3.5.5",
     "jsdoc-api": "^4.0.1",
     "jsdoc-parse": "^3.0.1",
-    "nodeunit": "^0.11.0",
-    "through2": "^2.0.3"
+    "nodeunit": "^0.11.0"
   },
   "dependencies": {}
 }
