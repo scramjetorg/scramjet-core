@@ -122,12 +122,11 @@ occur only after the previous entry is fully processed. This does mean
 it's much slower than parallel functions.
 
 **Kind**: instance method of [<code>DataStream</code>](#module_ScramjetCore..DataStream)  
-**Returns**: <code>Promise</code> - Promise resolved by the last object returned by the
-call of the transform function  
+**Returns**: <code>Promise</code> - Promise resolved by the last object returned by the call of the transform function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| func | <code>TransformFunction</code> | The into object will be passed as the first argument, the data object from the stream as the second. |
+| func | <code>TransformFunction</code> | The into object will be passed as the  first argument, the data object from the stream as the second. |
 | into | <code>Object</code> | Any object passed initally to the transform function |
 
 **Example**  
@@ -137,14 +136,18 @@ call of the transform function
 <a name="module_ScramjetCore..DataStream+use"></a>
 
 #### dataStream.use(func) ⇒ <code>\*</code>
-Calls the passed in place with the stream as first argument, returns result.
+Calls the passed method in place with the stream as first argument, returns result.
+
+The main intention of this method is to run scramjet modules - transforms that allow complex transforms of
+streams. These modules can also be run with [scramjet-cli](https://github.com/signicode/scramjet-cli) directly
+from the command line.
 
 **Kind**: instance method of [<code>DataStream</code>](#module_ScramjetCore..DataStream)  
 **Returns**: <code>\*</code> - anything the passed function returns  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| func | <code>function</code> | if passed, the function will be called on self                         to add an option to inspect the stream in place,                         while not breaking the transform chain |
+| func | <code>function</code> \| <code>String</code> | if passed, the function will be called on self                         to add an option to inspect the stream in place,                         while not breaking the transform chain.                         Alternatively this can be a relative path to a scramjet-module. |
 
 **Example**  
 ```js
