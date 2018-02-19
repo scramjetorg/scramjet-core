@@ -15,6 +15,7 @@
             * [.while(func)](#module_ScramjetCore..DataStream+while) ⇒ <code>DataStream</code>
             * [.until(func)](#module_ScramjetCore..DataStream+until) ⇒ <code>DataStream</code>
             * [.catch(callback)](#module_ScramjetCore..DataStream+catch) ↩︎
+            * [.raise(err)](#module_ScramjetCore..DataStream+raise) ⇒ <code>Promise</code>
             * [.pipe(to, options)](#module_ScramjetCore..DataStream+pipe) ⇒ <code>Writable</code>
             * [.bufferify(serializer)](#module_ScramjetCore..DataStream+bufferify) ⇒ <code>BufferStream</code>
             * [.stringify(serializer)](#module_ScramjetCore..DataStream+stringify) ⇒ <code>StringStream</code>
@@ -54,6 +55,7 @@
         * [.while(func)](#module_ScramjetCore..DataStream+while) ⇒ <code>DataStream</code>
         * [.until(func)](#module_ScramjetCore..DataStream+until) ⇒ <code>DataStream</code>
         * [.catch(callback)](#module_ScramjetCore..DataStream+catch) ↩︎
+        * [.raise(err)](#module_ScramjetCore..DataStream+raise) ⇒ <code>Promise</code>
         * [.pipe(to, options)](#module_ScramjetCore..DataStream+pipe) ⇒ <code>Writable</code>
         * [.bufferify(serializer)](#module_ScramjetCore..DataStream+bufferify) ⇒ <code>BufferStream</code>
         * [.stringify(serializer)](#module_ScramjetCore..DataStream+stringify) ⇒ <code>StringStream</code>
@@ -219,12 +221,32 @@ Works oposite of while.
 #### dataStream.catch(callback) ↩︎
 Provides an way to catch errors in chanined streams.
 
+The handler will be called as asynchronous
+ - if it resolves then the error will be muted.
+ - if it rejects then the error will be passed to the next handler
+
+If no handlers will resolve the error, an `error` event will be emitted
+
 **Kind**: instance method of [<code>DataStream</code>](#module_ScramjetCore..DataStream)  
 **Chainable**  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| callback | <code>function</code> | Error callback |
+| callback | <code>function</code> | Error handler (async function) |
+
+<a name="module_ScramjetCore..DataStream+raise"></a>
+
+#### dataStream.raise(err) ⇒ <code>Promise</code>
+Executes all error handlers and if none resolves, then emits an error.
+
+The returned promise will always be resolved even if there are no succesful handers.
+
+**Kind**: instance method of [<code>DataStream</code>](#module_ScramjetCore..DataStream)  
+**Returns**: <code>Promise</code> - the promise that will be resolved when the error is handled.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| err | <code>Error</code> | The thrown error |
 
 <a name="module_ScramjetCore..DataStream+pipe"></a>
 

@@ -164,6 +164,7 @@ A simple use case would be:
 | dataStream.while(func) ⇒ <code>DataStream</code> | Reads the stream while the function outcome is truthy. |  |
 | dataStream.until(func) ⇒ <code>DataStream</code> | Reads the stream until the function outcome is truthy. |  |
 | dataStream.catch(callback) ↩︎ | Provides an way to catch errors in chanined streams. |  |
+| dataStream.raise(err) ⇒ <code>Promise</code> | Executes all error handlers and if none resolves, then emits an error. |  |
 | dataStream.pipe(to, options) ⇒ <code>Writable</code> | Override of node.js Readable pipe. |  |
 | dataStream.bufferify(serializer) ⇒ [<code>BufferStream</code>](#BufferStream) | Creates a BufferStream | [bufferify example](../samples/data-stream-tobufferstream.js) |
 | dataStream.stringify(serializer) ⇒ <code>StringStream</code> | Creates a StringStream | [stringify example](../samples/data-stream-tostringstream.js) |
