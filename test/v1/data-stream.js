@@ -220,6 +220,34 @@ module.exports = {
             test.notStrictEqual(orgStream, pipedStream, "Piped stream musn't be the same object");
             orgStream.end({val: 123});
         },
+        allows_to_capture(test) {
+            test.expect(2);
+            let err = new Error("Hello!");
+            let err2 = new Error("Hello 2!");
+
+            const orgStream = new DataStream()
+                .catch(e => {
+                    test.equals(err, e, "Should pass the same error");
+                    return Promise.reject(err2);
+                });
+            ;
+
+            const pipedStream = orgStream.pipe(new DataStream())
+                .catch(e => {
+                    test.equals(err2, e, "Should pass the error via pipe");
+                    orgStream.end({});
+                    return true;
+                });
+
+            pipedStream.on("error", (e) => {
+                test.fail("Caught error should not be thrown");
+            });
+
+            pipedStream.on("end", () => test.done());
+            orgStream.raise(err);
+
+            pipedStream.resume();
+        },
         propagates_errors(test) {
             test.expect(1);
 
@@ -227,6 +255,7 @@ module.exports = {
             const pipedStream = orgStream.pipe(new DataStream());
 
             pipedStream.on("error", (e) => {
+                console.log("EEEE", e)
                 test.ok(e instanceof Error, "Pipe should propagate errors");
                 test.done();
             });
