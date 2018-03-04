@@ -10,6 +10,31 @@ const getStream = () => {
 };
 
 module.exports = {
+    test_options: {
+        set(test) {
+            const x = new DataStream({test:1});
+            test.equals(x._options.test, 1, "Option can be set in constructor");
+
+            x.setOptions({test:2, maxParallel: 17});
+            test.equals(x._options.test, 2, "Any option can be set");
+            test.equals(x._options.maxParallel, 17, "Default options can be set at any point");
+
+            test.done();
+        },
+        fromReferrer(test) {
+            const x = new DataStream({test:1});
+            const y = new DataStream({test:3});
+
+            x.pipe(y);
+            x.setOptions({test:2, maxParallel: 17});
+
+            test.equals(y._options.referrer, x, "Referrer is set correctly");
+            test.equals(x._options.test, 2, "Any option can be set");
+            test.equals(y._options.test, 3, "Own option is always more important than referrer's");
+            test.equals(y._options.maxParallel, 17, "Options are passed from referrer even if set after the reference");
+            test.done();
+        }
+    },
     test_while_until: {
         while(test) {
             const str = getStream();
@@ -255,7 +280,6 @@ module.exports = {
             const pipedStream = orgStream.pipe(new DataStream());
 
             pipedStream.on("error", (e) => {
-                console.log("EEEE", e)
                 test.ok(e instanceof Error, "Pipe should propagate errors");
                 test.done();
             });
