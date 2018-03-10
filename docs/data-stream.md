@@ -29,6 +29,7 @@
     * [~tap()](#module_ScramjetCore..tap)
     * [~whenRead()](#module_ScramjetCore..whenRead) ⇒ <code>Promise.&lt;Object&gt;</code>
     * [~whenWrote()](#module_ScramjetCore..whenWrote) ⇒ <code>Promise</code>
+    * [~whenEnd()](#module_ScramjetCore..whenEnd) ⇒ <code>Promise</code>
     * [~whenDrained()](#module_ScramjetCore..whenDrained) ⇒ <code>Promise</code>
     * [~setOptions(options)](#module_ScramjetCore..setOptions) ↩︎
     * [~StreamOptions](#module_ScramjetCore..StreamOptions) : <code>Object</code>
@@ -395,6 +396,12 @@ Reads a chunk from the stream and resolves the promise when read.
 
 ### ScramjetCore~whenWrote() ⇒ <code>Promise</code>
 Writes a chunk to the stream and returns a Promise resolved when more chunks can be written.
+
+**Kind**: inner method of [<code>ScramjetCore</code>](#module_ScramjetCore)  
+<a name="module_ScramjetCore..whenEnd"></a>
+
+### ScramjetCore~whenEnd() ⇒ <code>Promise</code>
+Resolves when stream ends - rejects on uncaught error
 
 **Kind**: inner method of [<code>ScramjetCore</code>](#module_ScramjetCore)  
 <a name="module_ScramjetCore..whenDrained"></a>
