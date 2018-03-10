@@ -10,6 +10,35 @@ const getStream = () => {
 };
 
 module.exports = {
+    test_when: {
+        end(test) {
+            test.expect(2);
+
+            let ended = false;
+            let notDone = true;
+
+            const stream = getStream().each(a => a);
+
+            stream.on("end", () => {
+                ended = true
+            });
+
+            (async () => {
+                await (stream.whenEnd());
+                notDone = false;
+                test.ok(ended, "Stream is ended");
+                test.done();
+            })()
+            .catch(
+                (err) => {
+                    test.ok(false, "Should not throw: " + err.stack)
+                }
+            )
+            ;
+
+            test.ok(notDone, "Does not resolve before the stream ends");
+        }
+    },
     test_options: {
         set(test) {
             const x = new DataStream({test:1});
