@@ -168,6 +168,7 @@ A simple use case would be:
 | dataStream.pipe(to, options) ⇒ <code>Writable</code> | Override of node.js Readable pipe. |  |
 | dataStream.bufferify(serializer) ⇒ [<code>BufferStream</code>](#BufferStream) | Creates a BufferStream | [bufferify example](../samples/data-stream-tobufferstream.js) |
 | dataStream.stringify(serializer) ⇒ <code>StringStream</code> | Creates a StringStream | [stringify example](../samples/data-stream-tostringstream.js) |
+| dataStream.run() ⇒ <code>Promise</code> | Consumes all stream items without doing anything |  |
 | dataStream.toArray(initial) ⇒ <code>Promise</code> | Aggregates the stream into a single Array |  |
 | dataStream.toGenerator() ⇒ <code>Iterable.&lt;Promise.&lt;\*&gt;&gt;</code> | Returns an async generator |  |
 | dataStream._selfInstance() ⇒ <code>DataStream</code> | Returns a new instance of self. | [_selfInstance example](../samples/data-stream-selfinstance.js) |
