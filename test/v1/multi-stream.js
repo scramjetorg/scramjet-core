@@ -59,6 +59,39 @@ module.exports = {
             }
         );
     },
+    test_mux_nowarn(test) {
+        test.expect(1);
+        const streams = [
+            getStream(10, 10, 1),
+            getStream(20, 10, 1),
+            getStream(30, 10, 1),
+            getStream(40, 10, 1),
+            getStream(50, 10, 1),
+            getStream(60, 10, 1),
+            getStream(70, 10, 1),
+            getStream(80, 10, 1),
+            getStream(90, 10, 1),
+            getStream(100, 10, 1),
+            getStream(110, 10, 1),
+            getStream(120, 10, 1)
+        ];
+
+        let noWarnings = 0;
+        process.on('warning', ({name, message, stack}) => {
+            console.error(stack);
+
+            if (name === 'MaxListenersExceededWarning')
+                noWarnings++;
+        });
+
+        const mux = new MultiStream(streams).mux();
+        mux.run().then(
+            () => {
+                test.equals(noWarnings, 0, 'should not warn on multiple event emitters');
+                test.done();
+            }
+        );
+    },
     test_mux_cmp(test) {
         test.expect(5);
 
