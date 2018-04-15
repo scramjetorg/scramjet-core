@@ -32,6 +32,7 @@
     * [~whenWrote()](#module_ScramjetCore..whenWrote) ⇒ <code>Promise</code>
     * [~whenEnd()](#module_ScramjetCore..whenEnd) ⇒ <code>Promise</code>
     * [~whenDrained()](#module_ScramjetCore..whenDrained) ⇒ <code>Promise</code>
+    * [~whenDrained()](#module_ScramjetCore..whenDrained) ⇒ <code>Promise</code>
     * [~setOptions(options)](#module_ScramjetCore..setOptions) ↩︎
     * [~StreamOptions](#module_ScramjetCore..StreamOptions) : <code>Object</code>
     * [~MapCallback](#module_ScramjetCore..MapCallback) ⇒ <code>Promise</code> \| <code>\*</code>
@@ -416,7 +417,13 @@ Resolves when stream ends - rejects on uncaught error
 <a name="module_ScramjetCore..whenDrained"></a>
 
 ### ScramjetCore~whenDrained() ⇒ <code>Promise</code>
-Returns a promise that resolves when the stream is drained/
+Returns a promise that resolves when the stream is drained
+
+**Kind**: inner method of [<code>ScramjetCore</code>](#module_ScramjetCore)  
+<a name="module_ScramjetCore..whenDrained"></a>
+
+### ScramjetCore~whenDrained() ⇒ <code>Promise</code>
+Returns a promise that resolves (!) when the stream is errors
 
 **Kind**: inner method of [<code>ScramjetCore</code>](#module_ScramjetCore)  
 <a name="module_ScramjetCore..setOptions"></a>
