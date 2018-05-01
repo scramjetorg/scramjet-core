@@ -1,10 +1,11 @@
 /* eslint-disable node/no-unpublished-require */
 const gulp = require("gulp");
 const path = require("path");
-const gutil = require("gulp-util");
+const log = require("fancy-log");
 const {DataStream} = require('./');
 const rename = require("gulp-rename");
-const nodeunit_runner = require("gulp-nodeunit-runner");
+const tape_nodeunit_runner = require("./test/tape-runner");
+
 const {exec: execp} = require('child_process');
 const eslint = require('gulp-eslint');
 const jsdoc = require('jsdoc-api');
@@ -32,7 +33,7 @@ gulp.task('lint', () => {
 
 gulp.task("test_legacy", function () {
     return gulp.src("test/v1/*.js")
-        .pipe(nodeunit_runner({reporter: "verbose"}))
+        .pipe(tape_nodeunit_runner({timeout: 5000}))
     ;
 });
 
@@ -73,7 +74,7 @@ gulp.task("docs", ["readme"], function() {
             return file;
         })
         .on("error", function(err) {
-            gutil.log(gutil.colors.red("jsdoc2md failed"), err.stack);
+            log.error("jsdoc2md failed", err.stack);
         })
         .pipe(rename(function(path) {
             path.extname = ".md";

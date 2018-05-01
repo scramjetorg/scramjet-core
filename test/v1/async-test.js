@@ -12,7 +12,7 @@ const getStream = () => {
 const decorateAsynchronously = async (cb, chunk) => new Promise((res) => {
     setTimeout(
         () => (cb(chunk), res(Object.assign({ref: true}, chunk))),
-        100+50*(chunk.val%4)
+        7+3*(chunk.val%4)
     );
 });
 
