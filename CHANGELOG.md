@@ -1,9 +1,13 @@
-# Current version: 4.9.1
+# Current version: 4.9.2
+
+* Fix reporter for tests
+
+# Change log
+
+## Scramjet-core 4.9.1
 
 * Changed no longer supported `nodeunit` in favor of `tape`.
 * Improved travis build speed.
-
-# Change log
 
 ## Scramjet-core 4.9.0
 

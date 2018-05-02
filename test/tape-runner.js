@@ -13,16 +13,16 @@ const mpath = require('path');
 const reporter = ({tests, name}) => {
     const ok = !tests.find(({ok}) => !ok);
 
-    console.log(ok ? "✓" : "✗", name);
+    console.error(ok ? "✓" : "✗", name);
 
     tests.forEach(
         ({ok, operator, actual, expected, name, error}) => {
-            console.log('    ', ok ? "✓" : "✗", `${operator}(${name})`);
+            console.error('    ', ok ? "✓" : "✗", `${operator}(${name})`);
             if (error) {
-                console.log('    ', error);
+                console.error('    ', error);
             }
             if (!ok && actual) {
-                console.log('     => actual:', actual, 'expected:', expected)
+                console.error('     => actual:', actual, 'expected:', expected)
             }
         }
     )
@@ -37,7 +37,7 @@ const flattenTests = ({tests, conf = {}, prefix = ''}) => {
             .reduce((acc, name) => {
                 if (typeof tests[name] === "function") {
                     acc.push({
-                        name: `${prefix}:${name}`,
+                        name: `${prefix}`,
                         conf,
                         async exec(t) {
                             return tests[name](tTest(t));
@@ -46,7 +46,7 @@ const flattenTests = ({tests, conf = {}, prefix = ''}) => {
 
                     return acc;
                 } else if (typeof tests[name] === "object") {
-                    return acc.concat(flattenTests({tests: tests[name], conf, name: prefix + '/' + name}).tests);
+                    return acc.concat(flattenTests({tests: tests[name], conf, prefix: prefix + '/' + name}).tests);
                 }
             }, [])
     };
