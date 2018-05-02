@@ -30,17 +30,16 @@ const reporter = ({tests, name}) => {
     return {name, ok};
 };
 
-const flattenTests = ({tests, conf, prefix = ''}) => {
+const flattenTests = ({tests, conf = {}, prefix = ''}) => {
     return {
         name: prefix,
         tests: Object.keys(tests)
-            .filter(name => name.indexOf('test') === 0)
             .reduce((acc, name) => {
                 if (typeof tests[name] === "function") {
                     acc.push({
                         name: `${prefix}:${name}`,
                         conf,
-                        exec(t) {
+                        async exec(t) {
                             return tests[name](tTest(t));
                         }
                     });
@@ -55,8 +54,6 @@ const flattenTests = ({tests, conf, prefix = ''}) => {
 
 const runTests = ({name, tests}) => {
     const htest = test.createHarness();
-    DataStream.fromArray(tests)
-        .map(({name, conf, exec}) => htest(name, conf, exec));
 
     let current = null;
     const acc = new DataStream;
@@ -82,6 +79,12 @@ const runTests = ({name, tests}) => {
         .on("end", () => acc.end())
     ;
 
+    DataStream.fromArray(tests)
+        .map(({name, conf, exec}) => htest(name, conf, exec))
+        .catch(e => {
+            console.error("Error!", e && e.stack)
+        });
+
     return acc
         .map(reporter)
         .toArray()
@@ -93,7 +96,7 @@ const runTests = ({name, tests}) => {
 };
 
 module.exports = (conf) => {
-    const ret = new DataStream()
+    return new DataStream()
         .map(({path}) => ({
             prefix: mpath.basename(path).replace(/\.js$/, ''),
             conf,
@@ -107,6 +110,7 @@ module.exports = (conf) => {
                 return;
             }
         );
-
-    return ret;
 };
+
+module.exports.flattenTests = flattenTests;
+module.exports.runTests = runTests;

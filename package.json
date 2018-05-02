@@ -6,6 +6,7 @@
   "directories": {
     "lib": "lib/",
     "doc": "docs/",
+    "test": "test/",
     "example": "samples/"
   },
   "keywords": [
