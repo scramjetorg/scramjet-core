@@ -13,16 +13,16 @@ const mpath = require('path');
 const reporter = ({tests, name}) => {
     const ok = !tests.find(({ok}) => !ok);
 
-    console.log(ok ? "✓" : "✗", name);
+    console.error(ok ? "✓" : "✗", name);
 
     tests.forEach(
         ({ok, operator, actual, expected, name, error}) => {
-            console.log('    ', ok ? "✓" : "✗", `${operator}(${name})`);
+            console.error('    ', ok ? "✓" : "✗", `${operator}(${name})`);
             if (error) {
-                console.log('    ', error);
+                console.error('    ', error);
             }
             if (!ok && actual) {
-                console.log('     => actual:', actual, 'expected:', expected)
+                console.error('     => actual:', actual, 'expected:', expected)
             }
         }
     )
