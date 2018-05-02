@@ -37,7 +37,7 @@ const flattenTests = ({tests, conf = {}, prefix = ''}) => {
             .reduce((acc, name) => {
                 if (typeof tests[name] === "function") {
                     acc.push({
-                        name: `${prefix}:${name}`,
+                        name: `${prefix}`,
                         conf,
                         async exec(t) {
                             return tests[name](tTest(t));
@@ -46,7 +46,7 @@ const flattenTests = ({tests, conf = {}, prefix = ''}) => {
 
                     return acc;
                 } else if (typeof tests[name] === "object") {
-                    return acc.concat(flattenTests({tests: tests[name], conf, name: prefix + '/' + name}).tests);
+                    return acc.concat(flattenTests({tests: tests[name], conf, prefix: prefix + '/' + name}).tests);
                 }
             }, [])
     };
