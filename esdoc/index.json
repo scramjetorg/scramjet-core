@@ -1,0 +1,2593 @@
+[
+  {
+    "__docId__": 0,
+    "kind": "file",
+    "name": "lib/buffer-stream.js",
+    "content": "/**\n * @module ScramjetCore\n * @file buffer-stream.js\n */\n\nconst scramjet = require('.');\n\n/**\n * A factilitation stream created for easy splitting or parsing buffers.\n *\n * Useful for working on built-in Node.js streams from files, parsing binary formats etc.\n *\n * A simple use case would be:\n *\n * ```javascript\n *  fs.createReadStream('pixels.rgba')\n *      .pipe(new BufferStream)         // pipe a buffer stream into scramjet\n *      .breakup(4)                     // split into 4 byte fragments\n *      .parse(buf => [\n *          buf.readInt8(0),            // the output is a stream of R,G,B and Alpha\n *          buf.readInt8(1),            // values from 0-255 in an array.\n *          buf.readInt8(2),\n *          buf.readInt8(3)\n *      ]);\n * ```\n *\n * @extends DataStream\n */\nclass BufferStream extends scramjet.DataStream {\n\n    /**\n     * Creates the BufferStream\n     *\n     * @param {object} opts Stream options passed to superclass\n     * @example {@link ../samples/buffer-stream-constructor.js}\n     */\n    constructor(...args) {\n        super(...args);\n        this.buffer = [];\n    }\n\n    /**\n     * Pop callback\n     *\n     * @callback ShiftCallback\n     * @param {Buffer} shifted shifted bytes\n     */\n\n    /**\n     * Shift given number of bytes from the original stream\n     *\n     * Works the same way as {@see DataStream.shift}, but in this case extracts\n     * the given number of bytes.\n     *\n     * @param {Number} chars The number of bytes to shift\n     * @param {ShiftCallback} func Function that receives a string of shifted bytes\n     * @return {BufferStream}  substream\n     *\n     * @example {@link ../samples/string-stream-shift.js}\n     */\n    shift(bytes, func) {\n        const ret = Buffer.alloc(bytes);\n        const str = this.tap()._selfInstance();\n        let offs = 0;\n\n        const chunkHandler = (chunk) => {\n            const length = Math.min(ret.length - offs, chunk.length);\n            chunk.copy(ret, offs, 0, length);\n            offs += length;\n            if (length >= bytes) {\n                unHook()\n                    .then(\n                        () => {\n                            str.write(chunk.slice(length));\n                            this.pipe(str);\n                        }\n                    );\n            }\n        };\n\n        const endHandler = (...args) => {\n            if (ret.length < bytes) {\n                unHook();\n            }\n            str.end(...args);\n        };\n\n        const errorHandler = str.emit.bind(str, \"error\");\n\n        const unHook = (async () => {\n            this.removeListener(\"data\", chunkHandler);\n            this.removeListener(\"end\", endHandler);\n            this.removeListener(\"error\", errorHandler);\n            return func(ret);\n        });\n\n\n        this.on(\"data\", chunkHandler);\n        this.on(\"end\", endHandler);\n        this.on(\"error\", errorHandler);\n\n        return str;\n    }\n\n    /**\n     * Splits the buffer stream into buffer objects\n     *\n     * @todo implement splitting by function\n     * @todo implement asynchronous splitter\n     * @param  {String|Buffer} splitter the buffer or string that the stream\n     *                                  should be split by.\n     * @return {BufferStream}  the re-splitted buffer stream.\n     * @example {@link ../samples/buffer-stream-split.js}\n     */\n    split(splitter) {\n        if (splitter instanceof Buffer || typeof splitter === \"string\") {\n            const needle = Buffer.from(splitter);\n            return this.tap().pipe(this._selfInstance({\n                transform(buffer, enc, callback) {\n                    if (Buffer.isBuffer(this._haystack) && this._haystack.length > 0) {\n                        this._haystack = Buffer.from([this._haystack, buffer]);\n                    } else {\n                        this._haystack = buffer;\n                    }\n\n                    let pos;\n                    while((pos = this._haystack.indexOf(needle)) > -1) {\n                        this.push(Buffer.from(this._haystack.slice(0, pos)));\n                        this._haystack = this._haystack.slice(pos + needle.length);\n                    }\n\n                    callback();\n                },\n                flush(callback) {\n                    if (this._haystack.length) this.push(this._haystack);\n                    this._haystack = null;\n                    callback();\n                }\n            }));\n        }\n    }\n\n    /**\n     * Breaks up a stream apart into chunks of the specified length\n     *\n     * @param  {Number} number the desired chunk length\n     * @return {BufferStream}  the resulting buffer stream.\n     * @example {@link ../samples/buffer-stream-breakup.js}\n     */\n    breakup(number) {\n        if (number <= 0 || !isFinite(+number))\n            throw new Error(\"Breakup number is invalid - must be a positive, finite integer.\");\n\n        return this.tap().pipe(this._selfInstance({\n            transform(chunk, encoding, callback) {\n                if (Buffer.isBuffer(this.buffer)) {\n                    chunk = Buffer.concat([this.buffer, chunk]);\n                }\n                let offset;\n                for (offset = 0; offset < chunk.length - number; offset += number) {\n                    this.push(chunk.slice(offset, offset + number));\n                }\n                this.buffer = chunk.slice(offset);\n                callback();\n            },\n            flush(callback) {\n                this.push(this.buffer);\n                this.buffer = null;\n                callback();\n            }\n        }));\n\n    }\n\n    /**\n     * Creates a string stream from the given buffer stream\n     *\n     * Still it returns a DataStream derivative and isn't the typical node.js\n     * stream so you can do all your transforms when you like.\n     *\n     * @param  {String} encoding The encoding to be used to convert the buffers\n     *                           to streams.\n     * @return {StringStream}  The converted stream.\n     * @example {@link ../samples/buffer-stream-tostringstream.js}\n     */\n    stringify(encoding) {\n        return this.pipe(new scramjet.StringStream(encoding || 'utf-8', {objectMode: true}));\n    }\n\n    /**\n     * Alias for {@link BufferStream#stringify}\n     * @function toStringStream\n     */\n\n    /**\n     * @callback ParseCallback\n     * @param {Buffer} chunk the transformed chunk\n     * @return {Promise}  the promise should be resolved with the parsed object\n     */\n\n    /**\n     * Parses every buffer to object\n     *\n     * The method MUST parse EVERY buffer into a single object, so the buffer\n     * stream here should already be splitted or broken up.\n     *\n     * @param  {ParseCallback} parser The transform function\n     * @return {DataStream}  The parsed objects stream.\n     * @example {@link ../samples/buffer-stream-parse.js}\n     */\n    parse(parser) {\n        return this.tap().map(parser, scramjet.DataStream);\n    }\n\n    /**\n     * Alias for {@link BufferStream#parse}\n     * @function toDataStream\n     */\n\n    /**\n     * @ignore\n     */\n    _transform(chunk, encoding, callback) {\n        this.push(Buffer.from(chunk, encoding));\n        return callback();\n    }\n\n}\n\nBufferStream.prototype.pop = BufferStream.prototype.shift;\nBufferStream.prototype.toDataStream = BufferStream.prototype.parse;\nBufferStream.prototype.toStringStream = BufferStream.prototype.stringify;\n\nmodule.exports = BufferStream;\n",
+    "static": true,
+    "longname": "C:/src/signicode/scramjet-core/lib/buffer-stream.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 1,
+    "kind": "variable",
+    "name": "scramjet",
+    "memberof": "lib/buffer-stream.js",
+    "static": true,
+    "longname": "lib/buffer-stream.js~scramjet",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/buffer-stream.js",
+    "importStyle": null,
+    "description": "",
+    "lineNumber": 6,
+    "unknown": [
+      {
+        "tagName": "@module",
+        "tagValue": "ScramjetCore"
+      },
+      {
+        "tagName": "@file",
+        "tagValue": "buffer-stream.js"
+      }
+    ]
+  },
+  {
+    "__docId__": 2,
+    "kind": "class",
+    "name": "BufferStream",
+    "memberof": "lib/buffer-stream.js",
+    "static": true,
+    "longname": "lib/buffer-stream.js~BufferStream",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/buffer-stream.js",
+    "importStyle": null,
+    "description": "A factilitation stream created for easy splitting or parsing buffers.\n\nUseful for working on built-in Node.js streams from files, parsing binary formats etc.\n\nA simple use case would be:\n\n```javascript\n fs.createReadStream('pixels.rgba')\n     .pipe(new BufferStream)         // pipe a buffer stream into scramjet\n     .breakup(4)                     // split into 4 byte fragments\n     .parse(buf => [\n         buf.readInt8(0),            // the output is a stream of R,G,B and Alpha\n         buf.readInt8(1),            // values from 0-255 in an array.\n         buf.readInt8(2),\n         buf.readInt8(3)\n     ]);\n```",
+    "lineNumber": 29,
+    "interface": false,
+    "extends": [
+      "*"
+    ]
+  },
+  {
+    "__docId__": 3,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "lib/buffer-stream.js~BufferStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/buffer-stream.js~BufferStream#constructor",
+    "access": null,
+    "description": "Creates the BufferStream",
+    "examples": [
+      "{@link ../samples/buffer-stream-constructor.js}"
+    ],
+    "lineNumber": 37,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "opts",
+        "description": "Stream options passed to superclass"
+      }
+    ]
+  },
+  {
+    "__docId__": 4,
+    "kind": "member",
+    "name": "buffer",
+    "memberof": "lib/buffer-stream.js~BufferStream",
+    "static": false,
+    "longname": "lib/buffer-stream.js~BufferStream#buffer",
+    "access": null,
+    "description": null,
+    "lineNumber": 39,
+    "undocument": true
+  },
+  {
+    "__docId__": 5,
+    "kind": "method",
+    "name": "shift",
+    "memberof": "lib/buffer-stream.js~BufferStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/buffer-stream.js~BufferStream#shift",
+    "access": null,
+    "description": "Shift given number of bytes from the original stream\n\nWorks the same way as {@see DataStream.shift}, but in this case extracts\nthe given number of bytes.",
+    "examples": [
+      "{@link ../samples/string-stream-shift.js}"
+    ],
+    "lineNumber": 61,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "chars",
+        "description": "The number of bytes to shift"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "ShiftCallback"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "func",
+        "description": "Function that receives a string of shifted bytes"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "BufferStream"
+      ],
+      "spread": false,
+      "description": "substream"
+    }
+  },
+  {
+    "__docId__": 6,
+    "kind": "method",
+    "name": "split",
+    "memberof": "lib/buffer-stream.js~BufferStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/buffer-stream.js~BufferStream#split",
+    "access": null,
+    "description": "Splits the buffer stream into buffer objects",
+    "examples": [
+      "{@link ../samples/buffer-stream-split.js}"
+    ],
+    "lineNumber": 115,
+    "todo": [
+      "implement splitting by function",
+      "implement asynchronous splitter"
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "String",
+          "Buffer"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "splitter",
+        "description": "the buffer or string that the stream\n                                 should be split by."
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "BufferStream"
+      ],
+      "spread": false,
+      "description": "the re-splitted buffer stream."
+    }
+  },
+  {
+    "__docId__": 7,
+    "kind": "member",
+    "name": "_haystack",
+    "memberof": "lib/buffer-stream.js~BufferStream",
+    "static": false,
+    "longname": "lib/buffer-stream.js~BufferStream#_haystack",
+    "access": null,
+    "description": null,
+    "lineNumber": 121,
+    "undocument": true
+  },
+  {
+    "__docId__": 11,
+    "kind": "method",
+    "name": "breakup",
+    "memberof": "lib/buffer-stream.js~BufferStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/buffer-stream.js~BufferStream#breakup",
+    "access": null,
+    "description": "Breaks up a stream apart into chunks of the specified length",
+    "examples": [
+      "{@link ../samples/buffer-stream-breakup.js}"
+    ],
+    "lineNumber": 150,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "number",
+        "description": "the desired chunk length"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "BufferStream"
+      ],
+      "spread": false,
+      "description": "the resulting buffer stream."
+    }
+  },
+  {
+    "__docId__": 14,
+    "kind": "method",
+    "name": "stringify",
+    "memberof": "lib/buffer-stream.js~BufferStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/buffer-stream.js~BufferStream#stringify",
+    "access": null,
+    "description": "Creates a string stream from the given buffer stream\n\nStill it returns a DataStream derivative and isn't the typical node.js\nstream so you can do all your transforms when you like.",
+    "examples": [
+      "{@link ../samples/buffer-stream-tostringstream.js}"
+    ],
+    "lineNumber": 186,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "encoding",
+        "description": "The encoding to be used to convert the buffers\n                          to streams."
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "StringStream"
+      ],
+      "spread": false,
+      "description": "The converted stream."
+    }
+  },
+  {
+    "__docId__": 15,
+    "kind": "method",
+    "name": "parse",
+    "memberof": "lib/buffer-stream.js~BufferStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/buffer-stream.js~BufferStream#parse",
+    "access": null,
+    "description": "Parses every buffer to object\n\nThe method MUST parse EVERY buffer into a single object, so the buffer\nstream here should already be splitted or broken up.",
+    "examples": [
+      "{@link ../samples/buffer-stream-parse.js}"
+    ],
+    "lineNumber": 211,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "ParseCallback"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "parser",
+        "description": "The transform function"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "DataStream"
+      ],
+      "spread": false,
+      "description": "The parsed objects stream."
+    }
+  },
+  {
+    "__docId__": 16,
+    "kind": "method",
+    "name": "_transform",
+    "memberof": "lib/buffer-stream.js~BufferStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/buffer-stream.js~BufferStream#_transform",
+    "access": null,
+    "description": "",
+    "lineNumber": 223,
+    "ignore": true
+  },
+  {
+    "__docId__": 17,
+    "kind": "file",
+    "name": "lib/data-stream.js",
+    "content": "/**\n * @module ScramjetCore\n */\n\nconst {PromiseTransformStream} = require('./util/promise-transform-stream');\nconst {Readable} = require(\"stream\");\nconst scramjet = require('./');\n\n// const cpus = require(\"os\").cpus();\n\n/**\n * Standard options for scramjet streams.\n *\n * @typedef {Object} StreamOptions\n * @property {Number} maxParallel the number of transforms done in parallel\n * @property {DataStream} referrer a referring stream to point to (if possible the transforms will be pushed to it\n *                                 instead of creating a new stream)\n */\n\n/**\n * DataStream is the primary stream type for Scramjet. When you parse your\n * stream, just pipe it you can then perform calculations on the data objects\n * streamed through your flow.\n *\n * @classdesc\n * @extends stream.PassThrough\n */\nclass DataStream extends PromiseTransformStream {\n\n    /**\n     * Create the DataStream.\n     *\n     * @param {StreamOptions} opts Stream options passed to superclass\n     *\n     * @example {@link ../samples/data-stream-constructor.js}\n     */\n    constructor(opts) {\n        super(Object.assign({\n            objectMode: true,\n            writableObjectMode: true,\n            readableObjectMode: true\n        }, opts));\n        this._error_handlers = [];\n    }\n\n    /**\n     * @callback MapCallback\n     * @param {*} chunk the chunk to be mapped\n     * @returns {Promise|*}  the mapped object\n     */\n\n    /**\n     * Transforms stream objects into new ones, just like Array.prototype.map\n     * does.\n     *\n     * @param {MapCallback} func The function that creates the new object\n     * @param {Class} Clazz (optional) The class to be mapped to.\n     * @return {DataStream}  mapped stream\n     *\n     * @example {@link ../samples/data-stream-map.js}\n     */\n    map(func, Clazz) {\n        Clazz = Clazz || this.constructor;\n        return this.pipe(new Clazz({\n            parallelTransform: func,\n            referrer: this\n        }));\n    }\n\n    /**\n     * @callback FilterCallback\n     * @param {*} chunk the chunk to be filtered or not\n     * @returns {Promise|Boolean}  information if the object should remain in\n     *                             the filtered stream.\n     */\n\n    /**\n     * Filters object based on the function outcome, just like\n     * Array.prototype.filter.\n     *\n     * @param  {FilterCallback} func The function that filters the object\n     * @return {DataStream}  filtered stream\n     *\n     * @example {@link ../samples/data-stream-filter.js}\n     */\n    filter(func) {\n        return this.pipe(this._selfInstance({\n            parallelTransform: func,\n            afterTransform: (chunk, ret) => ret ? chunk : Promise.reject(DataStream.filter),\n            referrer: this\n        }));\n    }\n\n    /**\n     * @callback ReduceCallback\n     * @param {*} acc the accumulator - the object initially passed or retuned\n     *                by the previous reduce operation\n     * @param {Object} chunk the stream chunk.\n     * @return {Promise|*}  accumulator for the next pass\n     */\n\n    /**\n     * Reduces the stream into a given accumulator\n     *\n     * Works similarily to Array.prototype.reduce, so whatever you return in the\n     * former operation will be the first operand to the latter.\n     *\n     * This method is serial - meaning that any processing on an entry will\n     * occur only after the previous entry is fully processed. This does mean\n     * it's much slower than parallel functions.\n     *\n     * @param  {TransformFunction} func The into object will be passed as the  first argument, the data object from the stream as the second.\n     * @param  {Object} into Any object passed initally to the transform function\n     * @return {Promise}  Promise resolved by the last object returned by the call of the transform function\n     *\n     * @example {@link ../samples/data-stream-reduce.js}\n     */\n    reduce(func, into) {\n\n        return new Promise((res, rej) => {\n\n            let last = Promise.resolve(into);\n\n            this.tap().pipe(new PromiseTransformStream({\n                parallelTransform: (chunk) => {\n                    return last = last.then((acc) => func(acc, chunk));\n                },\n                referrer: this,\n                initial: into\n            }))\n            .on(\"end\", () => last.then(res))\n            .on(\"error\", rej)\n            .resume();\n\n        });\n\n    }\n\n    /**\n     * Calls the passed method in place with the stream as first argument, returns result.\n     *\n     * The main intention of this method is to run scramjet modules - transforms that allow complex transforms of\n     * streams. These modules can also be run with [scramjet-cli](https://github.com/signicode/scramjet-cli) directly\n     * from the command line.\n     *\n     * @param  {Function|String} func if passed, the function will be called on self\n     *                         to add an option to inspect the stream in place,\n     *                         while not breaking the transform chain.\n     *                         Alternatively this can be a relative path to a scramjet-module.\n     * @return {*}  anything the passed function returns\n     *\n     * @example {@link ../samples/data-stream-use.js}\n     */\n    use(func) {\n        switch (typeof func) {\n            case \"function\":\n                return func(this);\n            case \"string\":\n                return require(func)(this);\n            default:\n                throw new Error();\n        }\n    }\n\n    /**\n     * @callback TeeCallback\n     * @param {DataStream} teed The teed stream\n     */\n\n    /**\n     * Duplicate the stream\n     *\n     * Creates a duplicate stream instance and pases it to the callback.\n     *\n     * @param {TeeCallback} func The duplicate stream will be passed as first argument.\n     * @return {DataStream}  self\n     *\n     * @example {@link ../samples/data-stream-tee.js}\n     */\n    tee(func) {\n        func(this.pipe(this._selfInstance()));\n        return this.tap();\n    }\n\n    /**\n     * Performs an operation on every chunk, without changing the stream\n     *\n     * This is a shorthand for ```stream.on(\"data\", func)``` but with flow control.\n     * Warning: this resumes the stream!\n     *\n     * @chainable\n     * @param  {MapCallback} func a callback called for each chunk.\n     */\n    each(func) {\n        return this.tap().map(\n            (a) => Promise.resolve(func(a))\n                .then(() => a)\n        ).resume();\n    }\n\n    /**\n     * Reads the stream while the function outcome is truthy.\n     *\n     * Stops reading and emits end as soon as it ends.\n     *\n     * @param  {FilterCallback} func The condition check\n     * @return {DataStream}  the shortened stream\n     */\n    while(func) {\n        let condition = true;\n        const out = this._selfInstance({\n            parallelTransform: func,\n            beforeTransform: (chunk) => condition ? chunk : Promise.reject(DataStream.filter),\n            afterTransform: (chunk, ret) => {\n                if (!ret) {\n                    condition = false;\n                    out.end();\n                    return Promise.reject(DataStream.filter);\n                } else {\n                    return chunk;\n                }\n            },\n            referrer: this\n        });\n        return this.pipe(out);\n    }\n\n    /**\n     * Reads the stream until the function outcome is truthy.\n     *\n     * Works oposite of while.\n     *\n     * @param  {FilterCallback} func The condition check\n     * @return {DataStream}  the shortened stream\n     */\n    until(func) {\n        return this.while((...args) => Promise.resolve(func(...args)).then((a) => !a));\n    }\n\n    /**\n     * Provides an way to catch errors in chanined streams.\n     *\n     * The handler will be called as asynchronous\n     *  - if it resolves then the error will be muted.\n     *  - if it rejects then the error will be passed to the next handler\n     *\n     * If no handlers will resolve the error, an `error` event will be emitted\n     *\n     * @param {Function} callback Error handler (async function)\n     * @chainable\n     */\n    catch(callback) {\n        this._error_handlers.push(callback);\n        return this;\n    }\n\n    /**\n     * Executes all error handlers and if none resolves, then emits an error.\n     *\n     * The returned promise will always be resolved even if there are no succesful handers.\n     *\n     * @param  {Error} err The thrown error\n     * @return {Promise}  the promise that will be resolved when the error is handled.\n     */\n    raise(err) {\n        return this._error_handlers\n            .reduce((err, handler) => err.catch(handler), Promise.reject(err))\n            .catch((err) => this.emit('error', err))\n        ;\n    }\n\n    /**\n     * Override of node.js Readable pipe.\n     *\n     * Except for calling overriden method it proxies errors to piped stream.\n     *\n     * @param  {Writable} to  Writable stream to write to\n     * @param  {WritableOptions} options\n     * @return {Writable}  the `to` stream\n     */\n    pipe(to, options) {\n        if (to === this) {\n            return this;\n        }\n\n        if (this !== to && to instanceof DataStream) {\n            to.setOptions({referrer: this});\n            this.tap()\n                .on(\"error\", (...err) => to.raise(...err));\n        } else if (to instanceof Readable) {\n            this.on(\"error\", (...err) => to.emit(\"error\", ...err));\n        }\n\n        return super.pipe(to, options || {end: true});\n    }\n\n    /**\n     * Creates a BufferStream\n     *\n     * @param  {MapCallback} serializer A method that converts chunks to buffers\n     * @return {BufferStream}  the resulting stream\n     *\n     * @example {@link ../samples/data-stream-tobufferstream.js}\n     */\n    bufferify(serializer) {\n        return this.map(serializer, scramjet.BufferStream);\n    }\n\n    /**\n     * Creates a StringStream\n     *\n     * @param  {MapCallback} serializer A method that converts chunks to strings\n     * @return {StringStream}  the resulting stream\n     *\n     * @example {@link ../samples/data-stream-tostringstream.js}\n     */\n    stringify(serializer) {\n        return this.map(serializer, scramjet.StringStream);\n    }\n\n    /**\n     * Consumes all stream items without doing anything\n     *\n     * @return {Promise} Resolved when the whole stream is read\n     */\n    async run() {\n        return this.each(() => 0).whenEnd();\n    }\n\n    /**\n     * Alias for {@link DataStream#stringify}\n     * @function toStringStream\n     */\n\n    /**\n     * Create a DataStream from an Array\n     *\n     * @param  {Array} arr list of chunks\n     * @return {DataStream}  the resulting stream\n     *\n     * @example {@link ../samples/data-stream-fromarray.js}\n     */\n    static fromArray(arr) {\n        const ret = new DataStream();\n        arr = arr.slice();\n        process.nextTick(() => {\n            arr.forEach((item) => ret.write(item));\n            ret.end();\n        });\n        return ret;\n    }\n\n\n    /**\n     * Create a DataStream from an Iterator\n     *\n     * Doesn't end the stream until it reaches end of the iterator.\n     *\n     * @param  {Iterator} iter the iterator object\n     * @return {DataStream}  the resulting stream\n     *\n     * @example {@link ../samples/data-stream-fromiterator.js}\n     */\n    static fromIterator(iter) {\n        return new DataStream({\n            read() {\n                const read = iter.next();\n                if (read.done) {\n                    this.push(null);\n                } else {\n                    Promise.resolve(read.value)\n                        .then((value) => this.push(value));\n                }\n            }\n        });\n    }\n\n    /**\n     * Aggregates the stream into a single Array\n     *\n     * In fact it's just a shorthand for reducing the stream into an Array.\n     *\n     * @param  {Array} initial Optional array to begin with.\n     * @return {Promise} Promise resolved with the resulting array on stream end.\n     */\n    toArray(initial) {\n        return this.reduce(\n            (arr, item) => (arr.push(item), arr),\n            initial || []\n        );\n    }\n\n    /**\n     * Returns an async generator\n     *\n     * Ready for https://github.com/tc39/proposal-async-iteration\n     *\n     * @return {Iterable.<Promise.<*>>} Returns an iterator that returns a promise for each item.\n     */\n    toGenerator() {\n        this.tap();\n        const ref = this;\n        return function*() {\n            let ended = false;\n            ref.on(\"end\", () => ended = true);\n            while (!ended) {\n                yield ref.whenRead();\n            }\n            return;\n        };\n    }\n\n    /**\n     * Stops merging transform callbacks at the current place in the command chain.\n     *\n     * @name tap\n     * @function\n     * @example {@link ../samples/data-stream-tap.js}\n     */\n\n    /**\n     * Reads a chunk from the stream and resolves the promise when read.\n     *\n     * @name whenRead\n     * @function\n     * @async\n     * @return {Promise<Object>}  the read item\n     */\n\n    /**\n     * Writes a chunk to the stream and returns a Promise resolved when more chunks can be written.\n     *\n     * @name whenWrote\n     * @function\n     * @async\n     * @return {Promise}\n     */\n\n    /**\n     * Resolves when stream ends - rejects on uncaught error\n     *\n     * @name whenEnd\n     * @function\n     * @async\n     * @return {Promise}\n     */\n\n    /**\n     * Returns a promise that resolves when the stream is drained\n     *\n     * @name whenDrained\n     * @function\n     * @async\n     * @return {Promise}\n     */\n\n    /**\n     * Returns a promise that resolves (!) when the stream is errors\n     *\n     * @name whenDrained\n     * @function\n     * @async\n     * @return {Promise}\n     */\n\n    /**\n     * Allows resetting stream options.\n     *\n     * It's much easier to use this in chain than constructing new stream:\n     *\n     * ```javascript\n     *     stream.map(myMapper).filter(myFilter).setOptions({maxParallel: 2})\n     * ```\n     *\n     * @meta.conds keep-order,chain\n     *\n     * @name setOptions\n     * @function\n     * @param {StreamOptions} options\n     * @chainable\n     */\n\n    /**\n     * Returns a new instance of self.\n     *\n     * Normally this doesn't have to be overridden.\n     * When the constructor would use some special arguments this may be used to\n     * override the object construction in {@link tee}...\n     *\n     * @internal\n     * @return {DataStream}  an empty instance of the same class.\n     * @example {@link ../samples/data-stream-selfinstance.js}\n     */\n    _selfInstance(...args) {\n        return new this.constructor(...args);\n    }\n\n}\n\nDataStream.prototype.toBufferStream = DataStream.prototype.bufferify;\nDataStream.prototype.toStringStream = DataStream.prototype.stringify;\n\nmodule.exports = DataStream;\n",
+    "static": true,
+    "longname": "C:/src/signicode/scramjet-core/lib/data-stream.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 18,
+    "kind": "variable",
+    "name": "PromiseTransformStream",
+    "memberof": "lib/data-stream.js",
+    "static": true,
+    "longname": "lib/data-stream.js~PromiseTransformStream",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/data-stream.js",
+    "importStyle": null,
+    "description": "",
+    "lineNumber": 5,
+    "unknown": [
+      {
+        "tagName": "@module",
+        "tagValue": "ScramjetCore"
+      }
+    ]
+  },
+  {
+    "__docId__": 19,
+    "kind": "variable",
+    "name": "Readable",
+    "memberof": "lib/data-stream.js",
+    "static": true,
+    "longname": "lib/data-stream.js~Readable",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/data-stream.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 6,
+    "undocument": true
+  },
+  {
+    "__docId__": 20,
+    "kind": "variable",
+    "name": "scramjet",
+    "memberof": "lib/data-stream.js",
+    "static": true,
+    "longname": "lib/data-stream.js~scramjet",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/data-stream.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 7,
+    "undocument": true
+  },
+  {
+    "__docId__": 21,
+    "kind": "typedef",
+    "name": "StreamOptions",
+    "memberof": "lib/data-stream.js",
+    "static": true,
+    "longname": "lib/data-stream.js~StreamOptions",
+    "access": null,
+    "description": "Standard options for scramjet streams.",
+    "properties": [
+      {
+        "nullable": null,
+        "types": [
+          "Number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "maxParallel",
+        "description": "the number of transforms done in parallel"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "DataStream"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "referrer",
+        "description": "a referring stream to point to (if possible the transforms will be pushed to it\n                                instead of creating a new stream)"
+      }
+    ],
+    "type": {
+      "types": [
+        "Object"
+      ],
+      "optional": false,
+      "name": "StreamOptions"
+    }
+  },
+  {
+    "__docId__": 22,
+    "kind": "class",
+    "name": "DataStream",
+    "memberof": "lib/data-stream.js",
+    "static": true,
+    "longname": "lib/data-stream.js~DataStream",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/data-stream.js",
+    "importStyle": null,
+    "description": "DataStream is the primary stream type for Scramjet. When you parse your\nstream, just pipe it you can then perform calculations on the data objects\nstreamed through your flow.",
+    "lineNumber": 28,
+    "unknown": [
+      {
+        "tagName": "@classdesc",
+        "tagValue": ""
+      }
+    ],
+    "interface": false,
+    "extends": [
+      "*"
+    ]
+  },
+  {
+    "__docId__": 23,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#constructor",
+    "access": null,
+    "description": "Create the DataStream.",
+    "examples": [
+      "{@link ../samples/data-stream-constructor.js}"
+    ],
+    "lineNumber": 37,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "StreamOptions"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "opts",
+        "description": "Stream options passed to superclass"
+      }
+    ]
+  },
+  {
+    "__docId__": 24,
+    "kind": "member",
+    "name": "_error_handlers",
+    "memberof": "lib/data-stream.js~DataStream",
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#_error_handlers",
+    "access": null,
+    "description": null,
+    "lineNumber": 43,
+    "undocument": true
+  },
+  {
+    "__docId__": 25,
+    "kind": "method",
+    "name": "map",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#map",
+    "access": null,
+    "description": "Transforms stream objects into new ones, just like Array.prototype.map\ndoes.",
+    "examples": [
+      "{@link ../samples/data-stream-map.js}"
+    ],
+    "lineNumber": 62,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "MapCallback"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "func",
+        "description": "The function that creates the new object"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Class"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "Clazz",
+        "description": "(optional) The class to be mapped to."
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "DataStream"
+      ],
+      "spread": false,
+      "description": "mapped stream"
+    }
+  },
+  {
+    "__docId__": 26,
+    "kind": "method",
+    "name": "filter",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#filter",
+    "access": null,
+    "description": "Filters object based on the function outcome, just like\nArray.prototype.filter.",
+    "examples": [
+      "{@link ../samples/data-stream-filter.js}"
+    ],
+    "lineNumber": 86,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "FilterCallback"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "func",
+        "description": "The function that filters the object"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "DataStream"
+      ],
+      "spread": false,
+      "description": "filtered stream"
+    }
+  },
+  {
+    "__docId__": 27,
+    "kind": "method",
+    "name": "reduce",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#reduce",
+    "access": null,
+    "description": "Reduces the stream into a given accumulator\n\nWorks similarily to Array.prototype.reduce, so whatever you return in the\nformer operation will be the first operand to the latter.\n\nThis method is serial - meaning that any processing on an entry will\noccur only after the previous entry is fully processed. This does mean\nit's much slower than parallel functions.",
+    "examples": [
+      "{@link ../samples/data-stream-reduce.js}"
+    ],
+    "lineNumber": 118,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "TransformFunction"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "func",
+        "description": "The into object will be passed as the  first argument, the data object from the stream as the second."
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "into",
+        "description": "Any object passed initally to the transform function"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Promise"
+      ],
+      "spread": false,
+      "description": "Promise resolved by the last object returned by the call of the transform function"
+    }
+  },
+  {
+    "__docId__": 28,
+    "kind": "method",
+    "name": "use",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#use",
+    "access": null,
+    "description": "Calls the passed method in place with the stream as first argument, returns result.\n\nThe main intention of this method is to run scramjet modules - transforms that allow complex transforms of\nstreams. These modules can also be run with [scramjet-cli](https://github.com/signicode/scramjet-cli) directly\nfrom the command line.",
+    "examples": [
+      "{@link ../samples/data-stream-use.js}"
+    ],
+    "lineNumber": 154,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Function",
+          "String"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "func",
+        "description": "if passed, the function will be called on self\n                        to add an option to inspect the stream in place,\n                        while not breaking the transform chain.\n                        Alternatively this can be a relative path to a scramjet-module."
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "*"
+      ],
+      "spread": false,
+      "description": "anything the passed function returns"
+    }
+  },
+  {
+    "__docId__": 29,
+    "kind": "method",
+    "name": "tee",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#tee",
+    "access": null,
+    "description": "Duplicate the stream\n\nCreates a duplicate stream instance and pases it to the callback.",
+    "examples": [
+      "{@link ../samples/data-stream-tee.js}"
+    ],
+    "lineNumber": 180,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "TeeCallback"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "func",
+        "description": "The duplicate stream will be passed as first argument."
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "DataStream"
+      ],
+      "spread": false,
+      "description": "self"
+    }
+  },
+  {
+    "__docId__": 30,
+    "kind": "method",
+    "name": "each",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#each",
+    "access": null,
+    "description": "Performs an operation on every chunk, without changing the stream\n\nThis is a shorthand for ```stream.on(\"data\", func)``` but with flow control.\nWarning: this resumes the stream!",
+    "lineNumber": 194,
+    "unknown": [
+      {
+        "tagName": "@chainable",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "MapCallback"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "func",
+        "description": "a callback called for each chunk."
+      }
+    ]
+  },
+  {
+    "__docId__": 31,
+    "kind": "method",
+    "name": "while",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#while",
+    "access": null,
+    "description": "Reads the stream while the function outcome is truthy.\n\nStops reading and emits end as soon as it ends.",
+    "lineNumber": 209,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "FilterCallback"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "func",
+        "description": "The condition check"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "DataStream"
+      ],
+      "spread": false,
+      "description": "the shortened stream"
+    }
+  },
+  {
+    "__docId__": 32,
+    "kind": "method",
+    "name": "until",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#until",
+    "access": null,
+    "description": "Reads the stream until the function outcome is truthy.\n\nWorks oposite of while.",
+    "lineNumber": 236,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "FilterCallback"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "func",
+        "description": "The condition check"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "DataStream"
+      ],
+      "spread": false,
+      "description": "the shortened stream"
+    }
+  },
+  {
+    "__docId__": 33,
+    "kind": "method",
+    "name": "catch",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#catch",
+    "access": null,
+    "description": "Provides an way to catch errors in chanined streams.\n\nThe handler will be called as asynchronous\n - if it resolves then the error will be muted.\n - if it rejects then the error will be passed to the next handler\n\nIf no handlers will resolve the error, an `error` event will be emitted",
+    "lineNumber": 252,
+    "unknown": [
+      {
+        "tagName": "@chainable",
+        "tagValue": ""
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Function"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "callback",
+        "description": "Error handler (async function)"
+      }
+    ]
+  },
+  {
+    "__docId__": 34,
+    "kind": "method",
+    "name": "raise",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#raise",
+    "access": null,
+    "description": "Executes all error handlers and if none resolves, then emits an error.\n\nThe returned promise will always be resolved even if there are no succesful handers.",
+    "lineNumber": 265,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Error"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "err",
+        "description": "The thrown error"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Promise"
+      ],
+      "spread": false,
+      "description": "the promise that will be resolved when the error is handled."
+    }
+  },
+  {
+    "__docId__": 35,
+    "kind": "method",
+    "name": "pipe",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#pipe",
+    "access": null,
+    "description": "Override of node.js Readable pipe.\n\nExcept for calling overriden method it proxies errors to piped stream.",
+    "lineNumber": 281,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Writable"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "to",
+        "description": "Writable stream to write to"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "WritableOptions"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "options",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Writable"
+      ],
+      "spread": false,
+      "description": "the `to` stream"
+    }
+  },
+  {
+    "__docId__": 36,
+    "kind": "method",
+    "name": "bufferify",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#bufferify",
+    "access": null,
+    "description": "Creates a BufferStream",
+    "examples": [
+      "{@link ../samples/data-stream-tobufferstream.js}"
+    ],
+    "lineNumber": 305,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "MapCallback"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "serializer",
+        "description": "A method that converts chunks to buffers"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "BufferStream"
+      ],
+      "spread": false,
+      "description": "the resulting stream"
+    }
+  },
+  {
+    "__docId__": 37,
+    "kind": "method",
+    "name": "stringify",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#stringify",
+    "access": null,
+    "description": "Creates a StringStream",
+    "examples": [
+      "{@link ../samples/data-stream-tostringstream.js}"
+    ],
+    "lineNumber": 317,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "MapCallback"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "serializer",
+        "description": "A method that converts chunks to strings"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "StringStream"
+      ],
+      "spread": false,
+      "description": "the resulting stream"
+    }
+  },
+  {
+    "__docId__": 38,
+    "kind": "method",
+    "name": "run",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#run",
+    "access": null,
+    "description": "Consumes all stream items without doing anything",
+    "lineNumber": 326,
+    "return": {
+      "nullable": null,
+      "types": [
+        "Promise"
+      ],
+      "spread": false,
+      "description": "Resolved when the whole stream is read"
+    }
+  },
+  {
+    "__docId__": 39,
+    "kind": "method",
+    "name": "fromArray",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/data-stream.js~DataStream.fromArray",
+    "access": null,
+    "description": "Create a DataStream from an Array",
+    "examples": [
+      "{@link ../samples/data-stream-fromarray.js}"
+    ],
+    "lineNumber": 343,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "arr",
+        "description": "list of chunks"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "DataStream"
+      ],
+      "spread": false,
+      "description": "the resulting stream"
+    }
+  },
+  {
+    "__docId__": 40,
+    "kind": "method",
+    "name": "fromIterator",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/data-stream.js~DataStream.fromIterator",
+    "access": null,
+    "description": "Create a DataStream from an Iterator\n\nDoesn't end the stream until it reaches end of the iterator.",
+    "examples": [
+      "{@link ../samples/data-stream-fromiterator.js}"
+    ],
+    "lineNumber": 364,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Iterator"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "iter",
+        "description": "the iterator object"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "DataStream"
+      ],
+      "spread": false,
+      "description": "the resulting stream"
+    }
+  },
+  {
+    "__docId__": 41,
+    "kind": "method",
+    "name": "toArray",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#toArray",
+    "access": null,
+    "description": "Aggregates the stream into a single Array\n\nIn fact it's just a shorthand for reducing the stream into an Array.",
+    "lineNumber": 386,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "initial",
+        "description": "Optional array to begin with."
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Promise"
+      ],
+      "spread": false,
+      "description": "Promise resolved with the resulting array on stream end."
+    }
+  },
+  {
+    "__docId__": 42,
+    "kind": "method",
+    "name": "toGenerator",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#toGenerator",
+    "access": null,
+    "description": "Returns an async generator\n\nReady for https://github.com/tc39/proposal-async-iteration",
+    "lineNumber": 400,
+    "return": {
+      "nullable": null,
+      "types": [
+        "Iterable.<Promise.<*>>"
+      ],
+      "spread": false,
+      "description": "Returns an iterator that returns a promise for each item."
+    }
+  },
+  {
+    "__docId__": 43,
+    "kind": "method",
+    "name": "_selfInstance",
+    "memberof": "lib/data-stream.js~DataStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/data-stream.js~DataStream#_selfInstance",
+    "access": null,
+    "description": "Returns a new instance of self.\n\nNormally this doesn't have to be overridden.\nWhen the constructor would use some special arguments this may be used to\noverride the object construction in {@link tee}...",
+    "examples": [
+      "{@link ../samples/data-stream-selfinstance.js}"
+    ],
+    "lineNumber": 494,
+    "unknown": [
+      {
+        "tagName": "@internal",
+        "tagValue": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "DataStream"
+      ],
+      "spread": false,
+      "description": "an empty instance of the same class."
+    }
+  },
+  {
+    "__docId__": 44,
+    "kind": "file",
+    "name": "lib/index.js",
+    "content": "/**\n * @module ScramjetCore\n */\n\nconst {plgctor} = require('./util/promise-transform-stream');\n\n/**\n * Exports\n *\n * @name scramjet\n * @type {Object}\n */\nmodule.exports = {\n    fromArray(...args) {\n        return this.DataStream.fromArray(...args);\n    },\n\n    /**\n     * Definition of a single mixin for a specific Scramjet class\n     *\n     * @typedef {Object} StreamMixin\n     * @property {Function} constructor optional constructor that will be called in the stream constructor (this has to be an own property!)\n     * @property {Function} * any name given will be mixed in to the scramjet stream (except for constructor)\n     */\n\n    /**\n     * Definition of a plugin in Scramjet\n     *\n     * @typedef {Object} ScramjetPlugin\n     * @property {StreamMixin} BufferStream definition of constructor and properties for the BufferStream prototype.\n     * @property {StreamMixin} DataStream definition of constructor and properties for the DataStream prototype.\n     * @property {StreamMixin} MultiStream definition of constructor and properties for the MultiStream prototype.\n     * @property {StreamMixin} StringStream definition of constructor and properties for the StringStream prototype.\n     */\n\n    /**\n     * Add a global plugin to scramjet - injects mixins into prototypes.\n     *\n     * @param  {ScramjetPlugin} mixin the plugin object\n     * @chainable\n     *\n     * @example {@link ../samples/scramjet-plugin.js}\n     */\n    plugin(mixins) {\n        for (const key of Object.keys(mixins)) {\n            if (key in this) {\n                const Mixin = mixins[key];\n                const Stream = this[key];\n                if (Mixin.hasOwnProperty(\"constructor\") && Stream[plgctor]) {\n                    Stream[plgctor].ctors.push(Mixin.constructor);\n                    delete Mixin.constructor;\n                }\n                Object.getOwnPropertyNames(Mixin).forEach(\n                    (prop) => Object.defineProperty(Stream.prototype, prop, Object.getOwnPropertyDescriptor(Mixin, prop))   // jshint ignore:line\n                );\n            } else {\n                this[key] = mixins[key];\n            }\n        }\n        return this;\n    },\n\n    /**\n     * Provides a lazy-load accessor to BufferStream\n     * @see module:ScramjetCore~BufferStream#\n     */\n    get BufferStream() { return require(\"./buffer-stream\"); },\n    /**\n     * Provides a lazy-load accessor to DataStream\n     * @see module:ScramjetCore~DataStream#\n     */\n    get DataStream() { return require(\"./data-stream\"); },\n    /**\n     * Provides a lazy-load accessor to MultiStream\n     * @see module:ScramjetCore~MultiStream#\n     */\n    get MultiStream() { return require(\"./multi-stream\"); },\n    /**\n     * Provides a lazy-load accessor to StringStream\n     * @see module:ScramjetCore~StringStream#\n     */\n    get StringStream() { return require(\"./string-stream\"); },\n    /**\n     * Provides a lazy-load accessor to PromiseTransformStream\n     * @see module:ScramjetCore~PromiseTransformStream#\n     */\n    get PromiseTransformStream() { return require(\"./util/promise-transform-stream\").PromiseTransformStream; },\n    /**\n     * Gets an API version (this may be important for future use)\n     * @param {Number} version The required version (currently only: 1)\n     */\n    API(version) {\n        if (version === 1) {\n            return module.exports;\n        }\n    }\n};\n",
+    "static": true,
+    "longname": "C:/src/signicode/scramjet-core/lib/index.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 45,
+    "kind": "variable",
+    "name": "plgctor",
+    "memberof": "lib/index.js",
+    "static": true,
+    "longname": "lib/index.js~plgctor",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core",
+    "importStyle": null,
+    "description": "",
+    "lineNumber": 5,
+    "unknown": [
+      {
+        "tagName": "@module",
+        "tagValue": "ScramjetCore"
+      }
+    ]
+  },
+  {
+    "__docId__": 46,
+    "kind": "typedef",
+    "name": "StreamMixin",
+    "memberof": "lib/index.js",
+    "static": true,
+    "longname": "lib/index.js~StreamMixin",
+    "access": null,
+    "description": "Definition of a single mixin for a specific Scramjet class",
+    "properties": [
+      {
+        "nullable": null,
+        "types": [
+          "Function"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "constructor",
+        "description": "optional constructor that will be called in the stream constructor (this has to be an own property!)"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Function"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "*",
+        "description": "any name given will be mixed in to the scramjet stream (except for constructor)"
+      }
+    ],
+    "type": {
+      "types": [
+        "Object"
+      ],
+      "optional": false,
+      "name": "StreamMixin"
+    }
+  },
+  {
+    "__docId__": 47,
+    "kind": "typedef",
+    "name": "ScramjetPlugin",
+    "memberof": "lib/index.js",
+    "static": true,
+    "longname": "lib/index.js~ScramjetPlugin",
+    "access": null,
+    "description": "Definition of a plugin in Scramjet",
+    "properties": [
+      {
+        "nullable": null,
+        "types": [
+          "StreamMixin"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "BufferStream",
+        "description": "definition of constructor and properties for the BufferStream prototype."
+      },
+      {
+        "nullable": null,
+        "types": [
+          "StreamMixin"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "DataStream",
+        "description": "definition of constructor and properties for the DataStream prototype."
+      },
+      {
+        "nullable": null,
+        "types": [
+          "StreamMixin"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "MultiStream",
+        "description": "definition of constructor and properties for the MultiStream prototype."
+      },
+      {
+        "nullable": null,
+        "types": [
+          "StreamMixin"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "StringStream",
+        "description": "definition of constructor and properties for the StringStream prototype."
+      }
+    ],
+    "type": {
+      "types": [
+        "Object"
+      ],
+      "optional": false,
+      "name": "ScramjetPlugin"
+    }
+  },
+  {
+    "__docId__": 48,
+    "kind": "file",
+    "name": "lib/multi-stream.js",
+    "content": "/**\n * @module ScramjetCore\n */\n\nconst OUT = Symbol(\"OUT\");\n\nconst mergesortStream = require(\"./util/merge-sort-stream\");\nconst EventEmitter = require(\"events\").EventEmitter;\nconst scramjet = require(\"./\");\n\n/**\n * An object consisting of multiple streams than can be refined or muxed.\n */\nclass MultiStream extends EventEmitter {\n\n    /**\n     * Crates an instance of MultiStream with the specified stream list\n     *\n     * @param  {stream.Readable[]} streams the list of readable streams (other\n     *                                     objects will be filtered out!)\n     * @param  {Object} options Optional options for the super object. ;)\n     *\n     * @example {@link ../samples/multi-stream-constructor.js}\n     */\n    constructor(streams, ...args) {\n\n        super(args.length ? args[0] : streams);\n\n        /**\n         * Array of all streams\n         * @type {Array}\n         */\n        this.streams = [];\n\n        if (Array.isArray(streams))\n            streams.forEach(\n                (str) => this.add(str)\n            );\n    }\n\n    /**\n     * Returns the current stream length\n     * @return {number}\n     */\n    get length() {\n        return this.streams.length;\n    }\n\n    /**\n     * Returns new MultiStream with the streams returned by the tranform.\n     *\n     * Runs callback for every stream, returns a new MultiStream of mapped\n     * streams and creates a new multistream consisting of streams returned\n     * by the callback.\n     * @todo For later add/remove operations to work properly, the stream must\n     * currently return the same instance!\n     *\n     * @param  {MapCallback} aFunc Mapper ran in Promise::then (so you can\n     *                                  return a promise or an object)\n     * @return {MultiStream}  the mapped instance\n     *\n     * @example {@link ../samples/multi-stream-map.js}\n     */\n    map(aFunc, rFunc) {\n        return Promise.all(\n            this.streams.map(\n                (s) => {\n                    return Promise.resolve(s)\n                        .then(aFunc)\n                    ;\n                }\n            )\n        ).then(\n            (streams) => {\n                const out = new MultiStream(\n                    streams\n                );\n\n                this.on(\n                    \"add\",\n                    (stream) => Promise.resolve(stream)\n                        .then(aFunc)\n                        .then(out.add.bind(out))\n                );\n\n                if (rFunc)\n                    this.on(\n                        \"remove\",\n                        (stream) => Promise.resolve(stream)\n                            .then(rFunc)\n                            .then(out.remove.bind(out))\n                    );\n\n                return out;\n            }\n        );\n    }\n\n    /**\n     * Calls Array.prototype.find on the streams\n     * @param  {Arguments} args arguments for\n     * @return {DataStream}  found DataStream\n     */\n    find(...args) {\n        return this.streams.find(...args);\n    }\n\n    each(aFunc, rFunc) {\n        return Promise.all(\n            this.streams.map(\n                (s) => {\n                    return Promise.resolve(s)\n                        .then(aFunc)\n                    ;\n                }\n            )\n        ).then(\n            () => {\n                this.on(\n                    \"add\",\n                    (stream) => Promise.resolve(stream).then(aFunc)\n                );\n\n                if (rFunc)\n                    this.on(\n                        \"remove\",\n                        (stream) => Promise.resolve(stream).then(rFunc)\n                    );\n\n                return this;\n            }\n        );\n    }\n\n    /**\n     * Filters the stream list and returns a new MultiStream with only the\n     * streams for which the callback returned true\n     *\n     * @param  {TransformFunction} func Filter ran in Promise::then (so you can\n     *                                  return a promise or a boolean)\n     * @return {MultiStream}  the filtered instance\n     *\n     * @example {@link ../samples/multi-stream-filter.js}\n     */\n    filter(func) {\n        return Promise.all(\n            this.streams.map(\n                (s) => Promise.resolve(s)\n                    .then(func)\n                    .then((o) => o ? s : null)\n            )\n        ).then(\n            (streams) => {\n                const out = new MultiStream(\n                    streams.filter((s) => s)\n                );\n                this.on(\n                    \"add\",\n                    (stream) => Promise.resolve(stream)\n                        .then(func)\n                        .then(out.add.bind(out))\n                );\n                this.on(\n                    \"remove\", out.remove.bind(out)\n                );\n                return out;\n            }\n        );\n    }\n\n    /**\n     * Muxes the streams into a single one\n     *\n     * @todo For now using comparator will not affect the mergesort.\n     * @todo Sorting requires all the streams to be constantly flowing, any\n     *       single one drain results in draining the muxed too even if there\n     *       were possible data on other streams.\n     *\n     * @param  {ComparatorFunction} cmp Should return -1 0 or 1 depending on the\n     *                                  desired order. If passed the chunks will\n     *                                  be added in a sorted order.\n     * @return {DataStream}  The resulting DataStream\n     *\n     * @example {@link ../samples/multi-stream-mux.js}\n     */\n    mux(cmp, Clazz) {\n\n        this[OUT] = Clazz ? new Clazz() : new scramjet.DataStream();\n\n        if (!cmp) {\n\n            const unpipeStream = (stream) => {\n                if (stream) stream.unpipe(this[OUT]);\n                this[OUT].setMaxListeners(this.streams.length);\n            };\n\n            const pipeStream = (stream) => {\n                this[OUT].setMaxListeners(this.streams.length);\n                stream.pipe(this[OUT], {end: false});\n            };\n\n            this.on(\"add\", pipeStream);\n            this.on(\"remove\", unpipeStream);\n\n            this.streams.forEach(pipeStream);\n\n            this.on(\"empty\", () => this[OUT].end());\n\n            return this[OUT];\n        }\n\n        return mergesortStream(this, cmp, 0, Clazz);\n    }\n\n    /**\n     * Adds a stream to the MultiStream\n     *\n     * If the stream was muxed, filtered or mapped, this stream will undergo the\n     * same transorms and conditions as if it was added in constructor.\n     *\n     * @param {stream.Readable} stream [description]\n     *\n     * @example {@link ../samples/multi-stream-add.js}\n     */\n    add(stream) {\n\n        if (stream) {\n            this.streams.push(stream);\n            this.setMaxListeners(this.streams.length + EventEmitter.defaultMaxListeners);\n            this.emit(\"add\", stream, this.streams.length - 1);\n            stream.on(\"end\", () => this.remove(stream));\n        }\n\n        return this;\n    }\n\n    /**\n     * Removes a stream from the MultiStream\n     *\n     * If the stream was muxed, filtered or mapped, it will be removed from same\n     * streams.\n     *\n     * @param {stream.Readable} stream [description]\n     *\n     * @example {@link ../samples/multi-stream-remove.js}\n     */\n    remove(stream) {\n\n        const strIndex = this.streams.indexOf(stream);\n        if (strIndex >= 0) {\n            this.setMaxListeners(this.streams.length + EventEmitter.defaultMaxListeners);\n            this.streams.splice(strIndex, 1);\n            this.emit(\"remove\", stream, strIndex);\n        }\n\n        if (!this.streams.length) {\n            this.emit(\"empty\");\n        }\n\n        return this;\n    }\n\n}\n\nmodule.exports = MultiStream;\n",
+    "static": true,
+    "longname": "C:/src/signicode/scramjet-core/lib/multi-stream.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 49,
+    "kind": "variable",
+    "name": "OUT",
+    "memberof": "lib/multi-stream.js",
+    "static": true,
+    "longname": "lib/multi-stream.js~OUT",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/multi-stream.js",
+    "importStyle": null,
+    "description": "",
+    "lineNumber": 5,
+    "unknown": [
+      {
+        "tagName": "@module",
+        "tagValue": "ScramjetCore"
+      }
+    ]
+  },
+  {
+    "__docId__": 50,
+    "kind": "variable",
+    "name": "mergesortStream",
+    "memberof": "lib/multi-stream.js",
+    "static": true,
+    "longname": "lib/multi-stream.js~mergesortStream",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/multi-stream.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 7,
+    "undocument": true
+  },
+  {
+    "__docId__": 51,
+    "kind": "variable",
+    "name": "EventEmitter",
+    "memberof": "lib/multi-stream.js",
+    "static": true,
+    "longname": "lib/multi-stream.js~EventEmitter",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/multi-stream.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 8,
+    "undocument": true
+  },
+  {
+    "__docId__": 52,
+    "kind": "variable",
+    "name": "scramjet",
+    "memberof": "lib/multi-stream.js",
+    "static": true,
+    "longname": "lib/multi-stream.js~scramjet",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/multi-stream.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 9,
+    "undocument": true
+  },
+  {
+    "__docId__": 53,
+    "kind": "class",
+    "name": "MultiStream",
+    "memberof": "lib/multi-stream.js",
+    "static": true,
+    "longname": "lib/multi-stream.js~MultiStream",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/multi-stream.js",
+    "importStyle": null,
+    "description": "An object consisting of multiple streams than can be refined or muxed.",
+    "lineNumber": 14,
+    "interface": false,
+    "extends": [
+      "EventEmitter"
+    ]
+  },
+  {
+    "__docId__": 54,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "lib/multi-stream.js~MultiStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/multi-stream.js~MultiStream#constructor",
+    "access": null,
+    "description": "Crates an instance of MultiStream with the specified stream list",
+    "examples": [
+      "{@link ../samples/multi-stream-constructor.js}"
+    ],
+    "lineNumber": 25,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "stream.Readable[]"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "streams",
+        "description": "the list of readable streams (other\n                                    objects will be filtered out!)"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "options",
+        "description": "Optional options for the super object. ;)"
+      }
+    ]
+  },
+  {
+    "__docId__": 55,
+    "kind": "member",
+    "name": "streams",
+    "memberof": "lib/multi-stream.js~MultiStream",
+    "static": false,
+    "longname": "lib/multi-stream.js~MultiStream#streams",
+    "access": null,
+    "description": "Array of all streams",
+    "lineNumber": 33,
+    "type": {
+      "nullable": null,
+      "types": [
+        "Array"
+      ],
+      "spread": false,
+      "description": null
+    }
+  },
+  {
+    "__docId__": 56,
+    "kind": "get",
+    "name": "length",
+    "memberof": "lib/multi-stream.js~MultiStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/multi-stream.js~MultiStream#length",
+    "access": null,
+    "description": "Returns the current stream length",
+    "lineNumber": 45,
+    "return": {
+      "nullable": null,
+      "types": [
+        "number"
+      ],
+      "spread": false,
+      "description": ""
+    }
+  },
+  {
+    "__docId__": 57,
+    "kind": "method",
+    "name": "map",
+    "memberof": "lib/multi-stream.js~MultiStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/multi-stream.js~MultiStream#map",
+    "access": null,
+    "description": "Returns new MultiStream with the streams returned by the tranform.\n\nRuns callback for every stream, returns a new MultiStream of mapped\nstreams and creates a new multistream consisting of streams returned\nby the callback.",
+    "examples": [
+      "{@link ../samples/multi-stream-map.js}"
+    ],
+    "lineNumber": 64,
+    "todo": [
+      "For later add/remove operations to work properly, the stream must\ncurrently return the same instance!"
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "MapCallback"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "aFunc",
+        "description": "Mapper ran in Promise::then (so you can\n                                 return a promise or an object)"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "MultiStream"
+      ],
+      "spread": false,
+      "description": "the mapped instance"
+    }
+  },
+  {
+    "__docId__": 58,
+    "kind": "method",
+    "name": "find",
+    "memberof": "lib/multi-stream.js~MultiStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/multi-stream.js~MultiStream#find",
+    "access": null,
+    "description": "Calls Array.prototype.find on the streams",
+    "lineNumber": 104,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Arguments"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "args",
+        "description": "arguments for"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "DataStream"
+      ],
+      "spread": false,
+      "description": "found DataStream"
+    }
+  },
+  {
+    "__docId__": 59,
+    "kind": "method",
+    "name": "each",
+    "memberof": "lib/multi-stream.js~MultiStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/multi-stream.js~MultiStream#each",
+    "access": null,
+    "description": null,
+    "lineNumber": 108,
+    "undocument": true
+  },
+  {
+    "__docId__": 60,
+    "kind": "method",
+    "name": "filter",
+    "memberof": "lib/multi-stream.js~MultiStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/multi-stream.js~MultiStream#filter",
+    "access": null,
+    "description": "Filters the stream list and returns a new MultiStream with only the\nstreams for which the callback returned true",
+    "examples": [
+      "{@link ../samples/multi-stream-filter.js}"
+    ],
+    "lineNumber": 145,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "TransformFunction"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "func",
+        "description": "Filter ran in Promise::then (so you can\n                                 return a promise or a boolean)"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "MultiStream"
+      ],
+      "spread": false,
+      "description": "the filtered instance"
+    }
+  },
+  {
+    "__docId__": 61,
+    "kind": "method",
+    "name": "mux",
+    "memberof": "lib/multi-stream.js~MultiStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/multi-stream.js~MultiStream#mux",
+    "access": null,
+    "description": "Muxes the streams into a single one",
+    "examples": [
+      "{@link ../samples/multi-stream-mux.js}"
+    ],
+    "lineNumber": 186,
+    "todo": [
+      "For now using comparator will not affect the mergesort.",
+      "Sorting requires all the streams to be constantly flowing, any\n      single one drain results in draining the muxed too even if there\n      were possible data on other streams."
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "ComparatorFunction"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "cmp",
+        "description": "Should return -1 0 or 1 depending on the\n                                 desired order. If passed the chunks will\n                                 be added in a sorted order."
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "DataStream"
+      ],
+      "spread": false,
+      "description": "The resulting DataStream"
+    }
+  },
+  {
+    "__docId__": 62,
+    "kind": "member",
+    "name": "[OUT]",
+    "memberof": "lib/multi-stream.js~MultiStream",
+    "static": false,
+    "longname": "lib/multi-stream.js~MultiStream#[OUT]",
+    "access": null,
+    "description": null,
+    "lineNumber": 188,
+    "undocument": true
+  },
+  {
+    "__docId__": 63,
+    "kind": "method",
+    "name": "add",
+    "memberof": "lib/multi-stream.js~MultiStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/multi-stream.js~MultiStream#add",
+    "access": null,
+    "description": "Adds a stream to the MultiStream\n\nIf the stream was muxed, filtered or mapped, this stream will undergo the\nsame transorms and conditions as if it was added in constructor.",
+    "examples": [
+      "{@link ../samples/multi-stream-add.js}"
+    ],
+    "lineNumber": 225,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "stream.Readable"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "stream",
+        "description": "[description]"
+      }
+    ]
+  },
+  {
+    "__docId__": 64,
+    "kind": "method",
+    "name": "remove",
+    "memberof": "lib/multi-stream.js~MultiStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/multi-stream.js~MultiStream#remove",
+    "access": null,
+    "description": "Removes a stream from the MultiStream\n\nIf the stream was muxed, filtered or mapped, it will be removed from same\nstreams.",
+    "examples": [
+      "{@link ../samples/multi-stream-remove.js}"
+    ],
+    "lineNumber": 247,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "stream.Readable"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "stream",
+        "description": "[description]"
+      }
+    ]
+  },
+  {
+    "__docId__": 65,
+    "kind": "file",
+    "name": "lib/string-stream.js",
+    "content": "/**\n * @module ScramjetCore\n */\n\nconst scramjet = require('./');\n\nconst SPLIT_LINE = /\\r\\n?|\\n/g;\n\n/**\n * A stream of string objects for further transformation on top of DataStream.\n *\n * @extends DataStream\n */\nclass StringStream extends scramjet.DataStream {\n\n    /**\n     * Constructs the stream with the given encoding\n     *\n     * @param  {String} encoding the encoding to use\n     * @return {StringStream}  the created data stream\n     *\n     * @example {@link ../samples/string-stream-constructor.js}\n     */\n    constructor(encoding, options) {\n\n        super(typeof encoding === \"string\" ? options : encoding);\n        this.buffer = \"\";\n        this.constructed = new Error().stack;\n        this.encoding = typeof encoding === \"string\" ? encoding : \"utf8\";\n    }\n\n    /**\n     * @callback ShiftCallback\n     * @param {String} shifted Pooped chars\n     */\n\n    /**\n     * Shifts given length of chars from the original stream\n     *\n     * Works the same way as {@see DataStream.shift}, but in this case extracts\n     * the given number of characters.\n     *\n     * @param {Number} bytes The number of characters to shift.\n     * @param {ShiftCallback} func Function that receives a string of shifted\n     *                                 chars.\n     * @return {StringStream}  substream.\n     *\n     * @example {@link ../samples/string-stream-shift.js}\n     */\n    shift(bytes, func) {\n        const ret = \"\";\n        const str = this.tap()._selfInstance({\n            referrer: this\n        });\n        let offs = 0;\n\n        const chunkHandler = (chunk) => {\n            const length = Math.min(bytes - offs, chunk.length);\n            chunk.substr(0, length);\n            offs += length;\n            if (length >= bytes) {\n                unHook()\n                    .then(\n                        () => {\n                            str.write(chunk.slice(length));\n                            this.pipe(str);\n                        }\n                    );\n            }\n        };\n\n        const endHandler = (...args) => {\n            if (ret.length < bytes) {\n                unHook();\n            }\n            str.end(...args);\n        };\n\n        const errorHandler = str.emit.bind(str, \"error\");\n\n        const unHook = () => {  // jshint ignore:line\n            this.removeListener(\"data\", chunkHandler);\n            this.removeListener(\"end\", endHandler);\n            this.removeListener(\"error\", errorHandler);\n            return Promise.resolve(ret)\n                .then(func);\n        };\n\n\n        this.on(\"data\", chunkHandler);\n        this.on(\"end\", endHandler);\n        this.on(\"error\", errorHandler);\n\n        return str;\n    }\n\n    /**\n     * A handly split by line regex to quickly get a line-by-line stream\n     */\n    static get SPLIT_LINE() {\n        return SPLIT_LINE;\n    }\n\n    /**\n     * Splits the string stream by the specified regexp or string\n     *\n     * @todo implement splitting by buffer or string\n     * @param  {RegExp|String} splitter What to split by\n     * @return {StringStream}  the re-splitted string stream.\n     *\n     * @example {@link ../samples/string-stream-split.js}\n     */\n    split(splitter) {\n        if (splitter instanceof RegExp || typeof splitter === \"string\") {\n            return this.tap().pipe(this._selfInstance({\n                transform(chunk, encoding, callback) {\n                    this.buffer += chunk.toString(this.encoding);\n                    const newChunks = this.buffer.split(splitter);\n                    while(newChunks.length > 1) {\n                        this.push(newChunks.shift());\n                    }\n                    this.buffer = newChunks[0];\n                    callback();\n                },\n                flush(callback) {\n                    this.push(this.buffer);\n                    this.buffer = \"\";\n                    callback();\n                },\n                referrer: this\n            }));\n        } else if (splitter instanceof Function) {\n            return this.tap().pipe(new StringStream({\n                transform: splitter,\n                referrer: this\n            }));\n        }\n    }\n\n    /**\n     * Finds matches in the string stream and streams the match results\n     *\n     * @todo implement splitting by buffer or string\n     * @param  {RegExp} splitter A function that will be called for every\n     *                             stream chunk.\n     * @return {StringStream}  string stream of matches.\n     *\n     * @example {@link ../samples/string-stream-match.js}\n     */\n    match(matcher) {\n        if (matcher instanceof RegExp) {\n            const replaceRegex = (matcher.source.search(/\\((?!\\?)/g) > -1) ?\n                new RegExp(\"[\\\\s\\\\S]*?\" + matcher.source, (matcher.ignoreCase ? 'i' : '') + (matcher.multiline ? 'm' : '') + (matcher.unicode ? 'u' : '') + 'g') :\n                new RegExp(\"[\\\\s\\\\S]*?(\" + matcher.source + \")\", (matcher.ignoreCase ? 'i' : '') + (matcher.multiline ? 'm' : '') + (matcher.unicode ? 'u' : '') + 'g')\n                ;\n\n            return this.tap().pipe(this._selfInstance({\n                transform(chunk, encoding, callback) {\n                    this.buffer = (this.buffer || \"\") + chunk.toString(\"utf-8\");\n                    this.buffer = this.buffer.replace(replaceRegex, (...match) => {\n                        this.push(match.slice(1, match.length - 2).join(\"\"));\n                        return '';\n                    });\n\n                    callback();\n                },\n                referrer: this\n            }));\n\n        }\n        throw new Error(\"Mathcher must be a RegExp!\");\n    }\n\n    /**\n     * Transforms the StringStream to BufferStream\n     *\n     * Creates a buffer stream from the given string stream. Still it returns a\n     * DataStream derivative and isn't the typical node.js stream so you can do\n     * all your transforms when you like.\n     *\n     * @return {StringStream}  The converted stream.\n     *\n     * @example {@link ../samples/string-stream-tobufferstream.js}\n     */\n    toBufferStream() {\n        return this.tap().map(\n            (str) => Buffer.from(str, this.encoding),\n            new scramjet.BufferStream({\n                referrer: this\n            })\n        );\n    }\n\n    /**\n     * @ignore\n     */\n    toStringStream(encoding) {\n        if (encoding)\n            return this.tap().pipe(this._selfInstance(encoding, {\n                referrer: this\n            }));\n        else\n            return this;\n    }\n\n    /**\n     * @callback ParseCallback\n     * @param {String} chunk the transformed chunk\n     * @return {Promise}  the promise should be resolved with the parsed object\n     */\n\n     /**\n      * Parses every string to object\n      *\n      * The method MUST parse EVERY string into a single object, so the string\n      * stream here should already be splitted.\n      *\n      * @param  {ParseCallback} parser The transform function\n      * @return {DataStream}  The parsed objects stream.\n      *\n      * @example {@link ../samples/string-stream-parse.js}\n      */\n    parse(parser, OtherStream) {\n        return this.tap().map(parser, OtherStream || scramjet.DataStream);\n    }\n\n    /**\n     * Alias for {@link StringStream#parse}\n     * @function toDataStream\n     */\n\n     /**\n      * @ignore\n      */\n    _transform(chunk, encoding, callback) {\n        this.push(chunk.toString(this.encoding));\n        return callback();\n    }\n\n    /**\n     * Creates a StringStream and writes a specific string.\n     *\n     * @param  {String} str      the string to push the your stream\n     * @param  {String} encoding optional encoding\n     * @return {StringStream}          new StringStream.\n     */\n    static fromString(str, encoding) {\n        const st =  new StringStream(encoding || 'utf-8');\n        st.end(str);\n        return st;\n    }\n\n}\n\nStringStream.prototype.pop = StringStream.prototype.shift;\n\nmodule.exports = StringStream;\n",
+    "static": true,
+    "longname": "C:/src/signicode/scramjet-core/lib/string-stream.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 66,
+    "kind": "variable",
+    "name": "scramjet",
+    "memberof": "lib/string-stream.js",
+    "static": true,
+    "longname": "lib/string-stream.js~scramjet",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/string-stream.js",
+    "importStyle": null,
+    "description": "",
+    "lineNumber": 5,
+    "unknown": [
+      {
+        "tagName": "@module",
+        "tagValue": "ScramjetCore"
+      }
+    ]
+  },
+  {
+    "__docId__": 67,
+    "kind": "variable",
+    "name": "SPLIT_LINE",
+    "memberof": "lib/string-stream.js",
+    "static": true,
+    "longname": "lib/string-stream.js~SPLIT_LINE",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/string-stream.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 7,
+    "undocument": true
+  },
+  {
+    "__docId__": 68,
+    "kind": "class",
+    "name": "StringStream",
+    "memberof": "lib/string-stream.js",
+    "static": true,
+    "longname": "lib/string-stream.js~StringStream",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/string-stream.js",
+    "importStyle": null,
+    "description": "A stream of string objects for further transformation on top of DataStream.",
+    "lineNumber": 14,
+    "interface": false,
+    "extends": [
+      "*"
+    ]
+  },
+  {
+    "__docId__": 69,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "lib/string-stream.js~StringStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/string-stream.js~StringStream#constructor",
+    "access": null,
+    "description": "Constructs the stream with the given encoding",
+    "examples": [
+      "{@link ../samples/string-stream-constructor.js}"
+    ],
+    "lineNumber": 24,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "encoding",
+        "description": "the encoding to use"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "StringStream"
+      ],
+      "spread": false,
+      "description": "the created data stream"
+    }
+  },
+  {
+    "__docId__": 70,
+    "kind": "member",
+    "name": "buffer",
+    "memberof": "lib/string-stream.js~StringStream",
+    "static": false,
+    "longname": "lib/string-stream.js~StringStream#buffer",
+    "access": null,
+    "description": null,
+    "lineNumber": 27,
+    "undocument": true
+  },
+  {
+    "__docId__": 71,
+    "kind": "member",
+    "name": "constructed",
+    "memberof": "lib/string-stream.js~StringStream",
+    "static": false,
+    "longname": "lib/string-stream.js~StringStream#constructed",
+    "access": null,
+    "description": null,
+    "lineNumber": 28,
+    "undocument": true
+  },
+  {
+    "__docId__": 72,
+    "kind": "member",
+    "name": "encoding",
+    "memberof": "lib/string-stream.js~StringStream",
+    "static": false,
+    "longname": "lib/string-stream.js~StringStream#encoding",
+    "access": null,
+    "description": null,
+    "lineNumber": 29,
+    "undocument": true
+  },
+  {
+    "__docId__": 73,
+    "kind": "method",
+    "name": "shift",
+    "memberof": "lib/string-stream.js~StringStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/string-stream.js~StringStream#shift",
+    "access": null,
+    "description": "Shifts given length of chars from the original stream\n\nWorks the same way as {@see DataStream.shift}, but in this case extracts\nthe given number of characters.",
+    "examples": [
+      "{@link ../samples/string-stream-shift.js}"
+    ],
+    "lineNumber": 50,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "bytes",
+        "description": "The number of characters to shift."
+      },
+      {
+        "nullable": null,
+        "types": [
+          "ShiftCallback"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "func",
+        "description": "Function that receives a string of shifted\n                                chars."
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "StringStream"
+      ],
+      "spread": false,
+      "description": "substream."
+    }
+  },
+  {
+    "__docId__": 74,
+    "kind": "get",
+    "name": "SPLIT_LINE",
+    "memberof": "lib/string-stream.js~StringStream",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/string-stream.js~StringStream.SPLIT_LINE",
+    "access": null,
+    "description": "A handly split by line regex to quickly get a line-by-line stream",
+    "lineNumber": 100
+  },
+  {
+    "__docId__": 75,
+    "kind": "method",
+    "name": "split",
+    "memberof": "lib/string-stream.js~StringStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/string-stream.js~StringStream#split",
+    "access": null,
+    "description": "Splits the string stream by the specified regexp or string",
+    "examples": [
+      "{@link ../samples/string-stream-split.js}"
+    ],
+    "lineNumber": 113,
+    "todo": [
+      "implement splitting by buffer or string"
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "RegExp",
+          "String"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "splitter",
+        "description": "What to split by"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "StringStream"
+      ],
+      "spread": false,
+      "description": "the re-splitted string stream."
+    }
+  },
+  {
+    "__docId__": 79,
+    "kind": "method",
+    "name": "match",
+    "memberof": "lib/string-stream.js~StringStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/string-stream.js~StringStream#match",
+    "access": null,
+    "description": "Finds matches in the string stream and streams the match results",
+    "examples": [
+      "{@link ../samples/string-stream-match.js}"
+    ],
+    "lineNumber": 150,
+    "todo": [
+      "implement splitting by buffer or string"
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "RegExp"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "splitter",
+        "description": "A function that will be called for every\n                            stream chunk."
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "StringStream"
+      ],
+      "spread": false,
+      "description": "string stream of matches."
+    }
+  },
+  {
+    "__docId__": 82,
+    "kind": "method",
+    "name": "toBufferStream",
+    "memberof": "lib/string-stream.js~StringStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/string-stream.js~StringStream#toBufferStream",
+    "access": null,
+    "description": "Transforms the StringStream to BufferStream\n\nCreates a buffer stream from the given string stream. Still it returns a\nDataStream derivative and isn't the typical node.js stream so you can do\nall your transforms when you like.",
+    "examples": [
+      "{@link ../samples/string-stream-tobufferstream.js}"
+    ],
+    "lineNumber": 185,
+    "return": {
+      "nullable": null,
+      "types": [
+        "StringStream"
+      ],
+      "spread": false,
+      "description": "The converted stream."
+    }
+  },
+  {
+    "__docId__": 83,
+    "kind": "method",
+    "name": "toStringStream",
+    "memberof": "lib/string-stream.js~StringStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/string-stream.js~StringStream#toStringStream",
+    "access": null,
+    "description": "",
+    "lineNumber": 197,
+    "ignore": true
+  },
+  {
+    "__docId__": 84,
+    "kind": "method",
+    "name": "parse",
+    "memberof": "lib/string-stream.js~StringStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/string-stream.js~StringStream#parse",
+    "access": null,
+    "description": "Parses every string to object\n\nThe method MUST parse EVERY string into a single object, so the string\nstream here should already be splitted.",
+    "examples": [
+      "{@link ../samples/string-stream-parse.js}"
+    ],
+    "lineNumber": 223,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "ParseCallback"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "parser",
+        "description": "The transform function"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "DataStream"
+      ],
+      "spread": false,
+      "description": "The parsed objects stream."
+    }
+  },
+  {
+    "__docId__": 85,
+    "kind": "method",
+    "name": "_transform",
+    "memberof": "lib/string-stream.js~StringStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/string-stream.js~StringStream#_transform",
+    "access": null,
+    "description": "",
+    "lineNumber": 235,
+    "ignore": true
+  },
+  {
+    "__docId__": 86,
+    "kind": "method",
+    "name": "fromString",
+    "memberof": "lib/string-stream.js~StringStream",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/string-stream.js~StringStream.fromString",
+    "access": null,
+    "description": "Creates a StringStream and writes a specific string.",
+    "lineNumber": 247,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "str",
+        "description": "the string to push the your stream"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "encoding",
+        "description": "optional encoding"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "StringStream"
+      ],
+      "spread": false,
+      "description": "new StringStream."
+    }
+  },
+  {
+    "__docId__": 87,
+    "kind": "file",
+    "name": "lib/util/merge-sort-stream.js",
+    "content": "const DataStream = require('../../').DataStream;\nconst DefaultBufferLength = 16;\n\nconst wrapComparator = (comparator) => (a, b) => comparator(a[0], b[0]);\nconst DefaultComparator = (a, b) => {\n    if (a < b) return -1;\n    if (b < a) return 1;\n    return 0;\n};\n\nmodule.exports = (multi, passedComparator, bufferLength, Clazz) => {\n\n    bufferLength = bufferLength || DefaultBufferLength;\n\n    Clazz = Clazz || DataStream;\n\n    const comparator = wrapComparator(passedComparator || DefaultComparator);\n\n    const out = new Clazz();\n    const readIndex = new Map();\n    const endIndex = new WeakMap();\n\n    const rest = [];\n\n    const onceTouchedStream = (stream) => {\n        return Promise.race([\n            new Promise((res) => stream.on(\"readable\", res)),\n            endIndex.get(stream)\n        ]);\n    };\n\n    const getMoreItemsForEntry = (stream, arr) => {\n        while (arr.length < bufferLength) {\n            let haveMore = stream.read();\n\n            if (haveMore !== null)\n                arr.push(haveMore);\n            else\n                break;\n        }\n\n        if (arr.length || !readIndex.has(stream))\n            return Promise.resolve(arr);\n\n        return onceTouchedStream(stream)\n            .then(\n                () => getMoreItemsForEntry(stream, arr),\n                () => Promise.resolve(arr)\n            );\n    };\n\n    const getMoreItems = () => {\n        const ret = [];\n        for (let entry of readIndex.entries()) {\n            ret.push(getMoreItemsForEntry(...entry));\n        }\n\n        if (!ret.length)\n            return Promise.resolve([]);\n\n        return Promise.all(ret);\n    };\n\n    // TODO: rewrite as generator?\n    const getSorted = (inArys) => {\n        const arr = [];\n        const arys = inArys.slice();\n\n        let min_length = 0;\n        let j = 0;\n\n        if (rest.length) {\n            arys.push(rest);\n        }\n\n        if (!arys.length)\n            return [];\n\n        while (true) {  // eslint-disable-line\n            let cnt = 0;\n\n            for (let ary of arys)\n                cnt += ary.length > j;\n\n            if (cnt === arys.length) {\n                for (let i = 0; i < arys.length; i++) {\n                    arr.push([arys[i][j], i, j, arys[i].length - j - 1]);\n                }\n                min_length = ++j;\n            } else {\n                break;\n            }\n        }\n\n        arr.sort(comparator);\n\n        const ret = [];\n        while (min_length > 0 && arr.length > 0) {\n\n            const item = arr.shift();\n            arys[item[1]].shift(item[2]);\n            ret.push(item[0]);\n            min_length = item[3];\n        }\n\n        return ret;\n    };\n\n    const writeSorted = (sorted) => {\n        let ret = true;\n\n        for (var i = 0; i < sorted.length; i++) {\n            ret = out.write(sorted[i]);\n        }\n\n        return ret || new Promise((res) => out.once(\"drain\", () => res(sorted.end)));\n    };\n\n    let removing = null;\n    let pushing = null;\n    const pushMoreItems = () => {\n\n        if (pushing)\n            return pushing;\n\n        pushing =\n            getMoreItems()\n            .then(\n                (arys) => getSorted(arys)\n            )\n            .then(\n                writeSorted\n            )\n            .catch(\n                (e) => e instanceof Error ? out.emit(\"error\", e) : (pushing = null, Promise.resolve())\n            )\n            .then(\n                () => {\n                    pushing = null;\n\n                    if (readIndex.size) {\n                        pushMoreItems();\n                    } else if (rest.length) {\n                        return writeSorted(rest.sort(passedComparator));\n                    }\n                }\n            );\n\n        return pushing;\n    };\n\n    const onEmpty = () => {\n        return Promise.resolve(pushing)\n            .then(() => out.end());\n    };\n\n    multi.each(\n        (addedStream) => {\n            const endPromise = new Promise(\n                (res, rej) => addedStream.on(\"end\", () => {\n                    multi.remove(addedStream);\n                    rej();\n                })\n            );\n\n            endPromise.catch(() => 0);\n\n            readIndex.set(addedStream, []);\n            endIndex.set(\n                addedStream,\n                endPromise\n            );\n        },\n        (removedStream) => {\n            removing = Promise.all([\n                getMoreItemsForEntry(removedStream, readIndex.get(removedStream), true)\n                    .then(\n                        (items) => {\n                            readIndex.delete(removedStream);\n                            rest.push(...items);\n                        }\n                    ),\n                removing\n            ]).then(\n                () => readIndex.size ? pushMoreItems() : onEmpty()\n            );\n        }\n    ).then(\n        pushMoreItems\n    ).catch(\n        e => out.emit('error', e)\n    );\n\n    return out;\n};\n",
+    "static": true,
+    "longname": "C:/src/signicode/scramjet-core/lib/util/merge-sort-stream.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 88,
+    "kind": "variable",
+    "name": "DataStream",
+    "memberof": "lib/util/merge-sort-stream.js",
+    "static": true,
+    "longname": "lib/util/merge-sort-stream.js~DataStream",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/util/merge-sort-stream.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 1,
+    "undocument": true
+  },
+  {
+    "__docId__": 89,
+    "kind": "variable",
+    "name": "DefaultBufferLength",
+    "memberof": "lib/util/merge-sort-stream.js",
+    "static": true,
+    "longname": "lib/util/merge-sort-stream.js~DefaultBufferLength",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/util/merge-sort-stream.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 2,
+    "undocument": true
+  },
+  {
+    "__docId__": 90,
+    "kind": "function",
+    "name": "wrapComparator",
+    "memberof": "lib/util/merge-sort-stream.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/util/merge-sort-stream.js~wrapComparator",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/util/merge-sort-stream.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 4,
+    "undocument": true
+  },
+  {
+    "__docId__": 91,
+    "kind": "function",
+    "name": "DefaultComparator",
+    "memberof": "lib/util/merge-sort-stream.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/util/merge-sort-stream.js~DefaultComparator",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/util/merge-sort-stream.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 5,
+    "undocument": true
+  },
+  {
+    "__docId__": 92,
+    "kind": "file",
+    "name": "lib/util/promise-transform-stream.js",
+    "content": "const {Transform} = require('stream');\nconst {EventEmitter} = require('events');\nconst DefaultHighWaterMark = require(\"os\").cpus().length * 2;\n\nconst filter = Symbol(\"FILTER\");\nconst plgctor = Symbol(\"plgctor\");\nconst storector = Symbol(\"storector\");\n\nconst ignore = () => 0;\n\n/**\n * DataStream is the primary stream type for Scramjet. When you parse your\n * stream, just pipe it you can then perform calculations on the data objects\n * streamed through your flow.\n *\n * @extends stream.PassThrough\n */\nclass PromiseTransformStream extends Transform {\n\n    constructor(options) {\n        options = options || {};\n        const newOptions = Object.assign({\n            objectMode: true,\n            parallelTransform: null,\n            flushPromise: null,\n            beforeTransform: null,\n            afterTransform: null\n        }, options);\n\n        super(newOptions);\n\n        this._tapped = false;\n\n        this._scramjet_options = {\n            referrer: options.referrer,\n            constructed: (new Error().stack)\n        };\n\n        this.setMaxListeners(DefaultHighWaterMark);\n        this.setOptions(newOptions);\n\n        if (newOptions.transform || !newOptions.parallelTransform) {\n\n            this.tap();\n\n        } else {\n            this.setOptions(\n                {\n                    transforms: []\n                },\n                {\n                    beforeTransform: newOptions.beforeTransform,\n                    afterTransform: newOptions.afterTransform,\n                    flushPromise: newOptions.flushPromise\n                }\n            );\n\n            this.cork();\n            if (options.referrer instanceof this.constructor && !options.referrer._tapped && !options.referrer._options.flushPromise) {\n                return options.referrer.pushTransform(options);\n            }\n\n            process.nextTick(this.uncork.bind(this));\n\n            this.pushTransform(newOptions);\n\n            if (this._scramjet_options.transforms.length) this.mkTransform();\n\n        }\n\n        const plgctors = this.constructor[plgctor].get();\n        if (plgctors.length) {\n\n            let ret;\n            plgctors.find(\n                (Ctor) => ret = Ctor.call(this, options)\n            );\n\n            if (typeof ret !== \"undefined\") {\n                return ret;\n            }\n        }\n    }\n\n    get _options() {\n        if (this._scramjet_options.referrer && this._scramjet_options.referrer !== this) {\n            return Object.assign({maxParallel: DefaultHighWaterMark}, this._scramjet_options.referrer._options, this._scramjet_options);\n        }\n        return Object.assign({maxParallel: DefaultHighWaterMark}, this._scramjet_options);\n    }\n\n    setOptions(...options) {\n        Object.assign(this._scramjet_options, ...options);\n\n        if (this._scramjet_options.maxParallel)\n            this.setMaxListeners(this._scramjet_options.maxParallel);\n\n        return this;\n    }\n\n    setMaxListeners(value) {\n        return super.setMaxListeners.call(this, value + EventEmitter.defaultMaxListeners);\n    }\n\n    static get [plgctor]() {\n        const proto = Object.getPrototypeOf(this);\n        return {\n            ctors: this[storector] = this.hasOwnProperty(storector) ? this[storector] : [],\n            get: () => proto[plgctor] ? proto[plgctor].get().concat(this[storector]) : this[storector]\n        };\n    }\n\n    async whenRead(count) {\n        return new Promise((res, rej) => {\n\n            const read = () => {\n                const ret = this.read(count);\n                if (ret) {\n                    return res(ret);\n                } else {\n                    this.on(\"readable\", read);\n                }\n            };\n\n            this.whenError().then(rej);\n            read();\n        });\n    }\n\n    async whenDrained() {\n        return this._scramjet_drainPromise || (this._scramjet_drainPromise = new Promise(\n            (res, rej) => this\n                .once(\"drain\", () => {\n                    this._scramjet_drainPromise = null;\n                    res();\n                })\n                .whenError().then(rej)\n        ));\n    }\n\n    async whenWrote(data) {\n        if (this.write(data)) {\n            return;\n        } else {\n            return this.whenDrained();\n        }\n    }\n\n    async whenError() {\n        return this._scramjet_errPromise || (this._scramjet_errPromise = new Promise((res) => {\n            this.once('error', (e) => {\n                this._scramjet_errPromise = null;\n                res(e);\n            });\n        }));\n    }\n\n    async whenEnd() {\n        return this._scramjet_endPromise || (this._scramjet_endPromise = new Promise((res, rej) => {\n            this.whenError().then(rej);\n            this.on('end', () => {\n                this._scramjet_endPromise = null;\n                res();\n            });\n        }));\n    }\n\n    graph(func) {\n        let referrer = this;\n        const ret = [];\n        while(referrer) {\n            ret.push(referrer);\n            referrer = referrer._options.referrer;\n        }\n        func(ret);\n        return this;\n    }\n\n    tap() {\n        this._tapped = true;\n        return this;\n    }\n\n    pushTransform(options) {\n\n        if (typeof options.parallelTransform === \"function\") {\n\n            const before = typeof options.beforeTransform === \"function\";\n            const after = typeof options.afterTransform === \"function\";\n\n            if (before)\n                this._scramjet_options.transforms.push(options.beforeTransform.bind(this));\n\n            if (after)\n                this._scramjet_options.transforms.push(async (chunk) => {\n                    return options.afterTransform.call(this, chunk, await options.parallelTransform.call(this, chunk));\n                });\n            else\n                this._scramjet_options.transforms.push(options.parallelTransform.bind(this));\n\n        }\n\n        if (options.flushPromise)\n            this._scramjet_options.flushPromise = async () => {\n                return typeof options.flushPromise === \"function\" ? options.flushPromise() : null;\n            };\n\n        return this;\n    }\n\n    mkTransform() {\n\n        let last = new Promise((res) => process.nextTick(() => res()));\n        let processing = [];\n\n        this._transform = (chunk, encoding, callback) => {\n            if (!this._scramjet_options.transforms.length) {\n                return last.then(\n                    () => callback(null, chunk)\n                );\n            }\n\n            last = Promise.all([\n                this._scramjet_options.transforms.reduce(\n                    (prev, transform) => prev.then(transform),\n                    Promise.resolve(chunk)\n                ).catch(\n                    (err) => err === filter ? filter : Promise.reject(err)\n                ),\n                last\n            ]).then(\n                (args) => {\n                    if (args[0] !== filter && typeof args[0] !== \"undefined\") {\n                        this.push(args[0]);\n                    }\n                }\n            );\n\n\n\n            if (processing.length >= this._options.maxParallel) {\n                processing[processing.length - this._options.maxParallel]\n                    .then(() => callback())\n                    .catch(ignore);\n            } else {\n                callback();\n            }\n\n            const ref = last;\n            processing.push(ref);   // append item to queue\n\n            ref.then(\n                    () => ref === processing.shift() || this.emit(\"error\", new Error(\"Promise resolved out of sequence!\", chunk))\n                )\n                .catch(\n                    (e) => Promise.resolve(null, this.emit(\"error\", e, chunk))\n                )\n                .catch(\n                    ignore // TODO: Another catch? WHY???\n                )\n                ;\n\n        };\n\n        this._flush = (callback) => {\n            if (this._scramjet_options.flushPromise) {\n                last.then(this._scramjet_options.flushPromise).then((data) => {\n\n                    if (Array.isArray(data))\n                        data.forEach(item => this.push(item));\n                    else\n                        this.push(data);\n\n                    callback();\n                });\n            } else {\n                last.then(() => callback());\n            }\n        };\n\n        return this;\n    }\n\n    _transform(chunk, encoding, callback) {\n        try {\n            callback(null, chunk);\n        } catch(err) {\n            callback(err);\n        }\n    }\n\n    static get filter() { return filter; }\n}\n\nmodule.exports = {\n    plgctor: plgctor,\n    PromiseTransformStream\n};\n",
+    "static": true,
+    "longname": "C:/src/signicode/scramjet-core/lib/util/promise-transform-stream.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 93,
+    "kind": "variable",
+    "name": "Transform",
+    "memberof": "lib/util/promise-transform-stream.js",
+    "static": true,
+    "longname": "lib/util/promise-transform-stream.js~Transform",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/util/promise-transform-stream.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 1,
+    "undocument": true
+  },
+  {
+    "__docId__": 94,
+    "kind": "variable",
+    "name": "EventEmitter",
+    "memberof": "lib/util/promise-transform-stream.js",
+    "static": true,
+    "longname": "lib/util/promise-transform-stream.js~EventEmitter",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/util/promise-transform-stream.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 2,
+    "undocument": true
+  },
+  {
+    "__docId__": 95,
+    "kind": "variable",
+    "name": "DefaultHighWaterMark",
+    "memberof": "lib/util/promise-transform-stream.js",
+    "static": true,
+    "longname": "lib/util/promise-transform-stream.js~DefaultHighWaterMark",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/util/promise-transform-stream.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 3,
+    "undocument": true
+  },
+  {
+    "__docId__": 96,
+    "kind": "variable",
+    "name": "filter",
+    "memberof": "lib/util/promise-transform-stream.js",
+    "static": true,
+    "longname": "lib/util/promise-transform-stream.js~filter",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/util/promise-transform-stream.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 5,
+    "undocument": true
+  },
+  {
+    "__docId__": 97,
+    "kind": "variable",
+    "name": "plgctor",
+    "memberof": "lib/util/promise-transform-stream.js",
+    "static": true,
+    "longname": "lib/util/promise-transform-stream.js~plgctor",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/util/promise-transform-stream.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 6,
+    "undocument": true
+  },
+  {
+    "__docId__": 98,
+    "kind": "variable",
+    "name": "storector",
+    "memberof": "lib/util/promise-transform-stream.js",
+    "static": true,
+    "longname": "lib/util/promise-transform-stream.js~storector",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/util/promise-transform-stream.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 7,
+    "undocument": true
+  },
+  {
+    "__docId__": 99,
+    "kind": "function",
+    "name": "ignore",
+    "memberof": "lib/util/promise-transform-stream.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/util/promise-transform-stream.js~ignore",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/util/promise-transform-stream.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 9,
+    "undocument": true
+  },
+  {
+    "__docId__": 100,
+    "kind": "class",
+    "name": "PromiseTransformStream",
+    "memberof": "lib/util/promise-transform-stream.js",
+    "static": true,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "access": null,
+    "export": false,
+    "importPath": "scramjet-core/lib/util/promise-transform-stream.js",
+    "importStyle": null,
+    "description": "DataStream is the primary stream type for Scramjet. When you parse your\nstream, just pipe it you can then perform calculations on the data objects\nstreamed through your flow.",
+    "lineNumber": 18,
+    "interface": false,
+    "extends": [
+      "*"
+    ]
+  },
+  {
+    "__docId__": 101,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#constructor",
+    "access": null,
+    "description": null,
+    "lineNumber": 20,
+    "undocument": true
+  },
+  {
+    "__docId__": 102,
+    "kind": "member",
+    "name": "_tapped",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#_tapped",
+    "access": null,
+    "description": null,
+    "lineNumber": 32,
+    "undocument": true
+  },
+  {
+    "__docId__": 103,
+    "kind": "member",
+    "name": "_scramjet_options",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#_scramjet_options",
+    "access": null,
+    "description": null,
+    "lineNumber": 34,
+    "undocument": true
+  },
+  {
+    "__docId__": 104,
+    "kind": "get",
+    "name": "_options",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#_options",
+    "access": null,
+    "description": null,
+    "lineNumber": 85,
+    "undocument": true
+  },
+  {
+    "__docId__": 105,
+    "kind": "method",
+    "name": "setOptions",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#setOptions",
+    "access": null,
+    "description": null,
+    "lineNumber": 92,
+    "undocument": true
+  },
+  {
+    "__docId__": 106,
+    "kind": "method",
+    "name": "setMaxListeners",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#setMaxListeners",
+    "access": null,
+    "description": null,
+    "lineNumber": 101,
+    "undocument": true
+  },
+  {
+    "__docId__": 107,
+    "kind": "get",
+    "name": "[plgctor]",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream.[plgctor]",
+    "access": null,
+    "description": null,
+    "lineNumber": 105,
+    "undocument": true
+  },
+  {
+    "__docId__": 108,
+    "kind": "method",
+    "name": "whenRead",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#whenRead",
+    "access": null,
+    "description": null,
+    "lineNumber": 113,
+    "undocument": true
+  },
+  {
+    "__docId__": 109,
+    "kind": "method",
+    "name": "whenDrained",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#whenDrained",
+    "access": null,
+    "description": null,
+    "lineNumber": 130,
+    "undocument": true
+  },
+  {
+    "__docId__": 110,
+    "kind": "member",
+    "name": "_scramjet_drainPromise",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#_scramjet_drainPromise",
+    "access": null,
+    "description": null,
+    "lineNumber": 134,
+    "undocument": true
+  },
+  {
+    "__docId__": 111,
+    "kind": "method",
+    "name": "whenWrote",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#whenWrote",
+    "access": null,
+    "description": null,
+    "lineNumber": 141,
+    "undocument": true
+  },
+  {
+    "__docId__": 112,
+    "kind": "method",
+    "name": "whenError",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#whenError",
+    "access": null,
+    "description": null,
+    "lineNumber": 149,
+    "undocument": true
+  },
+  {
+    "__docId__": 113,
+    "kind": "member",
+    "name": "_scramjet_errPromise",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#_scramjet_errPromise",
+    "access": null,
+    "description": null,
+    "lineNumber": 152,
+    "undocument": true
+  },
+  {
+    "__docId__": 114,
+    "kind": "method",
+    "name": "whenEnd",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "generator": false,
+    "async": true,
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#whenEnd",
+    "access": null,
+    "description": null,
+    "lineNumber": 158,
+    "undocument": true
+  },
+  {
+    "__docId__": 115,
+    "kind": "member",
+    "name": "_scramjet_endPromise",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#_scramjet_endPromise",
+    "access": null,
+    "description": null,
+    "lineNumber": 162,
+    "undocument": true
+  },
+  {
+    "__docId__": 116,
+    "kind": "method",
+    "name": "graph",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#graph",
+    "access": null,
+    "description": null,
+    "lineNumber": 168,
+    "undocument": true
+  },
+  {
+    "__docId__": 117,
+    "kind": "method",
+    "name": "tap",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#tap",
+    "access": null,
+    "description": null,
+    "lineNumber": 179,
+    "undocument": true
+  },
+  {
+    "__docId__": 119,
+    "kind": "method",
+    "name": "pushTransform",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#pushTransform",
+    "access": null,
+    "description": null,
+    "lineNumber": 184,
+    "undocument": true
+  },
+  {
+    "__docId__": 120,
+    "kind": "method",
+    "name": "mkTransform",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#mkTransform",
+    "access": null,
+    "description": null,
+    "lineNumber": 211,
+    "undocument": true
+  },
+  {
+    "__docId__": 122,
+    "kind": "member",
+    "name": "_flush",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#_flush",
+    "access": null,
+    "description": null,
+    "lineNumber": 265,
+    "undocument": true
+  },
+  {
+    "__docId__": 123,
+    "kind": "method",
+    "name": "_transform",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream#_transform",
+    "access": null,
+    "description": null,
+    "lineNumber": 284,
+    "undocument": true
+  },
+  {
+    "__docId__": 124,
+    "kind": "get",
+    "name": "filter",
+    "memberof": "lib/util/promise-transform-stream.js~PromiseTransformStream",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "lib/util/promise-transform-stream.js~PromiseTransformStream.filter",
+    "access": null,
+    "description": null,
+    "lineNumber": 292,
+    "undocument": true
+  },
+  {
+    "kind": "index",
+    "content": "[![Master Build Status](https://travis-ci.org/signicode/scramjet-core.svg?branch=master)](https://travis-ci.org/signicode/scramjet-core)\n[![Develop Build Status](https://travis-ci.org/signicode/scramjet-core.svg?branch=develop)](https://travis-ci.org/signicode/scramjet-core)\n[![Dependencies](https://david-dm.org/signicode/scramjet-core/status.svg)](https://david-dm.org/signicode/scramjet-core)\n[![Dev Dependencies](https://david-dm.org/signicode/scramjet-core/dev-status.svg)](https://david-dm.org/signicode/scramjet-core?type=dev)\n[![Known Vulnerabilities](https://snyk.io/test/github/signicode/scramjet-core/badge.svg)](https://snyk.io/test/github/signicode/scramjet-core)\n\nScramjet core\n---------------\n\nThis is the minimal, dependency free version of [`scramjet`](https://github.com/signicode/scramjet) used as of Scramjet\nversion 3.0.0 as a base for `scramjet` and scramjet plugins.\n\nUnless you are sure, you should be better off with using the main repo and module.\n\n## What does it do?\n\nScramjet is a fast and simple functional stream programming framework written on top of node.js object streams. It\nexposes a standards inspired javascript API and written fully in native ES6. Thanks to it some built in optimizations\nscramjet is much faster and much much simpler than similar frameworks when using asynchronous operations.\n\nIt is built upon the logic behind three well known javascript array operations - namingly map, filter and reduce. This\nmeans that if you've ever performed operations on an Array in JavaScript - you already know Scramjet like the back of\nyour hand.\n\nThe main advantage of scramjet is running asynchronous operations on your data streams. First of all it allows you to\nperform the transformations both synchronously and asynchronously by using the same API - so now you can \"map\" your\nstream from whatever source and call any number of API's consecutively.\n\nThe benchmarks are punblished in the [scramjet-benchmark repo](https://github.com/signicode/scramjet-benchmark).\n\n## Example\n\nHow about a CSV parser of all the parkings in the city of Wrocław from http://www.wroclaw.pl/open-data/...\n\n```javascript\nconst request = require(\"request\");\nconst {StringStream} = require(\"scramjet\");\n\nlet columns = null;\nrequest.get(\"http://www.wroclaw.pl/open-data/opendata/its/parkingi/parkingi.csv\")\n    .pipe(new StringStream())\n    .split(\"\\n\")\n    .parse((line) => line.split(\";\"))\n    .pop(1, (data) => columns = data)\n    .map((data) => columns.reduce((acc, id, i) => (acc[id] = data[i], acc), {}))\n    .on(\"data\", console.log.bind(console))\n```\n\n## Usage\n\nScramjet uses functional programming to run transformations on your data streams in a fashion very similar to the well\nknown event-stream node module. Most transformations are done by passing a transform function. You can write your\nfunction in three ways:\n\n1. Synchronous\n\n Example: a simple stream transform that outputs a stream of objects of the same id property and the length of the value string.\n\n ```javascript\n    datastream.map(\n        (item) => ({id: item.id, length: item.value.length})\n    )\n ```\n\n2. Asynchronous using ES2015 async await\n\nExample: A simple stream that uses Fetch API to get all the contents of all entries in the stream\n\n```javascript\ndatastream.map(\n    async (item) => fetch(item)\n)\n```\n\n3. Asynchronous using Promises\n\n Example: A simple stream that fetches an url mentioned in the incoming object\n\n ```javascript\n    datastream.map(\n        (item) => new Promise((resolve, reject) => {\n            request(item.url, (err, res, data) => {\n                if (err)\n                    reject(err); // will emit an \"error\" event on the stream\n                else\n                    resolve(data);\n            });\n        })\n    )\n ```\n\nThe actual logic of this transform function is as if you passed your function to the ```then``` method of a Promise\nresolved with the data from the input stream.\n\n## API Docs\n\nHere's the list of the exposed classes and methods, please review the specific documentation for details:\n\n* [```scramjet.DataStream```](docs/data-stream.md) - the base class for all scramjet classes.\n* [```scramjet.BufferStream```](docs/buffer-stream.md) - a DataStream of Buffers.\n* [```scramjet.StringStream```](docs/string-stream.md) - a DataStream of Strings.\n* [```scramjet.MultiStream```](docs/multi-stream.md) - a DataStream of Strings.\n* [```scramjet.plugin```](docs/index.md) - method for adding plugins, please see the docs\n* [more on plugins](docs/plugins.md) - a description and link.\n\nNote that:\n\n* Most of the methods take a callback argument that operates on the stream items.\n* The callback, unless it's stated otherwise, will receive an argument with the next chunk.\n* If you want to perform your operations asynchronously, return a Promise, otherwise just return the right value.\n\nThe quick reference of the exposed classes:\n\n\n<a name=\"BufferStream\"></a>\n### BufferStream ⇐ DataStream\n\nA factilitation stream created for easy splitting or parsing buffers.\n\nUseful for working on built-in Node.js streams from files, parsing binary formats etc.\n\nA simple use case would be:\n\n```javascript\n fs.createReadStream('pixels.rgba')\n     .pipe(new BufferStream)         // pipe a buffer stream into scramjet\n     .breakup(4)                     // split into 4 byte fragments\n     .parse(buf => [\n         buf.readInt8(0),            // the output is a stream of R,G,B and Alpha\n         buf.readInt8(1),            // values from 0-255 in an array.\n         buf.readInt8(2),\n         buf.readInt8(3)\n     ]);\n```\n\n[Detailed BufferStream docs here](docs/buffer-stream.md)\n\n| Method | Description | Example\n|--------|-------------|---------\n| new BufferStream(opts) | Creates the BufferStream |  |\n| bufferStream.shift(chars, func) ⇒ [<code>BufferStream</code>](#BufferStream) | Shift given number of bytes from the original stream | [shift example](../samples/string-stream-shift.js) |\n| bufferStream.split(splitter) ⇒ [<code>BufferStream</code>](#BufferStream) | Splits the buffer stream into buffer objects | [split example](../samples/buffer-stream-split.js) |\n| bufferStream.breakup(number) ⇒ [<code>BufferStream</code>](#BufferStream) | Breaks up a stream apart into chunks of the specified length | [breakup example](../samples/buffer-stream-breakup.js) |\n| bufferStream.stringify(encoding) ⇒ <code>StringStream</code> | Creates a string stream from the given buffer stream | [stringify example](../samples/buffer-stream-tostringstream.js) |\n| bufferStream.parse(parser) ⇒ <code>DataStream</code> | Parses every buffer to object | [parse example](../samples/buffer-stream-parse.js) |\n\n\n<a name=\"DataStream\"></a>\n### ~DataStream ⇐ stream.PassThrough\n\n\n\n[Detailed DataStream docs here](docs/data-stream.md)\n\n| Method | Description | Example\n|--------|-------------|---------\n| new DataStream(opts) | Create the DataStream. |  |\n| dataStream.map(func, Clazz) ⇒ <code>DataStream</code> | Transforms stream objects into new ones, just like Array.prototype.map | [map example](../samples/data-stream-map.js) |\n| dataStream.filter(func) ⇒ <code>DataStream</code> | Filters object based on the function outcome, just like | [filter example](../samples/data-stream-filter.js) |\n| dataStream.reduce(func, into) ⇒ <code>Promise</code> | Reduces the stream into a given accumulator | [reduce example](../samples/data-stream-reduce.js) |\n| dataStream.use(func) ⇒ <code>\\*</code> | Calls the passed method in place with the stream as first argument, returns result. | [use example](../samples/data-stream-use.js) |\n| dataStream.tee(func) ⇒ <code>DataStream</code> | Duplicate the stream | [tee example](../samples/data-stream-tee.js) |\n| dataStream.each(func) ↩︎ | Performs an operation on every chunk, without changing the stream |  |\n| dataStream.while(func) ⇒ <code>DataStream</code> | Reads the stream while the function outcome is truthy. |  |\n| dataStream.until(func) ⇒ <code>DataStream</code> | Reads the stream until the function outcome is truthy. |  |\n| dataStream.catch(callback) ↩︎ | Provides an way to catch errors in chanined streams. |  |\n| dataStream.raise(err) ⇒ <code>Promise</code> | Executes all error handlers and if none resolves, then emits an error. |  |\n| dataStream.pipe(to, options) ⇒ <code>Writable</code> | Override of node.js Readable pipe. |  |\n| dataStream.bufferify(serializer) ⇒ [<code>BufferStream</code>](#BufferStream) | Creates a BufferStream | [bufferify example](../samples/data-stream-tobufferstream.js) |\n| dataStream.stringify(serializer) ⇒ <code>StringStream</code> | Creates a StringStream | [stringify example](../samples/data-stream-tostringstream.js) |\n| dataStream.run() ⇒ <code>Promise</code> | Consumes all stream items without doing anything |  |\n| dataStream.toArray(initial) ⇒ <code>Promise</code> | Aggregates the stream into a single Array |  |\n| dataStream.toGenerator() ⇒ <code>Iterable.&lt;Promise.&lt;\\*&gt;&gt;</code> | Returns an async generator |  |\n| dataStream._selfInstance() ⇒ <code>DataStream</code> | Returns a new instance of self. | [_selfInstance example](../samples/data-stream-selfinstance.js) |\n| DataStream.fromArray(arr) ⇒ <code>DataStream</code> | Create a DataStream from an Array | [fromArray example](../samples/data-stream-fromarray.js) |\n| DataStream.fromIterator(iter) ⇒ <code>DataStream</code> | Create a DataStream from an Iterator | [fromIterator example](../samples/data-stream-fromiterator.js) |\n\n\n<a name=\"StringStream\"></a>\n### ~StringStream ⇐ DataStream\n\nA stream of string objects for further transformation on top of DataStream.\n\n[Detailed StringStream docs here](docs/string-stream.md)\n\n| Method | Description | Example\n|--------|-------------|---------\n| new StringStream(encoding) | Constructs the stream with the given encoding |  |\n| stringStream.shift(bytes, func) ⇒ <code>StringStream</code> | Shifts given length of chars from the original stream | [shift example](../samples/string-stream-shift.js) |\n| stringStream.split(splitter) ⇒ <code>StringStream</code> | Splits the string stream by the specified regexp or string | [split example](../samples/string-stream-split.js) |\n| stringStream.match(splitter) ⇒ <code>StringStream</code> | Finds matches in the string stream and streams the match results | [match example](../samples/string-stream-match.js) |\n| stringStream.toBufferStream() ⇒ <code>StringStream</code> | Transforms the StringStream to BufferStream | [toBufferStream example](../samples/string-stream-tobufferstream.js) |\n| stringStream.parse(parser) ⇒ <code>DataStream</code> | Parses every string to object | [parse example](../samples/string-stream-parse.js) |\n| StringStream.SPLIT_LINE | A handly split by line regex to quickly get a line-by-line stream |  |\n| StringStream.fromString(str, encoding) ⇒ <code>StringStream</code> | Creates a StringStream and writes a specific string. |  |\n\n\n<a name=\"MultiStream\"></a>\n### ~MultiStream\n\nAn object consisting of multiple streams than can be refined or muxed.\n\n[Detailed MultiStream docs here](docs/multi-stream.md)\n\n| Method | Description | Example\n|--------|-------------|---------\n| new MultiStream(streams, options) | Crates an instance of MultiStream with the specified stream list |  |\n| multiStream.streams : <code>Array</code> | Array of all streams |  |\n| multiStream.length ⇒ <code>number</code> | Returns the current stream length |  |\n| multiStream.map(aFunc) ⇒ <code>MultiStream</code> | Returns new MultiStream with the streams returned by the tranform. | [map example](../samples/multi-stream-map.js) |\n| multiStream.find(...args) ⇒ <code>DataStream</code> | Calls Array.prototype.find on the streams |  |\n| multiStream.filter(func) ⇒ <code>MultiStream</code> | Filters the stream list and returns a new MultiStream with only the | [filter example](../samples/multi-stream-filter.js) |\n| multiStream.mux(cmp) ⇒ <code>DataStream</code> | Muxes the streams into a single one | [mux example](../samples/multi-stream-mux.js) |\n| multiStream.add(stream) | Adds a stream to the MultiStream | [add example](../samples/multi-stream-add.js) |\n| multiStream.remove(stream) | Removes a stream from the MultiStream | [remove example](../samples/multi-stream-remove.js) |\n\n\n## License and contributions\n\nAs of version 2.0 Scramjet is MIT Licensed.\n\n## Help wanted\n\nThe project need's your help! There's lots of work to do - transforming and muxing, joining and splitting, browserifying, modularizing, documenting and issuing those issues.\n\nIf you want to help and be part of the Scramjet team, please reach out to me, signicode on Github or email me: scramjet@signicode.com.\n",
+    "longname": "C:\\src\\signicode\\scramjet-core\\README.md",
+    "name": "./README.md",
+    "static": true,
+    "access": "public"
+  },
+  {
+    "kind": "packageJSON",
+    "content": "{\n  \"name\": \"scramjet-core\",\n  \"version\": \"4.9.2\",\n  \"description\": \"A pluggable minimal version of Scramjet that focuses only on stream transform and exposes only core features\",\n  \"main\": \"lib/index.js\",\n  \"directories\": {\n    \"lib\": \"lib/\",\n    \"doc\": \"docs/\",\n    \"test\": \"test/\",\n    \"example\": \"samples/\"\n  },\n  \"keywords\": [\n    \"stream\",\n    \"es6\",\n    \"transform\",\n    \"transmux\",\n    \"mux\",\n    \"live data\",\n    \"realtime\",\n    \"filter\",\n    \"map\",\n    \"apache\",\n    \"spark\",\n    \"apex\",\n    \"highland\",\n    \"log\",\n    \"functional programming\",\n    \"parser\"\n  ],\n  \"scripts\": {\n    \"test\": \"gulp test\",\n    \"preversion\": \"gulp prerelease\"\n  },\n  \"homepage\": \"https://scramjet.eu/\",\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"https://github.com/signicode/scramjet-core.git\"\n  },\n  \"engines\": {\n    \"node\": \">=8\"\n  },\n  \"author\": \"Signicode / Michał Czapracki <cz@signicode.com>\",\n  \"license\": \"MIT\",\n  \"devDependencies\": {\n    \"dmd\": \"^3.0.12\",\n    \"eslint\": \"^4.19.1\",\n    \"eslint-config-defaults\": \"^9.0.0\",\n    \"eslint-plugin-node\": \"^6.0.1\",\n    \"fancy-log\": \"^1.3.2\",\n    \"fast-glob\": \"^2.2.1\",\n    \"gulp\": \"^3.9.1\",\n    \"gulp-concat\": \"^2.6.1\",\n    \"gulp-eslint\": \"^4.0.2\",\n    \"gulp-rename\": \"^1.2.2\",\n    \"jsdoc\": \"^3.5.5\",\n    \"jsdoc-api\": \"^4.0.3\",\n    \"jsdoc-parse\": \"^3.0.1\",\n    \"scramjet\": \"^4.10.1\",\n    \"tape\": \"^4.9.0\",\n    \"esdoc2\": \"^2.1.3\"\n  }\n}\n",
+    "longname": "C:\\src\\signicode\\scramjet-core\\package.json",
+    "name": "package.json",
+    "static": true,
+    "access": "public"
+  }
+]
