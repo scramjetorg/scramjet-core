@@ -9,6 +9,7 @@
             * [.map(func, Clazz)](#module_ScramjetCore..DataStream+map) ⇒ <code>DataStream</code>
             * [.filter(func)](#module_ScramjetCore..DataStream+filter) ⇒ <code>DataStream</code>
             * [.reduce(func, into)](#module_ScramjetCore..DataStream+reduce) ⇒ <code>Promise</code>
+            * [.into(func, into)](#module_ScramjetCore..DataStream+into) ⇒ <code>DataStream</code>
             * [.use(func)](#module_ScramjetCore..DataStream+use) ⇒ <code>\*</code>
             * [.tee(func)](#module_ScramjetCore..DataStream+tee) ⇒ <code>DataStream</code>
             * [.each(func)](#module_ScramjetCore..DataStream+each) ↩︎
@@ -38,6 +39,7 @@
     * [~MapCallback](#module_ScramjetCore..MapCallback) ⇒ <code>Promise</code> \| <code>\*</code>
     * [~FilterCallback](#module_ScramjetCore..FilterCallback) ⇒ <code>Promise</code> \| <code>Boolean</code>
     * [~ReduceCallback](#module_ScramjetCore..ReduceCallback) ⇒ <code>Promise</code> \| <code>\*</code>
+    * [~IntoCallback](#module_ScramjetCore..IntoCallback) ⇒ <code>\*</code>
     * [~TeeCallback](#module_ScramjetCore..TeeCallback) : <code>function</code>
 
 <a name="module_ScramjetCore..DataStream"></a>
@@ -52,6 +54,7 @@
         * [.map(func, Clazz)](#module_ScramjetCore..DataStream+map) ⇒ <code>DataStream</code>
         * [.filter(func)](#module_ScramjetCore..DataStream+filter) ⇒ <code>DataStream</code>
         * [.reduce(func, into)](#module_ScramjetCore..DataStream+reduce) ⇒ <code>Promise</code>
+        * [.into(func, into)](#module_ScramjetCore..DataStream+into) ⇒ <code>DataStream</code>
         * [.use(func)](#module_ScramjetCore..DataStream+use) ⇒ <code>\*</code>
         * [.tee(func)](#module_ScramjetCore..DataStream+tee) ⇒ <code>DataStream</code>
         * [.each(func)](#module_ScramjetCore..DataStream+each) ↩︎
@@ -139,6 +142,19 @@ it's much slower than parallel functions.
 ```js
 [../samples/data-stream-reduce.js](../samples/data-stream-reduce.js)
 ```
+<a name="module_ScramjetCore..DataStream+into"></a>
+
+#### dataStream.into(func, into) ⇒ <code>DataStream</code>
+Pushes the data into another scramjet stream while keeping flow control and
+
+**Kind**: instance method of [<code>DataStream</code>](#module_ScramjetCore..DataStream)  
+**Returns**: <code>DataStream</code> - the object passed as `into`  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| func |  | [description] |
+| into | <code>DataStream</code> | [description] |
+
 <a name="module_ScramjetCore..DataStream+use"></a>
 
 #### dataStream.use(func) ⇒ <code>\*</code>
@@ -489,6 +505,17 @@ Standard options for scramjet streams.
 | --- | --- | --- |
 | acc | <code>\*</code> | the accumulator - the object initially passed or retuned                by the previous reduce operation |
 | chunk | <code>Object</code> | the stream chunk. |
+
+<a name="module_ScramjetCore..IntoCallback"></a>
+
+### ScramjetCore~IntoCallback ⇒ <code>\*</code>
+**Kind**: inner typedef of [<code>ScramjetCore</code>](#module_ScramjetCore)  
+**Returns**: <code>\*</code> - resolution for the old stream (for flow control only)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| into | <code>\*</code> | stream passed to the into method |
+| chunk | <code>Object</code> | source stream chunk |
 
 <a name="module_ScramjetCore..TeeCallback"></a>
 
