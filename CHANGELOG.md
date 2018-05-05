@@ -1,6 +1,11 @@
-# Scramjet Core
 
-# Current version: 4.9.2
+# Scramjet Core 4.10.0
+
+* Relative modules - allow using paths relative to the current file like in `require` in `DataStream..use` method.
+* New `into` method allowing any rewrite while keeping flow control and error propagation,
+* Make test reporter push info to standard error.
+
+## Scramjet Core 4.9.2
 
 * Fix reporter for tests
 
@@ -37,7 +42,7 @@
 * Addition of a plugin interface.
 * Allow adding more stream types via plugins.
 
-## Scramjet Core 3.0
+## Scramjet Core 3.0.0
 
 * Removal of non-core methods and separation of scramjet and scramjet-core.
 
