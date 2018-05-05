@@ -1,19 +1,24 @@
-# Current version: 4.9.2
+
+# Scramjet Core 4.10.0
+
+* Relative modules - allow using paths relative to the current file like in `require` in `DataStream..use` method.
+* New `into` method allowing any rewrite while keeping flow control and error propagation,
+* Make test reporter push info to standard error.
+
+## Scramjet Core 4.9.2
 
 * Fix reporter for tests
 
-# Change log
-
-## Scramjet-core 4.9.1
+## Scramjet Core 4.9.1
 
 * Changed no longer supported `nodeunit` in favor of `tape`.
 * Improved travis build speed.
 
-## Scramjet-core 4.9.0
+## Scramjet Core 4.9.0
 
 * Node v10 support.
 
-## Scramjet-core 4.8.0
+## Scramjet Core 4.8.0
 
 * Fixed the EventEmitter leak messages from all scenarios.
 * Added `run` method on every stream to resume the flow.
@@ -22,22 +27,22 @@
 * `DataStream.toGenerator` method added (support for async generators).
 * Addition of two MultiStream methods: `find` and `length` (getter).
 
-## Scramjet-core 4.0.0
+## Scramjet Core 4.0.0
 
 * Dropped support for node.js v6.
 * Perfomance improvements in base transforms operation.
 
-## Scramjet-Core 3.2.0
+## Scramjet Core 3.2.0
 
 * Improved stream merge.
 * Added new methods: `DataStream::until` and `DataStream::while`.
 
-## Scramjet-Core 3.1.3
+## Scramjet Core 3.1.3
 
 * Addition of a plugin interface.
 * Allow adding more stream types via plugins.
 
-## Scramjet-Core 3.0
+## Scramjet Core 3.0.0
 
 * Removal of non-core methods and separation of scramjet and scramjet-core.
 

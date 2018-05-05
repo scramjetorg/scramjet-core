@@ -12,39 +12,9 @@ version 3.0.0 as a base for `scramjet` and scramjet plugins.
 
 Unless you are sure, you should be better off with using the main repo and module.
 
-## What does it do?
-
-Scramjet is a fast and simple functional stream programming framework written on top of node.js object streams. It
-exposes a standards inspired javascript API and written fully in native ES6. Thanks to it some built in optimizations
-scramjet is much faster and much much simpler than similar frameworks when using asynchronous operations.
-
 It is built upon the logic behind three well known javascript array operations - namingly map, filter and reduce. This
 means that if you've ever performed operations on an Array in JavaScript - you already know Scramjet like the back of
 your hand.
-
-The main advantage of scramjet is running asynchronous operations on your data streams. First of all it allows you to
-perform the transformations both synchronously and asynchronously by using the same API - so now you can "map" your
-stream from whatever source and call any number of API's consecutively.
-
-The benchmarks are punblished in the [scramjet-benchmark repo](https://github.com/signicode/scramjet-benchmark).
-
-## Example
-
-How about a CSV parser of all the parkings in the city of Wrocław from http://www.wroclaw.pl/open-data/...
-
-```javascript
-const request = require("request");
-const {StringStream} = require("scramjet");
-
-let columns = null;
-request.get("http://www.wroclaw.pl/open-data/opendata/its/parkingi/parkingi.csv")
-    .pipe(new StringStream())
-    .split("\n")
-    .parse((line) => line.split(";"))
-    .pop(1, (data) => columns = data)
-    .map((data) => columns.reduce((acc, id, i) => (acc[id] = data[i], acc), {}))
-    .on("data", console.log.bind(console))
-```
 
 ## Usage
 
@@ -158,6 +128,7 @@ A simple use case would be:
 | dataStream.map(func, Clazz) ⇒ <code>DataStream</code> | Transforms stream objects into new ones, just like Array.prototype.map | [map example](../samples/data-stream-map.js) |
 | dataStream.filter(func) ⇒ <code>DataStream</code> | Filters object based on the function outcome, just like | [filter example](../samples/data-stream-filter.js) |
 | dataStream.reduce(func, into) ⇒ <code>Promise</code> | Reduces the stream into a given accumulator | [reduce example](../samples/data-stream-reduce.js) |
+| dataStream.into(func, into) ⇒ <code>DataStream</code> | Pushes the data into another scramjet stream while keeping flow control and |  |
 | dataStream.use(func) ⇒ <code>\*</code> | Calls the passed method in place with the stream as first argument, returns result. | [use example](../samples/data-stream-use.js) |
 | dataStream.tee(func) ⇒ <code>DataStream</code> | Duplicate the stream | [tee example](../samples/data-stream-tee.js) |
 | dataStream.each(func) ↩︎ | Performs an operation on every chunk, without changing the stream |  |
@@ -214,6 +185,12 @@ An object consisting of multiple streams than can be refined or muxed.
 | multiStream.add(stream) | Adds a stream to the MultiStream | [add example](../samples/multi-stream-add.js) |
 | multiStream.remove(stream) | Removes a stream from the MultiStream | [remove example](../samples/multi-stream-remove.js) |
 
+
+## CLI
+
+Check out the command line interface for simplified scramjet usage with [scramjet-cli](https://www.npmjs.com/package/scramjet-cli)
+
+    $ sjr -i http://datasource.org/file.csv ./transform-module-1 ./transform-module-1 | gzip > logs.gz
 
 ## License and contributions
 
