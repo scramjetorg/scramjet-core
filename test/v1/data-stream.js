@@ -314,5 +314,23 @@ module.exports = {
             });
             orgStream.emit("error", new Error("Hello!"));
         }
+    },
+    test_mod: {
+        async string_arg(test) {
+            test.expect(1);
+
+            try {
+                const ret = await (
+                    DataStream.fromArray([0,1,2,3,4])
+                        .use('../lib/modtest')
+                        .toArray()
+                );
+                test.deepEqual(ret, [1,2,3,4,5], "Should identify and load the right module, relative to __dirname");
+            } catch(e) {
+                test.fail("Should not throw: " + e.stack);
+            }
+
+            test.done();
+        }
     }
 };
