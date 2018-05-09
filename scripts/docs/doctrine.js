@@ -1,6 +1,6 @@
 const doctrine = require('doctrine');
 
-module.exports = (data) => {
+const mapper = (data) => {
     const {doctrine, espree} = data;
     const specifics = {};
 
@@ -87,4 +87,28 @@ const getParams = ({param = []}) => {
      return param.map(
          ({name, type, description}) => ({name, type: getVarType(type), description})
      );
+};
+
+module.exports = (stream) => {
+    return stream.map(
+        (espree) => {
+            const doc = espree.doc;
+
+            let doctrineOutput = {};
+            if (doc && doc.source) {
+                doctrineOutput = doctrine.parse(doc.source, {unwrap: true, sloppy: true});
+
+                doctrineOutput.tags.forEach(x => {
+                    (doctrineOutput[x.title] || (doctrineOutput[x.title] = [])).push(x);
+                });
+                delete doctrineOutput.tags;
+            }
+
+            return {
+                espree,
+                doctrine: doctrineOutput
+            };
+        }
+    )
+    .map(mapper);
 };

@@ -1,6 +1,11 @@
+const {promisify} = require('util');
+const path = require("path");
+const fs = require('fs');
+const espree = require('espree');
+const {DataStream} = require('scramjet');
+
 // const ignored = {};
 const cache = new WeakMap();
-const {DataStream} = require('scramjet');
 
 /**
  * Parses a node
@@ -128,7 +133,7 @@ const walkChildren = async(target, children, scope, defaults) => {
 const walk = async(target, body, scope = [], defaults = {}) => {
     const [output, children = [], pathAddition = ''] = _parser(body);
 
-    if (output)
+    if (output && output.type)
         await target.whenWrote(Object.assign({scope}, defaults, output));
 
     if (pathAddition) {
@@ -139,7 +144,31 @@ const walk = async(target, body, scope = [], defaults = {}) => {
         await walkChildren(target, children, scope, defaults);
 };
 
-module.exports = async (out, {name, file, ast}) => {
+const parser = async (out, {name, file, ast}) => {
     await walk(out, ast, [], {name, file});
     return out;
+};
+
+module.exports = (stream) => {
+    const out = new DataStream();
+
+    return stream.map(async file => ({
+        file: file.replace(path.sep, '/'),
+        basename: path.basename(file),
+        content: await promisify(fs.readFile)(path.resolve(stream._options.pkgDir, file))
+    }))
+    .assign(({content}) => ({ast: espree.parse(content, {
+        ecmaVersion: 8,
+        attachComment: true,
+        loc: true,
+        sourceType: "module"
+    })}))
+    .catch(
+        e => out.raise(e)
+    )
+    .reduceNow(
+        parser,
+        out
+    );
+
 };

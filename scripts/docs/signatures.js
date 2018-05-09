@@ -1,4 +1,4 @@
-module.exports = (item => {
+module.exports = stream => stream.assign(item => {
     switch (item.type) {
         case "function":
         case "method":
