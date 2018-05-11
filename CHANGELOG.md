@@ -1,5 +1,10 @@
+## Scramjet 4.11.0
 
-# Scramjet Core 4.10.0
+* Allow multiple items in `whenWrote` (all arguments will be written to the stream),
+* Clearer and fixed documentation,
+* Better gitignore, added test for relative modules.
+
+## Scramjet Core 4.10.0
 
 * Relative modules - allow using paths relative to the current file like in `require` in `DataStream..use` method.
 * New `into` method allowing any rewrite while keeping flow control and error propagation,
