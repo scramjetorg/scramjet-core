@@ -43,6 +43,7 @@
   "license": "MIT",
   "devDependencies": {
     "dmd": "^3.0.12",
+    "docdown": "^0.7.3",
     "doctrine": "^2.1.0",
     "eslint": "^4.19.1",
     "eslint-config-defaults": "^9.0.0",
@@ -54,10 +55,10 @@
     "gulp-concat": "^2.6.1",
     "gulp-eslint": "^4.0.2",
     "gulp-rename": "^1.2.2",
+    "handlebars": "^4.0.11",
     "jsdoc": "^3.5.5",
     "jsdoc-api": "^4.0.3",
     "jsdoc-parse": "^3.0.1",
-    "mustache": "^2.3.0",
     "pkg-dir": "^2.0.0",
     "scramjet": "^4.11.0",
     "tape": "^4.9.0"

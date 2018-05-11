@@ -1,1 +1,1 @@
-{"id":"lib/index.js:","file":"lib/index.js","type":"var","description":"","summary":"","scope":"","tags":{"module":{"title":"module","description":null,"type":null,"name":"ScramjetCore"}},"output":["all","index",""]}
+{"var":{"id":"lib/index.js:","file":"lib/index.js","type":"var","description":"","summary":"","scope":"","tags":{"module":{"title":"module","description":null,"type":null,"name":"ScramjetCore"}},"output":["all","index",""]}}

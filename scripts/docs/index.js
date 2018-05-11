@@ -42,7 +42,7 @@ const outputs = Object.entries(targets).reduce(
                 chunk.output
                     .filter(id => id in outputs)
                     .map(
-                        id => outputs[id].whenWrote(chunk)
+                        id => outputs[id].whenWrote({[chunk.type]: chunk})
                     )
             )
         )
