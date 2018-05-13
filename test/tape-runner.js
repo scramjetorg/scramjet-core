@@ -44,7 +44,7 @@ const flattenTests = ({tests, conf = {}, prefix = ''}) => {
             .reduce((acc, name) => {
                 if (typeof tests[name] === "function") {
                     acc.push({
-                        name: `${prefix}`,
+                        name: `${prefix}/${name}`,
                         conf,
                         async exec(t) {
                             return tests[name](tTest(t));
