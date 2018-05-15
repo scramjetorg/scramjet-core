@@ -1,4 +1,10 @@
-## Scramjet 4.11.0
+# Scramjet Core 4.11.1
+
+* Fix `into` method: forward errors and end stream correctly.
+* Streams will now resume immediately, not on nextTick.
+* Typo fixes and code clarity fixes.
+
+## Scramjet Core 4.11.0
 
 * Allow multiple items in `whenWrote` (all arguments will be written to the stream),
 * Clearer and fixed documentation,

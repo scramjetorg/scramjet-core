@@ -2,13 +2,20 @@ const {DataStream} = require('../');
 const test = require("tape");
 const tTest = (t) => {
     return Object.assign(t, {
-        expect: t.plan,
-        done: t.end,
+        expect: (count) => {
+            t.expectCount = count;
+        },
+        done: () => {
+            if (t.expectCount > 0 && t.assertCount !== t.expectCount) {
+                t.fail(`Expected to run ${t.expectCount} assertions, but only ${t.assertCount} did.`);
+            }
+            t.end();
+        },
         equals: t.equal
     });
 };
 
-const mpath = require('path');
+const _path = require('path');
 
 const reporter = ({tests, name}) => {
     const ok = !tests.find(({ok}) => !ok);
@@ -25,7 +32,7 @@ const reporter = ({tests, name}) => {
                 console.error('     => actual:', actual, 'expected:', expected)
             }
         }
-    )
+    );
 
     return {name, ok};
 };
@@ -53,34 +60,34 @@ const flattenTests = ({tests, conf = {}, prefix = ''}) => {
 };
 
 const runTests = ({name, tests}) => {
-    const htest = test.createHarness();
+    const harness = test.createHarness();
 
     let current = null;
     const acc = new DataStream;
 
-    htest.createStream({objectMode: true})
+    harness.createStream({objectMode: true})
         .pipe(new DataStream)
-        .each((chunk) => {
-            switch (chunk.type) {
-                case "test":
-                    current = Object.assign({}, chunk, {
-                        tests: []
-                    })
-                    break;
-                case "assert":
-                    current.tests.push(chunk);
-                    break;
-                case "end":
-                    const last = current;
-                    current = null;
-                    return acc.whenWrote(last);
-            }
-        })
-        .on("end", () => acc.end())
-    ;
+            .each(async (chunk) => {
+                switch (chunk.type) {
+                    case "test":
+                        current = Object.assign({}, chunk, {
+                            tests: []
+                        });
+                        break;
+                    case "assert":
+                        current.tests.push(chunk);
+                        break;
+                    case "end":
+                        const last = current;
+                        current = null;
+                        return acc.whenWrote(last);
+                }
+            })
+            .on("end", () => acc.end())
+        ;
 
     DataStream.fromArray(tests)
-        .map(({name, conf, exec}) => htest(name, conf, exec))
+        .map(async ({name, conf, exec}) => harness(name, conf, exec))
         .catch(e => {
             console.error("Error!", e && e.stack)
         });
@@ -98,7 +105,7 @@ const runTests = ({name, tests}) => {
 module.exports = (conf) => {
     return new DataStream()
         .map(({path}) => ({
-            prefix: mpath.basename(path).replace(/\.js$/, ''),
+            prefix: _path.basename(path).replace(/\.js$/, ''),
             conf,
             tests: require(path)
         }))
@@ -107,7 +114,7 @@ module.exports = (conf) => {
         .until(
             ({name, ok}) => {
                 if (!ok) throw new Error(`Unit test errors occurred in ${name}`);
-                return;
+                return false;
             }
         );
 };
