@@ -7,6 +7,8 @@
 Scramjet core
 ---------------
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/signicode/scramjet-core.svg)](https://greenkeeper.io/)
+
 This is the minimal, dependency free version of [`scramjet`](https://github.com/signicode/scramjet) used as of Scramjet
 version 3.0.0 as a base for `scramjet` and scramjet plugins.
 
