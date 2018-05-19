@@ -69,7 +69,7 @@ gulp.task("docs", ["readme"], function() {
   return gulp.src("lib/*.js")
         .pipe(new DataStream())
         .map(async (file) => {
-            const output = await jsdoc2md({files: [file.path]});
+            const output = await jsdoc2md({ files: [file.path], plugin: "jsdoc2md/plugin-docs.js"});
             file.contents = Buffer.from(output);
             return file;
         })
