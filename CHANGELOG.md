@@ -1,4 +1,10 @@
-# Scramjet Core 4.11.1
+# Scramjet Core 4.12.0
+
+* Fix the `from` method.
+* Changelog and docs update, docs generated with new templates
+* Added tests for `DataStream.from`
+
+## Scramjet Core 4.11.1
 
 * Fix `into` method: forward errors and end stream correctly.
 * Streams will now resume immediately, not on nextTick.
