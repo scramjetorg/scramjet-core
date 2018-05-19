@@ -58,3 +58,4 @@ typings/
 .env
 
 CHANGELOG.md.orig
+yarn.lock
