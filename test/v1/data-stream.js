@@ -1,4 +1,4 @@
-const {DataStream} = require(process.env.SCRAMJET_TEST_HOME || '../../');
+const { DataStream, StringStream } = require(process.env.SCRAMJET_TEST_HOME || '../../');
 const {PassThrough} = require("stream");
 
 const getStream = () => {
@@ -51,6 +51,17 @@ module.exports = {
                 .toArray();
 
             test.deepEqual([1,2,3], z, "Should be the same as the stream");
+            test.done();
+        },
+        async subClass(test) {
+            const x = new PassThrough({ objectMode: true });
+            x.end("aaa");
+
+            const y = StringStream.from(x);
+            const z = await y.toArray();
+
+            test.deepEqual(["aaa"], z, "Should be the same as the stream");
+            test.ok(y instanceof StringStream, "Should return the derived class");
             test.done();
         }
     },
