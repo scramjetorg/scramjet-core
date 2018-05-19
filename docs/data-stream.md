@@ -12,8 +12,8 @@ streamed through your flow.
      .whenEnd());                         // wait until end
 ```
 
-**Kind**: global class
-**Extends**: <code>stream.PassThrough</code>
+**Kind**: global class  
+**Extends**: <code>stream.PassThrough</code>  
 
 * [DataStream](#DataStream) ⇐ <code>stream.PassThrough</code>
     * [new DataStream(opts)](#new_DataStream_new)
@@ -63,15 +63,15 @@ Create the DataStream.
 Transforms stream objects into new ones, just like Array.prototype.map
 does.
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Returns**: [<code>DataStream</code>](#DataStream) - mapped stream
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Returns**: [<code>DataStream</code>](#DataStream) - mapped stream  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | func | [<code>MapCallback</code>](#MapCallback) | The function that creates the new object |
 | Clazz | <code>Class</code> | (optional) The class to be mapped to. |
 
-**Example**
+**Example**  
 ```js
 [../samples/data-stream-map.js](../samples/data-stream-map.js)
 ```
@@ -81,14 +81,14 @@ does.
 Filters object based on the function outcome, just like
 Array.prototype.filter.
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Returns**: [<code>DataStream</code>](#DataStream) - filtered stream
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Returns**: [<code>DataStream</code>](#DataStream) - filtered stream  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | func | [<code>FilterCallback</code>](#FilterCallback) | The function that filters the object |
 
-**Example**
+**Example**  
 ```js
 [../samples/data-stream-filter.js](../samples/data-stream-filter.js)
 ```
@@ -104,15 +104,15 @@ This method is serial - meaning that any processing on an entry will
 occur only after the previous entry is fully processed. This does mean
 it's much slower than parallel functions.
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Returns**: <code>Promise</code> - Promise resolved by the last object returned by the call of the transform function
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Returns**: <code>Promise</code> - Promise resolved by the last object returned by the call of the transform function  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | func | [<code>ReduceCallback</code>](#ReduceCallback) | The into object will be passed as the  first argument, the data object from the stream as the second. |
 | into | <code>Object</code> | Any object passed initially to the transform function |
 
-**Example**
+**Example**  
 ```js
 [../samples/data-stream-reduce.js](../samples/data-stream-reduce.js)
 ```
@@ -121,8 +121,8 @@ it's much slower than parallel functions.
 ### dataStream.into(func, into) ⇒ [<code>DataStream</code>](#DataStream)
 Pushes the data into another scramjet stream while keeping flow control and
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Returns**: [<code>DataStream</code>](#DataStream) - the object passed as `into`
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Returns**: [<code>DataStream</code>](#DataStream) - the object passed as `into`  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -134,8 +134,8 @@ Pushes the data into another scramjet stream while keeping flow control and
 ### dataStream.tap()
 Stops merging transform callbacks at the current place in the command chain.
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Example**
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Example**  
 ```js
 [../samples/data-stream-tap.js](../samples/data-stream-tap.js)
 ```
@@ -144,14 +144,14 @@ Stops merging transform callbacks at the current place in the command chain.
 ### dataStream.whenRead() ⇒ <code>Promise.&lt;Object&gt;</code>
 Reads a chunk from the stream and resolves the promise when read.
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Returns**: <code>Promise.&lt;Object&gt;</code> - the read item
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Returns**: <code>Promise.&lt;Object&gt;</code> - the read item  
 <a name="DataStream+whenWrote"></a>
 
 ### dataStream.whenWrote(...data) ⇒ <code>Promise</code>
 Writes a chunk to the stream and returns a Promise resolved when more chunks can be written.
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -162,19 +162,19 @@ Writes a chunk to the stream and returns a Promise resolved when more chunks can
 ### dataStream.whenEnd() ⇒ <code>Promise</code>
 Resolves when stream ends - rejects on uncaught error
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 <a name="DataStream+whenDrained"></a>
 
 ### dataStream.whenDrained() ⇒ <code>Promise</code>
 Returns a promise that resolves when the stream is drained
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 <a name="DataStream+whenError"></a>
 
 ### dataStream.whenError() ⇒ <code>Promise</code>
 Returns a promise that resolves (!) when the stream is errors
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 <a name="DataStream+setOptions"></a>
 
 ### dataStream.setOptions(options) ↩︎
@@ -186,13 +186,13 @@ It's much easier to use this in chain than constructing new stream:
     stream.map(myMapper).filter(myFilter).setOptions({maxParallel: 2})
 ```
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Chainable**
-**Meta.conditions**: keep-order,chain
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Chainable**  
+**Meta.conditions**: keep-order,chain  
 
 | Param | Type |
 | --- | --- |
-| options | [<code>StreamOptions</code>](#StreamOptions) |
+| options | [<code>StreamOptions</code>](#StreamOptions) | 
 
 <a name="DataStream+use"></a>
 
@@ -203,14 +203,14 @@ The main intention of this method is to run scramjet modules - transforms that a
 streams. These modules can also be run with [scramjet-cli](https://github.com/signicode/scramjet-cli) directly
 from the command line.
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Returns**: <code>\*</code> - anything the passed function returns
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Returns**: <code>\*</code> - anything the passed function returns  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | func | <code>function</code> \| <code>String</code> | if passed, the function will be called on self                         to add an option to inspect the stream in place,                         while not breaking the transform chain.                         Alternatively this can be a relative path to a scramjet-module. |
 
-**Example**
+**Example**  
 ```js
 [../samples/data-stream-use.js](../samples/data-stream-use.js)
 ```
@@ -221,14 +221,14 @@ Duplicate the stream
 
 Creates a duplicate stream instance and passes it to the callback.
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Returns**: [<code>DataStream</code>](#DataStream) - self
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Returns**: [<code>DataStream</code>](#DataStream) - self  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | func | [<code>TeeCallback</code>](#TeeCallback) | The duplicate stream will be passed as first argument. |
 
-**Example**
+**Example**  
 ```js
 [../samples/data-stream-tee.js](../samples/data-stream-tee.js)
 ```
@@ -240,8 +240,8 @@ Performs an operation on every chunk, without changing the stream
 This is a shorthand for ```stream.on("data", func)``` but with flow control.
 Warning: this resumes the stream!
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Chainable**
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Chainable**  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -254,8 +254,8 @@ Reads the stream while the function outcome is truthy.
 
 Stops reading and emits end as soon as it ends.
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Returns**: [<code>DataStream</code>](#DataStream) - the shortened stream
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Returns**: [<code>DataStream</code>](#DataStream) - the shortened stream  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -268,8 +268,8 @@ Reads the stream until the function outcome is truthy.
 
 Works opposite of while.
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Returns**: [<code>DataStream</code>](#DataStream) - the shortened stream
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Returns**: [<code>DataStream</code>](#DataStream) - the shortened stream  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -286,8 +286,8 @@ The handler will be called as asynchronous
 
 If no handlers will resolve the error, an `error` event will be emitted
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Chainable**
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Chainable**  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -300,8 +300,8 @@ Executes all error handlers and if none resolves, then emits an error.
 
 The returned promise will always be resolved even if there are no successful handlers.
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Returns**: <code>Promise</code> - the promise that will be resolved when the error is handled.
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Returns**: <code>Promise</code> - the promise that will be resolved when the error is handled.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -314,8 +314,8 @@ Override of node.js Readable pipe.
 
 Except for calling overridden method it proxies errors to piped stream.
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Returns**: <code>Writable</code> - the `to` stream
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Returns**: <code>Writable</code> - the `to` stream  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -327,15 +327,15 @@ Except for calling overridden method it proxies errors to piped stream.
 ### dataStream.bufferify(serializer) ⇒ <code>BufferStream</code>
 Creates a BufferStream
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Returns**: <code>BufferStream</code> - the resulting stream
-**Meta.noreadme**:
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Returns**: <code>BufferStream</code> - the resulting stream  
+**Meta.noreadme**:   
 
 | Param | Type | Description |
 | --- | --- | --- |
 | serializer | [<code>MapCallback</code>](#MapCallback) | A method that converts chunks to buffers |
 
-**Example**
+**Example**  
 ```js
 [../samples/data-stream-tobufferstream.js](../samples/data-stream-tobufferstream.js)
 ```
@@ -344,14 +344,14 @@ Creates a BufferStream
 ### dataStream.stringify(serializer) ⇒ <code>StringStream</code>
 Creates a StringStream
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Returns**: <code>StringStream</code> - the resulting stream
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Returns**: <code>StringStream</code> - the resulting stream  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | serializer | [<code>MapCallback</code>](#MapCallback) | A method that converts chunks to strings |
 
-**Example**
+**Example**  
 ```js
 [../samples/data-stream-tostringstream.js](../samples/data-stream-tostringstream.js)
 ```
@@ -360,8 +360,8 @@ Creates a StringStream
 ### dataStream.run() ⇒ <code>Promise</code>
 Consumes all stream items without doing anything
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Returns**: <code>Promise</code> - Resolved when the whole stream is read
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Returns**: <code>Promise</code> - Resolved when the whole stream is read  
 <a name="DataStream+toArray"></a>
 
 ### dataStream.toArray(initial) ⇒ <code>Promise</code>
@@ -369,8 +369,8 @@ Aggregates the stream into a single Array
 
 In fact it's just a shorthand for reducing the stream into an Array.
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Returns**: <code>Promise</code> - Promise resolved with the resulting array on stream end.
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Returns**: <code>Promise</code> - Promise resolved with the resulting array on stream end.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -383,34 +383,34 @@ Returns an async generator
 
 Ready for https://github.com/tc39/proposal-async-iteration
 
-**Kind**: instance method of [<code>DataStream</code>](#DataStream)
-**Returns**: <code>Iterable.&lt;Promise.&lt;\*&gt;&gt;</code> - Returns an iterator that returns a promise for each item.
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Returns**: <code>Iterable.&lt;Promise.&lt;\*&gt;&gt;</code> - Returns an iterator that returns a promise for each item.  
 <a name="DataStream.from"></a>
 
 ### DataStream.from(stream, options) ⇒ <code>self</code>
 Returns a DataStream from any node.js Readable Stream
 
-**Kind**: static method of [<code>DataStream</code>](#DataStream)
-**Returns**: <code>self</code> - new instance of a scramjet stream
+**Kind**: static method of [<code>DataStream</code>](#DataStream)  
+**Returns**: <code>self</code> - new instance of a scramjet stream  
 
 | Param | Type |
 | --- | --- |
-| stream | <code>ReadableStream</code> |
-| options | [<code>StreamOptions</code>](#StreamOptions) |
+| stream | <code>ReadableStream</code> | 
+| options | [<code>StreamOptions</code>](#StreamOptions) | 
 
 <a name="DataStream.fromArray"></a>
 
 ### DataStream.fromArray(arr) ⇒ [<code>DataStream</code>](#DataStream)
 Create a DataStream from an Array
 
-**Kind**: static method of [<code>DataStream</code>](#DataStream)
-**Returns**: [<code>DataStream</code>](#DataStream) - the resulting stream
+**Kind**: static method of [<code>DataStream</code>](#DataStream)  
+**Returns**: [<code>DataStream</code>](#DataStream) - the resulting stream  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | arr | <code>Array</code> | list of chunks |
 
-**Example**
+**Example**  
 ```js
 [../samples/data-stream-fromarray.js](../samples/data-stream-fromarray.js)
 ```
@@ -421,14 +421,14 @@ Create a DataStream from an Iterator
 
 Doesn't end the stream until it reaches end of the iterator.
 
-**Kind**: static method of [<code>DataStream</code>](#DataStream)
-**Returns**: [<code>DataStream</code>](#DataStream) - the resulting stream
+**Kind**: static method of [<code>DataStream</code>](#DataStream)  
+**Returns**: [<code>DataStream</code>](#DataStream) - the resulting stream  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | iter | <code>Iterator</code> | the iterator object |
 
-**Example**
+**Example**  
 ```js
 [../samples/data-stream-fromiterator.js](../samples/data-stream-fromiterator.js)
 ```
@@ -437,12 +437,12 @@ Doesn't end the stream until it reaches end of the iterator.
 ## toStringStream()
 Alias for [stringify](#DataStream+stringify)
 
-**Kind**: global function
+**Kind**: global function  
 <a name="MapCallback"></a>
 
 ## MapCallback ⇒ <code>Promise</code> \| <code>\*</code>
-**Kind**: global typedef
-**Returns**: <code>Promise</code> \| <code>\*</code> - the mapped object
+**Kind**: global typedef  
+**Returns**: <code>Promise</code> \| <code>\*</code> - the mapped object  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -451,9 +451,9 @@ Alias for [stringify](#DataStream+stringify)
 <a name="FilterCallback"></a>
 
 ## FilterCallback ⇒ <code>Promise</code> \| <code>Boolean</code>
-**Kind**: global typedef
+**Kind**: global typedef  
 **Returns**: <code>Promise</code> \| <code>Boolean</code> - information if the object should remain in
-                            the filtered stream.
+                            the filtered stream.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -462,8 +462,8 @@ Alias for [stringify](#DataStream+stringify)
 <a name="ReduceCallback"></a>
 
 ## ReduceCallback ⇒ <code>Promise</code> \| <code>\*</code>
-**Kind**: global typedef
-**Returns**: <code>Promise</code> \| <code>\*</code> - accumulator for the next pass
+**Kind**: global typedef  
+**Returns**: <code>Promise</code> \| <code>\*</code> - accumulator for the next pass  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -473,8 +473,8 @@ Alias for [stringify](#DataStream+stringify)
 <a name="IntoCallback"></a>
 
 ## IntoCallback ⇒ <code>\*</code>
-**Kind**: global typedef
-**Returns**: <code>\*</code> - resolution for the old stream (for flow control only)
+**Kind**: global typedef  
+**Returns**: <code>\*</code> - resolution for the old stream (for flow control only)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -484,7 +484,7 @@ Alias for [stringify](#DataStream+stringify)
 <a name="TeeCallback"></a>
 
 ## TeeCallback : <code>function</code>
-**Kind**: global typedef
+**Kind**: global typedef  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -495,7 +495,7 @@ Alias for [stringify](#DataStream+stringify)
 ## StreamOptions : <code>Object</code>
 Standard options for scramjet streams.
 
-**Kind**: global typedef
+**Kind**: global typedef  
 **Properties**
 
 | Name | Type | Description |
