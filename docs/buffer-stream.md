@@ -107,7 +107,7 @@ the given number of bytes.
 Splits the buffer stream into buffer objects
 
 **Kind**: instance method of [<code>BufferStream</code>](#BufferStream)  
-**Returns**: [<code>BufferStream</code>](#BufferStream) - the re-splitted buffer stream.  
+**Returns**: [<code>BufferStream</code>](#BufferStream) - the re-split buffer stream.  
 **Todo**
 
 - [ ] implement splitting by function
@@ -163,7 +163,7 @@ stream so you can do all your transforms when you like.
 Parses every buffer to object
 
 The method MUST parse EVERY buffer into a single object, so the buffer
-stream here should already be splitted or broken up.
+stream here should already be split or broken up.
 
 **Kind**: instance method of [<code>BufferStream</code>](#BufferStream)  
 **Returns**: <code>DataStream</code> - The parsed objects stream.  
