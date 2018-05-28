@@ -1,3 +1,5 @@
+![Scramjet Logo](https://signicode.com/scramjet-logo-light.svg)
+
 [![Master Build Status](https://travis-ci.org/signicode/scramjet-core.svg?branch=master)](https://travis-ci.org/signicode/scramjet-core)
 [![Develop Build Status](https://travis-ci.org/signicode/scramjet-core.svg?branch=develop)](https://travis-ci.org/signicode/scramjet-core)
 [![Dependencies](https://david-dm.org/signicode/scramjet-core/status.svg)](https://david-dm.org/signicode/scramjet-core)
@@ -6,7 +8,7 @@
 [![Greenkeeper badge](https://badges.greenkeeper.io/signicode/scramjet-core.svg)](https://greenkeeper.io/)
 
 Scramjet core
----------------
+===============
 
 This is the minimal, dependency free version of [`scramjet`](https://github.com/signicode/scramjet) used as of Scramjet
 version 3.0.0 as a base for `scramjet` and scramjet plugins.
@@ -20,8 +22,21 @@ your hand.
 ## Usage
 
 Scramjet uses functional programming to run transformations on your data streams in a fashion very similar to the well
-known event-stream node module. Most transformations are done by passing a transform function. You can write your
-function in three ways:
+known event-stream node module. Most transformations are done by passing a transform function.
+
+It's all about chaining, really - you develop your flow based on a chain of calls that return another method like this:
+
+```javascript
+    scramjet.from(someReadableStream)           // you can construct your stream any way you like
+        .map(someMapper)                        // you can map the objects in the stream
+        .map(someAsyncAPICall)                  // you can call an API for each item
+        .filter(asynchronousFilterOperation)    // you can even filter by async function
+        .catch(errorHandler)                    // there's built in error handling
+        .until(doneCondition)                   // you can stop reading the stream whenever you're done
+        .toArray();                             // you can accumulate
+```
+
+You can write your transforms in three ways:
 
 1. Synchronous
 
@@ -33,17 +48,17 @@ function in three ways:
     )
  ```
 
-2. Asynchronous using ES2015 async await
+1. Asynchronous using ES2015 async await
 
 Example: A simple stream that uses Fetch API to get all the contents of all entries in the stream
 
 ```javascript
-datastream.map(
-    async (item) => fetch(item)
-)
+    datastream.map(
+        async (item) => fetch(item)
+    )
 ```
 
-3. Asynchronous using Promises
+1. Asynchronous using Promises
 
  Example: A simple stream that fetches an url mentioned in the incoming object
 
@@ -67,18 +82,19 @@ resolved with the data from the input stream.
 
 Here's the list of the exposed classes and methods, please review the specific documentation for details:
 
-* [```scramjet.DataStream```](docs/data-stream.md) - the base class for all scramjet classes.
-* [```scramjet.BufferStream```](docs/buffer-stream.md) - a DataStream of Buffers.
-* [```scramjet.StringStream```](docs/string-stream.md) - a DataStream of Strings.
-* [```scramjet.MultiStream```](docs/multi-stream.md) - a DataStream of Strings.
-* [```scramjet.plugin```](docs/index.md) - method for adding plugins, please see the docs
+* [`exports`](docs/index.md) - module exports explained
+* [`scramjet.DataStream`](docs/data-stream.md) - the base class for all scramjet classes.
+* [`scramjet.BufferStream`](docs/buffer-stream.md) - a DataStream of Buffers.
+* [`scramjet.StringStream`](docs/string-stream.md) - a DataStream of Strings.
+* [`scramjet.MultiStream`](docs/multi-stream.md) - a DataStream of Strings.
 * [more on plugins](docs/plugins.md) - a description and link.
 
 Note that:
 
 * Most of the methods take a callback argument that operates on the stream items.
 * The callback, unless it's stated otherwise, will receive an argument with the next chunk.
-* If you want to perform your operations asynchronously, return a Promise, otherwise just return the right value.
+* You can use `async` functions or return `Promise`s wherever you like.
+* Methods usually return the same class, so are chainable `↺` or are asynchronous `⇄`
 
 The quick reference of the exposed classes:
 
