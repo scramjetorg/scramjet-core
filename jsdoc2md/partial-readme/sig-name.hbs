@@ -7,7 +7,7 @@
 {{@accessSymbol}}{{#if (isEvent)}}"{{{name}}}"{{else}}{{{name}}}{{/if~}}
 {{#if @methodSign}}{{#if (isEvent)}} {{@methodSign}}{{else}}{{@methodSign}}{{/if}}{{/if~}}
 {{{@codeClose}~}}
-{{#if @returnTypes}} {{{inlineReturnTypes @returnTypes}}}{{/if ~}}
+{{#if @returnTypes}} : {{{inlineReturnTypes @returnTypes}}}{{/if ~}}
 {{#ifReturnSymbol}} {{returnSymbol}}{{/ifReturnSymbol~}}
 {{#if @suffix}} {{@suffix}}{{/if~}}
 {{{@depClose}~}}
