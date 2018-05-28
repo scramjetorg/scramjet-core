@@ -139,14 +139,14 @@ await (DataStream.from(aStream) // create a DataStream
 * [`dataStream.until(func) ↺`](docs/data-stream.md#DataStream+until) - Reads the stream until the function outcome is truthy.
 * [`dataStream.catch(callback) ↺`](docs/data-stream.md#DataStream+catch) - Provides a way to catch errors in chained streams.
 * [`dataStream.raise(err) ⇄`](docs/data-stream.md#DataStream+raise) - Executes all error handlers and if none resolves, then emits an error.
-* [`dataStream.pipe(to, options) Writable ↺`](docs/data-stream.md#DataStream+pipe) - Override of node.js Readable pipe.
-* [`dataStream.bufferify(serializer) BufferStream ↺`](docs/data-stream.md#DataStream+bufferify) - Creates a BufferStream
-* [`dataStream.stringify(serializer) StringStream ↺`](docs/data-stream.md#DataStream+stringify) - Creates a StringStream
-* [`dataStream.toArray(initial) Array ⇄`](docs/data-stream.md#DataStream+toArray) - Aggregates the stream into a single Array
-* [`dataStream.toGenerator() Iterable.<Promise.<*>>`](docs/data-stream.md#DataStream+toGenerator) - Returns an async generator
+* [`dataStream.pipe(to, options) : Writable ↺`](docs/data-stream.md#DataStream+pipe) - Override of node.js Readable pipe.
+* [`dataStream.bufferify(serializer) : BufferStream ↺`](docs/data-stream.md#DataStream+bufferify) - Creates a BufferStream
+* [`dataStream.stringify(serializer) : StringStream ↺`](docs/data-stream.md#DataStream+stringify) - Creates a StringStream
+* [`dataStream.toArray(initial) : Array ⇄`](docs/data-stream.md#DataStream+toArray) - Aggregates the stream into a single Array
+* [`dataStream.toGenerator() : Iterable.<Promise.<*>>`](docs/data-stream.md#DataStream+toGenerator) - Returns an async generator
 * [`DataStream:from(stream, options) ↺`](docs/data-stream.md#DataStream.from) - Returns a DataStream from any node.js Readable Stream
-* [`DataStream:fromArray(arr) DataStream`](docs/data-stream.md#DataStream.fromArray) - Create a DataStream from an Array
-* [`DataStream:fromIterator(iter) DataStream`](docs/data-stream.md#DataStream.fromIterator) - Create a DataStream from an Iterator
+* [`DataStream:fromArray(arr) : DataStream`](docs/data-stream.md#DataStream.fromArray) - Create a DataStream from an Array
+* [`DataStream:fromIterator(iter) : DataStream`](docs/data-stream.md#DataStream.fromIterator) - Create a DataStream from an Iterator
 
 ### StringStream
 
@@ -163,13 +163,13 @@ StringStream.fromString()
 **Most popular methods:**
 
 * `new StringStream(encoding)` - Constructs the stream with the given encoding
-* [`stringStream.shift(bytes, func) StringStream ↺`](docs/string-stream.md#StringStream+shift) - Shifts given length of chars from the original stream
-* [`stringStream.split(splitter) StringStream ↺`](docs/string-stream.md#StringStream+split) - Splits the string stream by the specified regexp or string
-* [`stringStream.match(matcher) StringStream ↺`](docs/string-stream.md#StringStream+match) - Finds matches in the string stream and streams the match results
-* [`stringStream.toBufferStream() StringStream`](docs/string-stream.md#StringStream+toBufferStream) - Transforms the StringStream to BufferStream
-* [`stringStream.parse(parser) DataStream`](docs/string-stream.md#StringStream+parse) - Parses every string to object
+* [`stringStream.shift(bytes, func) ↺`](docs/string-stream.md#StringStream+shift) - Shifts given length of chars from the original stream
+* [`stringStream.split(splitter) ↺`](docs/string-stream.md#StringStream+split) - Splits the string stream by the specified regexp or string
+* [`stringStream.match(matcher) ↺`](docs/string-stream.md#StringStream+match) - Finds matches in the string stream and streams the match results
+* [`stringStream.toBufferStream() : BufferStream ↺`](docs/string-stream.md#StringStream+toBufferStream) - Transforms the StringStream to BufferStream
+* [`stringStream.parse(parser) : DataStream ↺`](docs/string-stream.md#StringStream+parse) - Parses every string to object
 * [`StringStream:SPLIT_LINE`](docs/string-stream.md#StringStream.SPLIT_LINE) - A handly split by line regex to quickly get a line-by-line stream
-* [`StringStream:fromString(str, encoding) StringStream`](docs/string-stream.md#StringStream.fromString) - Creates a StringStream and writes a specific string.
+* [`StringStream:fromString(str, encoding) : StringStream`](docs/string-stream.md#StringStream.fromString) - Creates a StringStream and writes a specific string.
 
 ### BufferStream
 
@@ -196,11 +196,11 @@ A simple use case would be:
 **Most popular methods:**
 
 * `new BufferStream(opts)` - Creates the BufferStream
-* [`bufferStream.shift(chars, func) BufferStream ↺`](docs/buffer-stream.md#BufferStream+shift) - Shift given number of bytes from the original stream
-* [`bufferStream.split(splitter) BufferStream ↺`](docs/buffer-stream.md#BufferStream+split) - Splits the buffer stream into buffer objects
-* [`bufferStream.breakup(number) BufferStream ↺`](docs/buffer-stream.md#BufferStream+breakup) - Breaks up a stream apart into chunks of the specified length
-* [`bufferStream.stringify(encoding) StringStream`](docs/buffer-stream.md#BufferStream+stringify) - Creates a string stream from the given buffer stream
-* [`bufferStream.parse(parser) DataStream`](docs/buffer-stream.md#BufferStream+parse) - Parses every buffer to object
+* [`bufferStream.shift(chars, func) : BufferStream ↺`](docs/buffer-stream.md#BufferStream+shift) - Shift given number of bytes from the original stream
+* [`bufferStream.split(splitter) : BufferStream ↺`](docs/buffer-stream.md#BufferStream+split) - Splits the buffer stream into buffer objects
+* [`bufferStream.breakup(number) : BufferStream ↺`](docs/buffer-stream.md#BufferStream+breakup) - Breaks up a stream apart into chunks of the specified length
+* [`bufferStream.stringify(encoding) : StringStream`](docs/buffer-stream.md#BufferStream+stringify) - Creates a string stream from the given buffer stream
+* [`bufferStream.parse(parser) : DataStream`](docs/buffer-stream.md#BufferStream+parse) - Parses every buffer to object
 
 ### MultiStream
 
@@ -211,12 +211,12 @@ An object consisting of multiple streams than can be refined or muxed.
 **Most popular methods:**
 
 * `new MultiStream(streams, options)` - Crates an instance of MultiStream with the specified stream list
-* [`multiStream.streams Array`](docs/multi-stream.md#MultiStream+streams) - Array of all streams
-* [`multiStream.length number`](docs/multi-stream.md#MultiStream+length) - Returns the current stream length
-* [`multiStream.map(aFunc) MultiStream ↺`](docs/multi-stream.md#MultiStream+map) - Returns new MultiStream with the streams returned by the transform.
-* [`multiStream.find(...args) DataStream`](docs/multi-stream.md#MultiStream+find) - Calls Array.prototype.find on the streams
-* [`multiStream.filter(func) MultiStream ↺`](docs/multi-stream.md#MultiStream+filter) - Filters the stream list and returns a new MultiStream with only the
-* [`multiStream.mux(cmp) DataStream`](docs/multi-stream.md#MultiStream+mux) - Muxes the streams into a single one
+* [`multiStream.streams : Array`](docs/multi-stream.md#MultiStream+streams) - Array of all streams
+* [`multiStream.length : number`](docs/multi-stream.md#MultiStream+length) - Returns the current stream length
+* [`multiStream.map(aFunc) : MultiStream ↺`](docs/multi-stream.md#MultiStream+map) - Returns new MultiStream with the streams returned by the transform.
+* [`multiStream.find(...args) : DataStream`](docs/multi-stream.md#MultiStream+find) - Calls Array.prototype.find on the streams
+* [`multiStream.filter(func) : MultiStream ↺`](docs/multi-stream.md#MultiStream+filter) - Filters the stream list and returns a new MultiStream with only the
+* [`multiStream.mux(cmp) : DataStream`](docs/multi-stream.md#MultiStream+mux) - Muxes the streams into a single one
 * [`multiStream.add(stream)`](docs/multi-stream.md#MultiStream+add) - Adds a stream to the MultiStream
 * [`multiStream.remove(stream)`](docs/multi-stream.md#MultiStream+remove) - Removes a stream from the MultiStream
 

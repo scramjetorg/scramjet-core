@@ -11,7 +11,6 @@ can be constructed with the following options passed to mimic node.js standard s
 
 * `async promiseTransform(chunk)` - transform method that resolves with a single output chunk
 * `async promiseWrite(chunk)` - write method that that resolves when chunk is written
-* `async promiseWriteV(chunk)` - write method that that resolves when chunk is written
 * `async promiseRead(count)` - read method that resolves with an array of chunks when called
 
 See [node.js API for stream implementers for details](https://nodejs.org/api/stream.html#stream_api_for_stream_implementers)
