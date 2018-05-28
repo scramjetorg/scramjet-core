@@ -1,4 +1,12 @@
-# Scramjet Core 4.12.0
+# Scramjet Core 4.13.0
+
+* Allow "read only" scramjet streams
+* Allow "write only" scramjet streams
+* Update dependencies.
+* Better documentation and tests.
+* More efficient `reduce`
+
+## Scramjet Core 4.12.0
 
 * Fix the `from` method.
 * Changelog and docs update, docs generated with new templates
