@@ -1,3 +1,5 @@
+![Scramjet Logo](https://signicode.com/scramjet-logo-light.svg)
+
 [![Master Build Status](https://travis-ci.org/signicode/scramjet-core.svg?branch=master)](https://travis-ci.org/signicode/scramjet-core)
 [![Develop Build Status](https://travis-ci.org/signicode/scramjet-core.svg?branch=develop)](https://travis-ci.org/signicode/scramjet-core)
 [![Dependencies](https://david-dm.org/signicode/scramjet-core/status.svg)](https://david-dm.org/signicode/scramjet-core)
@@ -6,7 +8,7 @@
 [![Greenkeeper badge](https://badges.greenkeeper.io/signicode/scramjet-core.svg)](https://greenkeeper.io/)
 
 Scramjet core
----------------
+===============
 
 This is the minimal, dependency free version of [`scramjet`](https://github.com/signicode/scramjet) used as of Scramjet
 version 3.0.0 as a base for `scramjet` and scramjet plugins.
@@ -20,8 +22,21 @@ your hand.
 ## Usage
 
 Scramjet uses functional programming to run transformations on your data streams in a fashion very similar to the well
-known event-stream node module. Most transformations are done by passing a transform function. You can write your
-function in three ways:
+known event-stream node module. Most transformations are done by passing a transform function.
+
+It's all about chaining, really - you develop your flow based on a chain of calls that return another method like this:
+
+```javascript
+    scramjet.from(someReadableStream)           // you can construct your stream any way you like
+        .map(someMapper)                        // you can map the objects in the stream
+        .map(someAsyncAPICall)                  // you can call an API for each item
+        .filter(asynchronousFilterOperation)    // you can even filter by async function
+        .catch(errorHandler)                    // there's built in error handling
+        .until(doneCondition)                   // you can stop reading the stream whenever you're done
+        .toArray();                             // you can accumulate
+```
+
+You can write your transforms in three ways:
 
 1. Synchronous
 
@@ -33,17 +48,17 @@ function in three ways:
     )
  ```
 
-2. Asynchronous using ES2015 async await
+1. Asynchronous using ES2015 async await
 
 Example: A simple stream that uses Fetch API to get all the contents of all entries in the stream
 
 ```javascript
-datastream.map(
-    async (item) => fetch(item)
-)
+    datastream.map(
+        async (item) => fetch(item)
+    )
 ```
 
-3. Asynchronous using Promises
+1. Asynchronous using Promises
 
  Example: A simple stream that fetches an url mentioned in the incoming object
 
@@ -67,87 +82,96 @@ resolved with the data from the input stream.
 
 Here's the list of the exposed classes and methods, please review the specific documentation for details:
 
-* [```scramjet.DataStream```](docs/data-stream.md) - the base class for all scramjet classes.
-* [```scramjet.BufferStream```](docs/buffer-stream.md) - a DataStream of Buffers.
-* [```scramjet.StringStream```](docs/string-stream.md) - a DataStream of Strings.
-* [```scramjet.MultiStream```](docs/multi-stream.md) - a DataStream of Strings.
-* [```scramjet.plugin```](docs/index.md) - method for adding plugins, please see the docs
+* [`exports`](docs/index.md) - module exports explained
+* [`scramjet.DataStream`](docs/data-stream.md) - the base class for all scramjet classes.
+* [`scramjet.BufferStream`](docs/buffer-stream.md) - a DataStream of Buffers.
+* [`scramjet.StringStream`](docs/string-stream.md) - a DataStream of Strings.
+* [`scramjet.MultiStream`](docs/multi-stream.md) - a DataStream of Strings.
 * [more on plugins](docs/plugins.md) - a description and link.
 
 Note that:
 
 * Most of the methods take a callback argument that operates on the stream items.
 * The callback, unless it's stated otherwise, will receive an argument with the next chunk.
-* If you want to perform your operations asynchronously, return a Promise, otherwise just return the right value.
+* You can use `async` functions or return `Promise`s wherever you like.
+* Methods usually return the same class, so are chainable `↺` or are asynchronous `⇄`
 
 The quick reference of the exposed classes:
 
-
-<a name="DataStream"></a>
-### DataStream ⇐ stream.PassThrough
+### DataStream
 
 DataStream is the primary stream type for Scramjet. When you parse your
 stream, just pipe it you can then perform calculations on the data objects
 streamed through your flow.
 
+Use as:
+
 ```javascript
- await (DataStream.fromArray([1,2,3,4,5]) // create a DataStream
-     .map(readFile)                       // read some data asynchronously
-     .map(sendToApi)                      // send the data somewhere
-     .whenEnd());                         // wait until end
+const { DataStream } = require('scramjet');
+
+await (DataStream.from(aStream) // create a DataStream
+    .map(findInFiles)           // read some data asynchronously
+    .map(sendToAPI)             // send the data somewhere
+    .run());                    // wait until end
 ```
+
+[Detailed DataStream docs here](docs/data-stream.md)
 
 **Most popular methods:**
 
-* `new DataStream(opts)` - Create the DataStream. 
-* `dataStream.map(func, Clazz) ⇒ [<code>DataStream</code>](#DataStream)` - Transforms stream objects into new ones, just like Array.prototype.map [map example](../samples/data-stream-map.js)
-* `dataStream.filter(func) ⇒ [<code>DataStream</code>](#DataStream)` - Filters object based on the function outcome, just like [filter example](../samples/data-stream-filter.js)
-* `dataStream.reduce(func, into) ⇒ <code>Promise</code>` - Reduces the stream into a given accumulator [reduce example](../samples/data-stream-reduce.js)
-* `dataStream.into(func, into) ⇒ [<code>DataStream</code>](#DataStream)` - Pushes the data into another scramjet stream while keeping flow control and 
-* `dataStream.tap()` - Stops merging transform callbacks at the current place in the command chain. [tap example](../samples/data-stream-tap.js)
-* `dataStream.whenRead() ⇒ <code>Promise.&lt;Object&gt;</code>` - Reads a chunk from the stream and resolves the promise when read. 
-* `dataStream.whenWrote(...data) ⇒ <code>Promise</code>` - Writes a chunk to the stream and returns a Promise resolved when more chunks can be written. 
-* `dataStream.whenEnd() ⇒ <code>Promise</code>` - Resolves when stream ends - rejects on uncaught error 
-* `dataStream.whenDrained() ⇒ <code>Promise</code>` - Returns a promise that resolves when the stream is drained 
-* `dataStream.whenError() ⇒ <code>Promise</code>` - Returns a promise that resolves (!) when the stream is errors 
-* `dataStream.setOptions(options) ↩︎` - Allows resetting stream options. 
-* `dataStream.use(func) ⇒ <code>\*</code>` - Calls the passed method in place with the stream as first argument, returns result. [use example](../samples/data-stream-use.js)
-* `dataStream.tee(func) ⇒ [<code>DataStream</code>](#DataStream)` - Duplicate the stream [tee example](../samples/data-stream-tee.js)
-* `dataStream.each(func) ↩︎` - Performs an operation on every chunk, without changing the stream 
-* `dataStream.while(func) ⇒ [<code>DataStream</code>](#DataStream)` - Reads the stream while the function outcome is truthy. 
-* `dataStream.until(func) ⇒ [<code>DataStream</code>](#DataStream)` - Reads the stream until the function outcome is truthy. 
-* `dataStream.catch(callback) ↩︎` - Provides a way to catch errors in chained streams. 
-* `dataStream.raise(err) ⇒ <code>Promise</code>` - Executes all error handlers and if none resolves, then emits an error. 
-* `dataStream.pipe(to, options) ⇒ <code>Writable</code>` - Override of node.js Readable pipe. 
-* `dataStream.bufferify(serializer) ⇒ [<code>BufferStream</code>](#BufferStream)` - Creates a BufferStream [bufferify example](../samples/data-stream-tobufferstream.js)
-* `dataStream.stringify(serializer) ⇒ [<code>StringStream</code>](#StringStream)` - Creates a StringStream [stringify example](../samples/data-stream-tostringstream.js)
-* `dataStream.run() ⇒ <code>Promise</code>` - Consumes all stream items without doing anything 
-* `dataStream.toArray(initial) ⇒ <code>Promise</code>` - Aggregates the stream into a single Array 
-* `dataStream.toGenerator() ⇒ <code>Iterable.&lt;Promise.&lt;\*&gt;&gt;</code>` - Returns an async generator 
-* `DataStream.from(stream, options) ⇒ <code>self</code>` - Returns a DataStream from any node.js Readable Stream 
-* `DataStream.fromArray(arr) ⇒ [<code>DataStream</code>](#DataStream)` - Create a DataStream from an Array [fromArray example](../samples/data-stream-fromarray.js)
-* `DataStream.fromIterator(iter) ⇒ [<code>DataStream</code>](#DataStream)` - Create a DataStream from an Iterator [fromIterator example](../samples/data-stream-fromiterator.js)
-[Detailed DataStream docs here](docs/data-stream.md)
+* `new DataStream(opts)` - Create the DataStream.
+* [`dataStream.map(func, Clazz) ↺`](docs/data-stream.md#DataStream+map) - Transforms stream objects into new ones, just like Array.prototype.map
+* [`dataStream.filter(func) ↺`](docs/data-stream.md#DataStream+filter) - Filters object based on the function outcome, just like
+* [`dataStream.reduce(func, into) ⇄`](docs/data-stream.md#DataStream+reduce) - Reduces the stream into a given accumulator
+* [`dataStream.into(func, into) ↺`](docs/data-stream.md#DataStream+into) - Allows own implementation of stream chaining.
+* [`dataStream.use(func) ↺`](docs/data-stream.md#DataStream+use) - Calls the passed method in place with the stream as first argument, returns result.
+* [`dataStream.run() ⇄`](docs/data-stream.md#DataStream+run) - Consumes all stream items doing nothing. Resolves when the stream is ended.
+* [`dataStream.tap()`](docs/data-stream.md#DataStream+tap) - Stops merging transform callbacks at the current place in the command chain.
+* [`dataStream.whenRead() ⇄`](docs/data-stream.md#DataStream+whenRead) - Reads a chunk from the stream and resolves the promise when read.
+* [`dataStream.whenWrote(...dat) ⇄`](docs/data-stream.md#DataStream+whenWrote) - Writes a chunk to the stream and returns a Promise resolved when more chunks can be written.
+* [`dataStream.whenEnd() ⇄`](docs/data-stream.md#DataStream+whenEnd) - Resolves when stream ends - rejects on uncaught error
+* [`dataStream.whenDrained() ⇄`](docs/data-stream.md#DataStream+whenDrained) - Returns a promise that resolves when the stream is drained
+* [`dataStream.whenError() ⇄`](docs/data-stream.md#DataStream+whenError) - Returns a promise that resolves (!) when the stream is errors
+* [`dataStream.setOptions(options) ↺`](docs/data-stream.md#DataStream+setOptions) - Allows resetting stream options.
+* [`dataStream.tee(func) ↺`](docs/data-stream.md#DataStream+tee) - Duplicate the stream
+* [`dataStream.each(func) ↺`](docs/data-stream.md#DataStream+each) - Performs an operation on every chunk, without changing the stream
+* [`dataStream.while(func) ↺`](docs/data-stream.md#DataStream+while) - Reads the stream while the function outcome is truthy.
+* [`dataStream.until(func) ↺`](docs/data-stream.md#DataStream+until) - Reads the stream until the function outcome is truthy.
+* [`dataStream.catch(callback) ↺`](docs/data-stream.md#DataStream+catch) - Provides a way to catch errors in chained streams.
+* [`dataStream.raise(err) ⇄`](docs/data-stream.md#DataStream+raise) - Executes all error handlers and if none resolves, then emits an error.
+* [`dataStream.pipe(to, options) Writable ↺`](docs/data-stream.md#DataStream+pipe) - Override of node.js Readable pipe.
+* [`dataStream.bufferify(serializer) BufferStream ↺`](docs/data-stream.md#DataStream+bufferify) - Creates a BufferStream
+* [`dataStream.stringify(serializer) StringStream ↺`](docs/data-stream.md#DataStream+stringify) - Creates a StringStream
+* [`dataStream.toArray(initial) Array ⇄`](docs/data-stream.md#DataStream+toArray) - Aggregates the stream into a single Array
+* [`dataStream.toGenerator() Iterable.<Promise.<*>>`](docs/data-stream.md#DataStream+toGenerator) - Returns an async generator
+* [`DataStream:from(stream, options) ↺`](docs/data-stream.md#DataStream.from) - Returns a DataStream from any node.js Readable Stream
+* [`DataStream:fromArray(arr) DataStream`](docs/data-stream.md#DataStream.fromArray) - Create a DataStream from an Array
+* [`DataStream:fromIterator(iter) DataStream`](docs/data-stream.md#DataStream.fromIterator) - Create a DataStream from an Iterator
 
-<a name="StringStream"></a>
-### StringStream ⇐ DataStream
+### StringStream
 
 A stream of string objects for further transformation on top of DataStream.
 
-**Most popular methods:**
+Example:
 
-* `new StringStream(encoding)` - Constructs the stream with the given encoding 
-* `stringStream.shift(bytes, func) ⇒ [<code>StringStream</code>](#StringStream)` - Shifts given length of chars from the original stream [shift example](../samples/string-stream-shift.js)
-* `stringStream.split(splitter) ⇒ [<code>StringStream</code>](#StringStream)` - Splits the string stream by the specified regexp or string [split example](../samples/string-stream-split.js)
-* `stringStream.match(splitter) ⇒ [<code>StringStream</code>](#StringStream)` - Finds matches in the string stream and streams the match results [match example](../samples/string-stream-match.js)
-* `stringStream.toBufferStream() ⇒ [<code>StringStream</code>](#StringStream)` - Transforms the StringStream to BufferStream [toBufferStream example](../samples/string-stream-tobufferstream.js)
-* `stringStream.parse(parser) ⇒ [<code>DataStream</code>](#DataStream)` - Parses every string to object [parse example](../samples/string-stream-parse.js)
-* `StringStream.SPLIT_LINE` - A handly split by line regex to quickly get a line-by-line stream 
-* `StringStream.fromString(str, encoding) ⇒ [<code>StringStream</code>](#StringStream)` - Creates a StringStream and writes a specific string. 
+```javascript
+StringStream.fromString()
+```
+
 [Detailed StringStream docs here](docs/string-stream.md)
 
-<a name="BufferStream"></a>
-### BufferStream ⇐ DataStream
+**Most popular methods:**
+
+* `new StringStream(encoding)` - Constructs the stream with the given encoding
+* [`stringStream.shift(bytes, func) StringStream ↺`](docs/string-stream.md#StringStream+shift) - Shifts given length of chars from the original stream
+* [`stringStream.split(splitter) StringStream ↺`](docs/string-stream.md#StringStream+split) - Splits the string stream by the specified regexp or string
+* [`stringStream.match(matcher) StringStream ↺`](docs/string-stream.md#StringStream+match) - Finds matches in the string stream and streams the match results
+* [`stringStream.toBufferStream() StringStream`](docs/string-stream.md#StringStream+toBufferStream) - Transforms the StringStream to BufferStream
+* [`stringStream.parse(parser) DataStream`](docs/string-stream.md#StringStream+parse) - Parses every string to object
+* [`StringStream:SPLIT_LINE`](docs/string-stream.md#StringStream.SPLIT_LINE) - A handly split by line regex to quickly get a line-by-line stream
+* [`StringStream:fromString(str, encoding) StringStream`](docs/string-stream.md#StringStream.fromString) - Creates a StringStream and writes a specific string.
+
+### BufferStream
 
 A factilitation stream created for easy splitting or parsing buffers.
 
@@ -167,33 +191,35 @@ A simple use case would be:
      ]);
 ```
 
-**Most popular methods:**
-
-* `new BufferStream(opts)` - Creates the BufferStream 
-* `bufferStream.shift(chars, func) ⇒ [<code>BufferStream</code>](#BufferStream)` - Shift given number of bytes from the original stream [shift example](../samples/string-stream-shift.js)
-* `bufferStream.split(splitter) ⇒ [<code>BufferStream</code>](#BufferStream)` - Splits the buffer stream into buffer objects [split example](../samples/buffer-stream-split.js)
-* `bufferStream.breakup(number) ⇒ [<code>BufferStream</code>](#BufferStream)` - Breaks up a stream apart into chunks of the specified length [breakup example](../samples/buffer-stream-breakup.js)
-* `bufferStream.stringify(encoding) ⇒ [<code>StringStream</code>](#StringStream)` - Creates a string stream from the given buffer stream [stringify example](../samples/buffer-stream-tostringstream.js)
-* `bufferStream.parse(parser) ⇒ [<code>DataStream</code>](#DataStream)` - Parses every buffer to object [parse example](../samples/buffer-stream-parse.js)
 [Detailed BufferStream docs here](docs/buffer-stream.md)
 
-<a name="MultiStream"></a>
+**Most popular methods:**
+
+* `new BufferStream(opts)` - Creates the BufferStream
+* [`bufferStream.shift(chars, func) BufferStream ↺`](docs/buffer-stream.md#BufferStream+shift) - Shift given number of bytes from the original stream
+* [`bufferStream.split(splitter) BufferStream ↺`](docs/buffer-stream.md#BufferStream+split) - Splits the buffer stream into buffer objects
+* [`bufferStream.breakup(number) BufferStream ↺`](docs/buffer-stream.md#BufferStream+breakup) - Breaks up a stream apart into chunks of the specified length
+* [`bufferStream.stringify(encoding) StringStream`](docs/buffer-stream.md#BufferStream+stringify) - Creates a string stream from the given buffer stream
+* [`bufferStream.parse(parser) DataStream`](docs/buffer-stream.md#BufferStream+parse) - Parses every buffer to object
+
 ### MultiStream
 
 An object consisting of multiple streams than can be refined or muxed.
 
+[Detailed MultiStream docs here](docs/multi-stream.md)
+
 **Most popular methods:**
 
-* `new MultiStream(streams, options)` - Crates an instance of MultiStream with the specified stream list 
-* `multiStream.streams : <code>Array</code>` - Array of all streams 
-* `multiStream.length ⇒ <code>number</code>` - Returns the current stream length 
-* `multiStream.map(aFunc) ⇒ [<code>MultiStream</code>](#MultiStream)` - Returns new MultiStream with the streams returned by the tranform. [map example](../samples/multi-stream-map.js)
-* `multiStream.find(...args) ⇒ [<code>DataStream</code>](#DataStream)` - Calls Array.prototype.find on the streams 
-* `multiStream.filter(func) ⇒ [<code>MultiStream</code>](#MultiStream)` - Filters the stream list and returns a new MultiStream with only the [filter example](../samples/multi-stream-filter.js)
-* `multiStream.mux(cmp) ⇒ [<code>DataStream</code>](#DataStream)` - Muxes the streams into a single one [mux example](../samples/multi-stream-mux.js)
-* `multiStream.add(stream)` - Adds a stream to the MultiStream [add example](../samples/multi-stream-add.js)
-* `multiStream.remove(stream)` - Removes a stream from the MultiStream [remove example](../samples/multi-stream-remove.js)
-[Detailed MultiStream docs here](docs/multi-stream.md)
+* `new MultiStream(streams, options)` - Crates an instance of MultiStream with the specified stream list
+* [`multiStream.streams Array`](docs/multi-stream.md#MultiStream+streams) - Array of all streams
+* [`multiStream.length number`](docs/multi-stream.md#MultiStream+length) - Returns the current stream length
+* [`multiStream.map(aFunc) MultiStream ↺`](docs/multi-stream.md#MultiStream+map) - Returns new MultiStream with the streams returned by the transform.
+* [`multiStream.find(...args) DataStream`](docs/multi-stream.md#MultiStream+find) - Calls Array.prototype.find on the streams
+* [`multiStream.filter(func) MultiStream ↺`](docs/multi-stream.md#MultiStream+filter) - Filters the stream list and returns a new MultiStream with only the
+* [`multiStream.mux(cmp) DataStream`](docs/multi-stream.md#MultiStream+mux) - Muxes the streams into a single one
+* [`multiStream.add(stream)`](docs/multi-stream.md#MultiStream+add) - Adds a stream to the MultiStream
+* [`multiStream.remove(stream)`](docs/multi-stream.md#MultiStream+remove) - Removes a stream from the MultiStream
+
 
 
 ## CLI

@@ -1,10 +1,10 @@
 const { DataStream, StringStream } = require(process.env.SCRAMJET_TEST_HOME || '../../');
 const {PassThrough} = require("stream");
 
-const getStream = () => {
+const getStream = (x = 100) => {
     const ret = new DataStream();
     let cnt = 0;
-    for (let i = 0; i < 100; i++)
+    for (let i = 0; i < x; i++)
         ret.write({val: cnt++});
     process.nextTick(() => ret.end());
     return ret;
@@ -285,6 +285,30 @@ module.exports = {
             ).catch(
                 (e) => (console.log(e), test.ok(false, "Should not throw error: " + e))
             );
+    },
+    test_from: {
+        async array(test) {
+            test.expect(1);
+            const arr = [1,2,3,4,5,6,7,8,9];
+            const str = DataStream.fromArray(arr);
+            test.deepEqual(await str.toArray(), arr, 'Should resolve to the same array');
+            test.done();
+        },
+        async iterator(test) {
+            test.expect(1);
+            const arr = (function* () {
+                let i = 1;
+                while (i < 10)
+                    yield i++;
+            })();
+            const str = DataStream.fromIterator(arr);
+            str.catch(e => {
+                console.error(e);
+                throw e;
+            })
+            test.deepEqual(await str.toArray(), [1,2,3,4,5,6,7,8,9], 'Should resolve to the same array');
+            test.done();
+        },
     },
     test_pipe: {
         pipes(test) {

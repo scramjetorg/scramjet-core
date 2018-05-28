@@ -1,9 +1,13 @@
-{{#if name}}{{#unless internal}}
-<a name="{{name}}"></a>
-### {{#sig~}}{{#if @prefix}}{{@prefix}} {{/if~}}{{@accessSymbol}}{{{name}}}{{~#if @returnSymbol}} {{@returnSymbol}}{{/if~}}{{#if @returnTypes}} {{@returnTypes}}{{/if~}}{{~/sig}}
+{{~#if name}}{{#unless internal~}}
+### {{#sig~}}
+    {{~#if @prefix}}{{@prefix}} {{/if~}}
+    {{~@accessSymbol}}{{{name}}}
+{{~/sig}}
+
 
 {{{description}}}
 
-{{>stream-class-table}}
 [Detailed {{#if @prefix}}{{@prefix}} {{/if~}}{{@accessSymbol}}{{{name}}} docs here](docs/{{{replace meta.filename ".js" ".md"}}})
-{{/unless}}{{/if~}}
+
+{{>stream-class-table}}
+{{/unless}}{{/if}}
