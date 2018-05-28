@@ -47,7 +47,12 @@ const flattenTests = ({tests, conf = {}, prefix = ''}) => {
                         name: `${prefix}/${name}`,
                         conf,
                         async exec(t) {
-                            return tests[name](tTest(t));
+                            try {
+                                await tests[name](tTest(t));
+                            } catch(e) {
+                                t.fail(e);
+                                t.done();
+                            }
                         }
                     });
 
@@ -113,7 +118,9 @@ module.exports = (conf) => {
         .map(runTests)
         .until(
             ({name, ok}) => {
-                if (!ok) throw new Error(`Unit test errors occurred in ${name}`);
+                if (!ok) {
+                    throw new Error(`✗ Unit test errors occurred in ${name}`);
+                }
                 return false;
             }
         );

@@ -1,3 +1,5 @@
+![Scramjet Logo](https://signicode.com/scramjet-logo-light.svg)
+
 <a name="MultiStream"></a>
 
 ## MultiStream
@@ -7,14 +9,14 @@ An object consisting of multiple streams than can be refined or muxed.
 
 * [MultiStream](#MultiStream)
     * [new MultiStream(streams, options)](#new_MultiStream_new)
-    * [.streams](#MultiStream+streams) : <code>Array</code>
-    * [.length](#MultiStream+length) ⇒ <code>number</code>
-    * [.map(aFunc)](#MultiStream+map) ⇒ [<code>MultiStream</code>](#MultiStream)
-    * [.find(...args)](#MultiStream+find) ⇒ <code>DataStream</code>
-    * [.filter(func)](#MultiStream+filter) ⇒ [<code>MultiStream</code>](#MultiStream)
-    * [.mux(cmp)](#MultiStream+mux) ⇒ <code>DataStream</code>
-    * [.add(stream)](#MultiStream+add)
-    * [.remove(stream)](#MultiStream+remove)
+    * [multiStream.streams](#MultiStream+streams)  <code>Array</code>
+    * [multiStream.length](#MultiStream+length)  <code>number</code>
+    * [multiStream.map(aFunc)](#MultiStream+map) ↺ [<code>MultiStream</code>](#MultiStream)
+    * [multiStream.find(...args)](#MultiStream+find)  <code>DataStream</code>
+    * [multiStream.filter(func)](#MultiStream+filter) ↺ [<code>MultiStream</code>](#MultiStream)
+    * [multiStream.mux(cmp)](#MultiStream+mux)  <code>DataStream</code>
+    * [multiStream.add(stream)](#MultiStream+add)
+    * [multiStream.remove(stream)](#MultiStream+remove)
 
 <a name="new_MultiStream_new"></a>
 
@@ -29,32 +31,28 @@ Crates an instance of MultiStream with the specified stream list
 
 <a name="MultiStream+streams"></a>
 
-### multiStream.streams : <code>Array</code>
+### multiStream.streams : Array
 Array of all streams
 
 **Kind**: instance property of [<code>MultiStream</code>](#MultiStream)  
 <a name="MultiStream+length"></a>
 
-### multiStream.length ⇒ <code>number</code>
+### multiStream.length : number
 Returns the current stream length
 
 **Kind**: instance property of [<code>MultiStream</code>](#MultiStream)  
 <a name="MultiStream+map"></a>
 
-### multiStream.map(aFunc) ⇒ [<code>MultiStream</code>](#MultiStream)
-Returns new MultiStream with the streams returned by the tranform.
+### multiStream.map(aFunc) : MultiStream ↺
+Returns new MultiStream with the streams returned by the transform.
 
 Runs callback for every stream, returns a new MultiStream of mapped
 streams and creates a new multistream consisting of streams returned
 by the callback.
 
 **Kind**: instance method of [<code>MultiStream</code>](#MultiStream)  
+**Chainable**  
 **Returns**: [<code>MultiStream</code>](#MultiStream) - the mapped instance  
-**Todo**
-
-- [ ] For later add/remove operations to work properly, the stream must
-currently return the same instance!
-
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -66,7 +64,7 @@ currently return the same instance!
 ```
 <a name="MultiStream+find"></a>
 
-### multiStream.find(...args) ⇒ <code>DataStream</code>
+### multiStream.find(...args) : DataStream
 Calls Array.prototype.find on the streams
 
 **Kind**: instance method of [<code>MultiStream</code>](#MultiStream)  
@@ -78,11 +76,12 @@ Calls Array.prototype.find on the streams
 
 <a name="MultiStream+filter"></a>
 
-### multiStream.filter(func) ⇒ [<code>MultiStream</code>](#MultiStream)
+### multiStream.filter(func) : MultiStream ↺
 Filters the stream list and returns a new MultiStream with only the
 streams for which the callback returned true
 
 **Kind**: instance method of [<code>MultiStream</code>](#MultiStream)  
+**Chainable**  
 **Returns**: [<code>MultiStream</code>](#MultiStream) - the filtered instance  
 
 | Param | Type | Description |
@@ -95,7 +94,7 @@ streams for which the callback returned true
 ```
 <a name="MultiStream+mux"></a>
 
-### multiStream.mux(cmp) ⇒ <code>DataStream</code>
+### multiStream.mux(cmp) : DataStream
 Muxes the streams into a single one
 
 **Kind**: instance method of [<code>MultiStream</code>](#MultiStream)  
@@ -125,6 +124,7 @@ If the stream was muxed, filtered or mapped, this stream will undergo the
 same transorms and conditions as if it was added in constructor.
 
 **Kind**: instance method of [<code>MultiStream</code>](#MultiStream)  
+**Meta.noreadme**:   
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -143,6 +143,7 @@ If the stream was muxed, filtered or mapped, it will be removed from same
 streams.
 
 **Kind**: instance method of [<code>MultiStream</code>](#MultiStream)  
+**Meta.noreadme**:   
 
 | Param | Type | Description |
 | --- | --- | --- |
