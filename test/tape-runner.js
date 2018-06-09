@@ -7,7 +7,7 @@ const tTest = (t) => {
         },
         done: () => {
             if (t.expectCount > 0 && t.assertCount !== t.expectCount) {
-                t.fail(`Expected to run ${t.expectCount} assertions, but only ${t.assertCount} did.`);
+                t.fail(`Expected ${t.expectCount} assertions, but ${t.assertCount} were run.`);
             }
             t.end();
         },
