@@ -80,6 +80,11 @@ const runTests = ({name, tests}) => {
                         });
                         break;
                     case "assert":
+                        if (!current) {
+                            const err = new Error('Test assertions run after the test has completed');
+                            err.assertion = chunk;
+                            throw err;
+                        }
                         current.tests.push(chunk);
                         break;
                     case "end":
