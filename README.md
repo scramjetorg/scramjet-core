@@ -144,6 +144,8 @@ await (DataStream.from(aStream) // create a DataStream
 * [`dataStream.stringify(serializer) : StringStream ↺`](docs/data-stream.md#DataStream+stringify) - Creates a StringStream
 * [`dataStream.toArray(initial) : Array ⇄`](docs/data-stream.md#DataStream+toArray) - Aggregates the stream into a single Array
 * [`dataStream.toGenerator() : Iterable.<Promise.<*>>`](docs/data-stream.md#DataStream+toGenerator) - Returns an async generator
+* [`dataStream.toBufferStream(serializer) : BufferStream ↺`](docs/data-stream.md#DataStream+toBufferStream) - Creates a BufferStream
+* [`dataStream.toStringStream(serializer) : StringStream ↺`](docs/data-stream.md#DataStream+toStringStream) - Creates a StringStream
 * [`DataStream:from(stream, options) ↺`](docs/data-stream.md#DataStream.from) - Returns a DataStream from any node.js Readable Stream
 * [`DataStream:fromArray(arr) : DataStream`](docs/data-stream.md#DataStream.fromArray) - Create a DataStream from an Array
 * [`DataStream:fromIterator(iter) : DataStream`](docs/data-stream.md#DataStream.fromIterator) - Create a DataStream from an Iterator
@@ -168,6 +170,7 @@ StringStream.fromString()
 * [`stringStream.match(matcher) ↺`](docs/string-stream.md#StringStream+match) - Finds matches in the string stream and streams the match results
 * [`stringStream.toBufferStream() : BufferStream ↺`](docs/string-stream.md#StringStream+toBufferStream) - Transforms the StringStream to BufferStream
 * [`stringStream.parse(parser) : DataStream ↺`](docs/string-stream.md#StringStream+parse) - Parses every string to object
+* [`stringStream.pop(bytes, func) ↺`](docs/string-stream.md#StringStream+pop) - Shifts given length of chars from the original stream
 * [`StringStream:SPLIT_LINE`](docs/string-stream.md#StringStream.SPLIT_LINE) - A handly split by line regex to quickly get a line-by-line stream
 * [`StringStream:fromString(str, encoding) : StringStream`](docs/string-stream.md#StringStream.fromString) - Creates a StringStream and writes a specific string.
 
@@ -201,6 +204,9 @@ A simple use case would be:
 * [`bufferStream.breakup(number) : BufferStream ↺`](docs/buffer-stream.md#BufferStream+breakup) - Breaks up a stream apart into chunks of the specified length
 * [`bufferStream.stringify(encoding) : StringStream`](docs/buffer-stream.md#BufferStream+stringify) - Creates a string stream from the given buffer stream
 * [`bufferStream.parse(parser) : DataStream`](docs/buffer-stream.md#BufferStream+parse) - Parses every buffer to object
+* [`bufferStream.toStringStream(encoding) : StringStream`](docs/buffer-stream.md#BufferStream+toStringStream) - Creates a string stream from the given buffer stream
+* [`bufferStream.pop(chars, func) : BufferStream ↺`](docs/buffer-stream.md#BufferStream+pop) - Shift given number of bytes from the original stream
+* [`bufferStream.toDataStream(parser) : DataStream`](docs/buffer-stream.md#BufferStream+toDataStream) - Parses every buffer to object
 
 ### MultiStream
 

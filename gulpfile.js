@@ -38,7 +38,7 @@ gulp.task("readme", async () => {
     );
 });
 
-gulp.task("docs", gulp.series("readme", function() {
+gulp.task("docs", gulp.series("readme", function makeDocs() {
   return gulp.src("lib/*.js")
         .pipe(new DataStream())
         .map(async (file) => {

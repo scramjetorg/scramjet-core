@@ -21,6 +21,7 @@ StringStream.fromString()
     * [stringStream.match(matcher)](#StringStream+match) ↺
     * [stringStream.toBufferStream()](#StringStream+toBufferStream) ↺ <code>BufferStream</code>
     * [stringStream.parse(parser)](#StringStream+parse) ↺ <code>DataStream</code>
+    * [stringStream.pop(bytes, func)](#StringStream+pop) ↺
     * [StringStream:SPLIT_LINE](#StringStream.SPLIT_LINE)
     * [StringStream:fromString(str, encoding)](#StringStream.fromString)  [<code>StringStream</code>](#StringStream)
 
@@ -122,6 +123,26 @@ stream here should already be split.
 **Example**  
 ```js
 [../samples/string-stream-parse.js](../samples/string-stream-parse.js)
+```
+<a name="StringStream+pop"></a>
+
+### stringStream.pop(bytes, func) ↺
+Shifts given length of chars from the original stream
+
+Works the same way as {@see DataStream.shift}, but in this case extracts
+the given number of characters.
+
+**Kind**: instance method of [<code>StringStream</code>](#StringStream)  
+**Chainable**  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| bytes | <code>Number</code> | The number of characters to shift. |
+| func | [<code>ShiftCallback</code>](#ShiftCallback) | Function that receives a string of shifted chars. |
+
+**Example**  
+```js
+[../samples/string-stream-shift.js](../samples/string-stream-shift.js)
 ```
 <a name="StringStream.SPLIT_LINE"></a>
 
