@@ -157,7 +157,8 @@ from the command line.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| func | <code>function</code> \| <code>String</code> | if passed, the function will be called on self                         to add an option to inspect the stream in place,                         while not breaking the transform chain.                         Alternatively this can be a relative path to a scramjet-module. |
+| func | <code>function</code> \| <code>String</code> | if passed, the function will be called on self to add an option to inspect the stream in place, while not breaking the transform chain. Alternatively this can be a relative path to a scramjet-module. |
+| [...args] | <code>\*</code> | any additional args top be passed to the module |
 
 **Example**  
 ```js
