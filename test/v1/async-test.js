@@ -57,13 +57,13 @@ module.exports = {
         test.expect(3);
         getStream()
             .map(decorateAsynchronouslyWithError.bind(null, () => 0))
-            .on("error", (e, chunk) => {
+            .once("error", (e, chunk) => {
                 test.ok(true, "Should emit error");
                 test.ok(e instanceof Error, "Thrown should be an instance of Error");
                 test.equals(chunk.val, 22, "Should error on and pass catch 22... I mean chunk...");
                 test.done();
             })
-            .on("end", e => {
+            .once("end", e => {
                 test.fail("Should not end!");
                 test.done();
             });

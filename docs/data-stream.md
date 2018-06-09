@@ -47,6 +47,8 @@ await (DataStream.from(aStream) // create a DataStream
     * [dataStream.stringify(serializer)](#DataStream+stringify) ↺ <code>StringStream</code>
     * [dataStream.toArray(initial)](#DataStream+toArray) ⇄ <code>Array</code>
     * [dataStream.toGenerator()](#DataStream+toGenerator)  <code>Iterable.&lt;Promise.&lt;\*&gt;&gt;</code>
+    * [dataStream.toBufferStream(serializer)](#DataStream+toBufferStream) ↺ <code>BufferStream</code>
+    * [dataStream.toStringStream(serializer)](#DataStream+toStringStream) ↺ <code>StringStream</code>
     * [DataStream:from(stream, options)](#DataStream.from) ↺
     * [DataStream:fromArray(arr)](#DataStream.fromArray)  [<code>DataStream</code>](#DataStream)
     * [DataStream:fromIterator(iter)](#DataStream.fromIterator)  [<code>DataStream</code>](#DataStream)
@@ -157,7 +159,8 @@ from the command line.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| func | <code>function</code> \| <code>String</code> | if passed, the function will be called on self                         to add an option to inspect the stream in place,                         while not breaking the transform chain.                         Alternatively this can be a relative path to a scramjet-module. |
+| func | <code>function</code> \| <code>String</code> | if passed, the function will be called on self to add an option to inspect the stream in place, while not breaking the transform chain. Alternatively this can be a relative path to a scramjet-module. |
+| [...args] | <code>\*</code> | any additional args top be passed to the module |
 
 **Example**  
 ```js
@@ -414,6 +417,41 @@ Ready for https://github.com/tc39/proposal-async-iteration
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Returns**: <code>Iterable.&lt;Promise.&lt;\*&gt;&gt;</code> - Returns an iterator that returns a promise for each item.  
+<a name="DataStream+toBufferStream"></a>
+
+### dataStream.toBufferStream(serializer) : BufferStream ↺
+Creates a BufferStream
+
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Chainable**  
+**Returns**: <code>BufferStream</code> - the resulting stream  
+**Meta.noreadme**:   
+
+| Param | Type | Description |
+| --- | --- | --- |
+| serializer | [<code>MapCallback</code>](#MapCallback) | A method that converts chunks to buffers |
+
+**Example**  
+```js
+[../samples/data-stream-tobufferstream.js](../samples/data-stream-tobufferstream.js)
+```
+<a name="DataStream+toStringStream"></a>
+
+### dataStream.toStringStream(serializer) : StringStream ↺
+Creates a StringStream
+
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Chainable**  
+**Returns**: <code>StringStream</code> - the resulting stream  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| serializer | [<code>MapCallback</code>](#MapCallback) | A method that converts chunks to strings |
+
+**Example**  
+```js
+[../samples/data-stream-tostringstream.js](../samples/data-stream-tostringstream.js)
+```
 <a name="DataStream.from"></a>
 
 ### DataStream:from(stream, options) ↺
@@ -459,12 +497,6 @@ Doesn't end the stream until it reaches end of the iterator.
 ```js
 [../samples/data-stream-fromiterator.js](../samples/data-stream-fromiterator.js)
 ```
-<a name="toStringStream"></a>
-
-## toStringStream()
-Alias for [stringify](#DataStream+stringify)
-
-**Kind**: global function  
 <a name="MapCallback"></a>
 
 ## MapCallback : Promise | *

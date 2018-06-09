@@ -7,7 +7,7 @@ const tTest = (t) => {
         },
         done: () => {
             if (t.expectCount > 0 && t.assertCount !== t.expectCount) {
-                t.fail(`Expected to run ${t.expectCount} assertions, but only ${t.assertCount} did.`);
+                t.fail(`Expected ${t.expectCount} assertions, but ${t.assertCount} were run.`);
             }
             t.end();
         },
@@ -80,6 +80,11 @@ const runTests = ({name, tests}) => {
                         });
                         break;
                     case "assert":
+                        if (!current) {
+                            const err = new Error('Test assertions run after the test has completed');
+                            err.assertion = chunk;
+                            throw err;
+                        }
                         current.tests.push(chunk);
                         break;
                     case "end":

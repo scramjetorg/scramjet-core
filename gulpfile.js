@@ -1,35 +1,21 @@
 /* eslint-disable node/no-unpublished-require */
-const gulp = require("gulp");
-const path = require("path");
-const log = require("fancy-log");
-const {DataStream} = require('./');
-const rename = require("gulp-rename");
-const tape_nodeunit_runner = require("./test/tape-runner");
-
 const {exec: execp} = require('child_process');
-const eslint = require('gulp-eslint');
-const jsdoc = require('jsdoc-api');
-const jsdocParse = require('jsdoc-parse');
-const dmd = require('dmd');
+const path = require("path");
 const {promisify} = require('util');
 const fs = require('fs');
 
-gulp.task('lint', () => {
-    // ESLint ignores files with "node_modules" paths.
-    // So, it's best to have gulp ignore the directory as well.
-    // Also, Be sure to return the stream from the task;
-    // Otherwise, the task may end before the stream has finished.
-    return gulp.src(['**/*.js','!node_modules/**'])
-        // eslint() attaches the lint output to the "eslint" property
-        // of the file object so it can be used by other modules.
-        .pipe(eslint())
-        // eslint.format() outputs the lint results to the console.
-        // Alternatively use eslint.formatEach() (see Docs).
-        .pipe(eslint.format())
-        // To have the process exit with an error code (1) on
-        // lint error, return the stream and pipe to failAfterError last.
-        .pipe(eslint.failAfterError());
-});
+const gulp = require("gulp");
+const rename = require("gulp-rename");
+const log = require("fancy-log");
+const dmd = require('dmd');
+const jsdoc = require('jsdoc-api');
+const jsdocParse = require('jsdoc-parse');
+const tape_nodeunit_runner = require("./test/tape-runner");
+const {DataStream} = require('./');
+
+const lint = require("./scripts/tasks/lint");
+
+gulp.task('lint', lint());
 
 gulp.task("test_legacy", function () {
     return gulp.src("test/v1/*.js")
@@ -37,20 +23,7 @@ gulp.task("test_legacy", function () {
     ;
 });
 
-gulp.task("scm_clean", ["default"], function(cb){
-    execp("git status --porcelain", (err, stdout) => {
-        if (err) {
-            cb(err);
-        } else if (stdout.trim()) {
-            cb(new Error("Workdir not clean!"));
-        } else {
-            cb();
-        }
-    });
-});
-
 const jsdoc2md = async ({files, plugin}) => {
-
     const data = await jsdoc.explain({files});
     const parsed = await jsdocParse(data);
     const output = await dmd.async(parsed, { plugin, "member-index-format": "list" });
@@ -65,7 +38,7 @@ gulp.task("readme", async () => {
     );
 });
 
-gulp.task("docs", ["readme"], function() {
+gulp.task("docs", gulp.series("readme", function makeDocs() {
   return gulp.src("lib/*.js")
         .pipe(new DataStream())
         .map(async (file) => {
@@ -80,8 +53,20 @@ gulp.task("docs", ["readme"], function() {
             path.extname = ".md";
         }))
         .pipe(gulp.dest("docs/"));
-});
+}));
 
-gulp.task("test", ["lint", "test_legacy"]);
-gulp.task("default", ["readme", "lint", "docs", "test_legacy"]);
-gulp.task("prerelease", ["scm_clean"]);
+gulp.task("scm_clean", gulp.series("docs", function (cb) {
+    execp("git status --porcelain", (err, stdout) => {
+        if (err) {
+            cb(err);
+        } else if (stdout.trim()) {
+            cb(new Error("Workdir not clean!"));
+        } else {
+            cb();
+        }
+    });
+}));
+
+gulp.task("test", gulp.series("lint", "test_legacy"));
+gulp.task("default", gulp.series("readme", "lint", "docs", "test_legacy"));
+gulp.task("prerelease", gulp.series("default", "scm_clean"));
