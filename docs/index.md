@@ -34,7 +34,7 @@ See [node.js API for stream implementers for details](https://nodejs.org/api/str
 <a name="module_scramjet.errors"></a>
 
 ### scramjet:errors : ScramjetErrors
-Creates a DataStream from an Array
+Exposes error classes (undocumented)
 
 **Kind**: static property of [<code>scramjet</code>](#module_scramjet)  
 **Read only**: true  
