@@ -286,12 +286,33 @@ module.exports = {
                 (e) => (console.log(e), test.ok(false, "Should not throw error: " + e))
             );
     },
-    test_from: {
+    test_fromx: {
         async array(test) {
             test.expect(1);
             const arr = [1,2,3,4,5,6,7,8,9];
             const str = DataStream.fromArray(arr);
             test.deepEqual(await str.toArray(), arr, 'Should resolve to the same array');
+            test.done();
+        },
+        async iteratorMap(test) {
+            test.expect(4);
+            const iter = (function*(z) {
+                while (z++ < 100) yield z;
+                return 100;
+            })(1);
+
+            const arr = await DataStream.fromIterator(iter)
+                .setOptions({maxParallel: 512})
+                .map(x => x*2)
+                .map(x => x*2)
+                .toArray();
+
+            test.equals(arr[0], 8, "Test some elements...")
+            test.equals(arr[48], 200, "Test some elements...")
+            test.equals(arr[98], 400, "Test some elements...")
+
+            test.equals(arr.length, 100, "Should have all elements");
+
             test.done();
         },
         async iterator(test) {
