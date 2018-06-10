@@ -1,4 +1,10 @@
-# Scramjet Core 4.13.1
+# Scramjet core
+
+## Scramjet Core 4.13.2
+
+* Documentation fixes
+
+## Scramjet Core 4.13.1
 
 * Fix error handling and make sure that catch/raise methods are working correctly.
 * Fix docs to better work with typescript declarations

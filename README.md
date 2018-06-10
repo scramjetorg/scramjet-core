@@ -128,7 +128,7 @@ await (DataStream.from(aStream) // create a DataStream
 * [`dataStream.run() ⇄`](docs/data-stream.md#DataStream+run) - Consumes all stream items doing nothing. Resolves when the stream is ended.
 * [`dataStream.tap()`](docs/data-stream.md#DataStream+tap) - Stops merging transform callbacks at the current place in the command chain.
 * [`dataStream.whenRead() ⇄`](docs/data-stream.md#DataStream+whenRead) - Reads a chunk from the stream and resolves the promise when read.
-* [`dataStream.whenWrote(...dat) ⇄`](docs/data-stream.md#DataStream+whenWrote) - Writes a chunk to the stream and returns a Promise resolved when more chunks can be written.
+* [`dataStream.whenWrote(chunk, [...more]) ⇄`](docs/data-stream.md#DataStream+whenWrote) - Writes a chunk to the stream and returns a Promise resolved when more chunks can be written.
 * [`dataStream.whenEnd() ⇄`](docs/data-stream.md#DataStream+whenEnd) - Resolves when stream ends - rejects on uncaught error
 * [`dataStream.whenDrained() ⇄`](docs/data-stream.md#DataStream+whenDrained) - Returns a promise that resolves when the stream is drained
 * [`dataStream.whenError() ⇄`](docs/data-stream.md#DataStream+whenError) - Returns a promise that resolves (!) when the stream is errors
