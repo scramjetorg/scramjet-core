@@ -31,7 +31,7 @@ await (DataStream.from(aStream) // create a DataStream
     * [dataStream.run()](#DataStream+run)
     * [dataStream.tap()](#DataStream+tap)
     * [dataStream.whenRead()](#DataStream+whenRead)
-    * [dataStream.whenWrote(...dat)](#DataStream+whenWrote)
+    * [dataStream.whenWrote(chunk, [...more])](#DataStream+whenWrote)
     * [dataStream.whenEnd()](#DataStream+whenEnd)
     * [dataStream.whenDrained()](#DataStream+whenDrained)
     * [dataStream.whenError()](#DataStream+whenError)
@@ -190,14 +190,15 @@ Reads a chunk from the stream and resolves the promise when read.
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 <a name="DataStream+whenWrote"></a>
 
-### dataStream.whenWrote(...dat) ⇄
+### dataStream.whenWrote(chunk, [...more]) ⇄
 Writes a chunk to the stream and returns a Promise resolved when more chunks can be written.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 
-| Param | Type |
-| --- | --- |
-| ...dat | <code>\*</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| chunk | <code>\*</code> | a chunk to write |
+| [...more] | <code>\*</code> | more chunks to write |
 
 <a name="DataStream+whenEnd"></a>
 
