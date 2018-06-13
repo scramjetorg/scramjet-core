@@ -23,7 +23,8 @@ module.exports = {
             const tgt = new DataStream({
                 promiseWrite(chunk) { if (output.indexOf(chunk) > -1) output.splice(output.indexOf(chunk), 1); }
             });
-            const ret = await (src.pipe(
+
+            await (src.pipe(
                 new DataStream({ promiseTransform(chunk) { return chunk+2 }})
             ).pipe(
                 tgt
