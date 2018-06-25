@@ -2,7 +2,8 @@
 
 const { DataStream } = require('scramjet');
 const path = require('path');
-const tapeRunner = require('./tape-runner');
 
-DataStream.fromArray([{path: path.resolve(process.cwd(), process.argv[2])}])
-    .pipe(tapeRunner({timeout: 10000}));
+DataStream
+    .fromArray([{path: path.resolve(process.cwd(), process.argv[2])}])
+    .use('nodeunit-tape-compat', {timeout: 10000})
+;

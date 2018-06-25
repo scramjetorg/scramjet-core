@@ -10,7 +10,6 @@ const log = require("fancy-log");
 const dmd = require('dmd');
 const jsdoc = require('jsdoc-api');
 const jsdocParse = require('jsdoc-parse');
-const tape_nodeunit_runner = require("./test/tape-runner");
 const {DataStream} = require('./');
 
 const lint = require("./scripts/tasks/lint");
@@ -18,8 +17,9 @@ const lint = require("./scripts/tasks/lint");
 gulp.task('lint', lint());
 
 gulp.task("test_legacy", function () {
-    return gulp.src("test/v1/*.js")
-        .pipe(tape_nodeunit_runner({timeout: 5000}))
+    return DataStream.from(gulp.src("test/v1/*.js"))
+        .use('nodeunit-tape-compat', {timeout: 5000})
+        .run()
     ;
 });
 

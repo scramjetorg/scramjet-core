@@ -44,11 +44,7 @@ Returns the current stream length
 <a name="MultiStream+map"></a>
 
 ### multiStream.map(aFunc) : MultiStream ↺
-Returns new MultiStream with the streams returned by the transform.
-
-Runs callback for every stream, returns a new MultiStream of mapped
-streams and creates a new multistream consisting of streams returned
-by the callback.
+Returns new MultiStream with the streams returned by the transform.Runs callback for every stream, returns a new MultiStream of mappedstreams and creates a new multistream consisting of streams returnedby the callback.
 
 **Kind**: instance method of [<code>MultiStream</code>](#MultiStream)  
 **Chainable**  
@@ -77,8 +73,7 @@ Calls Array.prototype.find on the streams
 <a name="MultiStream+filter"></a>
 
 ### multiStream.filter(func) : MultiStream ↺
-Filters the stream list and returns a new MultiStream with only the
-streams for which the callback returned true
+Filters the stream list and returns a new MultiStream with only thestreams for which the callback returned true
 
 **Kind**: instance method of [<code>MultiStream</code>](#MultiStream)  
 **Chainable**  
@@ -102,9 +97,7 @@ Muxes the streams into a single one
 **Todo**
 
 - [ ] For now using comparator will not affect the mergesort.
-- [ ] Sorting requires all the streams to be constantly flowing, any
-      single one drain results in draining the muxed too even if there
-      were possible data on other streams.
+- [ ] Sorting requires all the streams to be constantly flowing, any      single one drain results in draining the muxed too even if there      were possible data on other streams.
 
 
 | Param | Type | Description |
@@ -118,10 +111,7 @@ Muxes the streams into a single one
 <a name="MultiStream+add"></a>
 
 ### multiStream.add(stream)
-Adds a stream to the MultiStream
-
-If the stream was muxed, filtered or mapped, this stream will undergo the
-same transorms and conditions as if it was added in constructor.
+Adds a stream to the MultiStreamIf the stream was muxed, filtered or mapped, this stream will undergo thesame transorms and conditions as if it was added in constructor.
 
 **Kind**: instance method of [<code>MultiStream</code>](#MultiStream)  
 **Meta.noreadme**:   
@@ -137,10 +127,7 @@ same transorms and conditions as if it was added in constructor.
 <a name="MultiStream+remove"></a>
 
 ### multiStream.remove(stream)
-Removes a stream from the MultiStream
-
-If the stream was muxed, filtered or mapped, it will be removed from same
-streams.
+Removes a stream from the MultiStreamIf the stream was muxed, filtered or mapped, it will be removed from samestreams.
 
 **Kind**: instance method of [<code>MultiStream</code>](#MultiStream)  
 **Meta.noreadme**:   

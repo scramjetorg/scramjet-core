@@ -3,20 +3,7 @@
 <a name="DataStream"></a>
 
 ## DataStream : stream.PassThrough
-DataStream is the primary stream type for Scramjet. When you parse your
-stream, just pipe it you can then perform calculations on the data objects
-streamed through your flow.
-
-Use as:
-
-```javascript
-const { DataStream } = require('scramjet');
-
-await (DataStream.from(aStream) // create a DataStream
-    .map(findInFiles)           // read some data asynchronously
-    .map(sendToAPI)             // send the data somewhere
-    .run());                    // wait until end
-```
+DataStream is the primary stream type for Scramjet. When you parse yourstream, just pipe it you can then perform calculations on the data objectsstreamed through your flow.Use as:```javascriptconst { DataStream } = require('scramjet');await (DataStream.from(aStream) // create a DataStream    .map(findInFiles)           // read some data asynchronously    .map(sendToAPI)             // send the data somewhere    .run());                    // wait until end```
 
 **Kind**: global class  
 **Extends**: <code>stream.PassThrough</code>  
@@ -66,8 +53,7 @@ Create the DataStream.
 <a name="DataStream+map"></a>
 
 ### dataStream.map(func, Clazz) ↺
-Transforms stream objects into new ones, just like Array.prototype.map
-does.
+Transforms stream objects into new ones, just like Array.prototype.mapdoes.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -84,8 +70,7 @@ does.
 <a name="DataStream+filter"></a>
 
 ### dataStream.filter(func) ↺
-Filters object based on the function outcome, just like
-Array.prototype.filter.
+Filters object based on the function outcome, just likeArray.prototype.filter.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -101,15 +86,7 @@ Array.prototype.filter.
 <a name="DataStream+reduce"></a>
 
 ### dataStream.reduce(func, into) ⇄
-Reduces the stream into a given accumulator
-
-Works similarly to Array.prototype.reduce, so whatever you return in the
-former operation will be the first operand to the latter. The result is a
-promise that's resolved with the return value of the last transform executed.
-
-This method is serial - meaning that any processing on an entry will
-occur only after the previous entry is fully processed. This does mean
-it's much slower than parallel functions.
+Reduces the stream into a given accumulatorWorks similarly to Array.prototype.reduce, so whatever you return in theformer operation will be the first operand to the latter. The result is apromise that's resolved with the return value of the last transform executed.This method is serial - meaning that any processing on an entry willoccur only after the previous entry is fully processed. This does meanit's much slower than parallel functions.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 
@@ -125,13 +102,7 @@ it's much slower than parallel functions.
 <a name="DataStream+into"></a>
 
 ### dataStream.into(func, into) ↺
-Allows own implementation of stream chaining.
-
-The async callback is called on every chunk and should implement writes in it's own way. The
-resolution will be awaited for flow control. The passed `into` argument is passed as the first
-argument to every call.
-
-It returns the DataStream passed as the second argument.
+Allows own implementation of stream chaining.The async callback is called on every chunk and should implement writes in it's own way. Theresolution will be awaited for flow control. The passed `into` argument is passed as the firstargument to every call.It returns the DataStream passed as the second argument.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -148,11 +119,7 @@ It returns the DataStream passed as the second argument.
 <a name="DataStream+use"></a>
 
 ### dataStream.use(func) ↺
-Calls the passed method in place with the stream as first argument, returns result.
-
-The main intention of this method is to run scramjet modules - transforms that allow complex transforms of
-streams. These modules can also be run with [scramjet-cli](https://github.com/signicode/scramjet-cli) directly
-from the command line.
+Calls the passed method in place with the stream as first argument, returns result.The main intention of this method is to run scramjet modules - transforms that allow complex transforms ofstreams. These modules can also be run with [scramjet-cli](https://github.com/signicode/scramjet-cli) directlyfrom the command line.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -221,13 +188,7 @@ Returns a promise that resolves (!) when the stream is errors
 <a name="DataStream+setOptions"></a>
 
 ### dataStream.setOptions(options) ↺
-Allows resetting stream options.
-
-It's much easier to use this in chain than constructing new stream:
-
-```javascript
-    stream.map(myMapper).filter(myFilter).setOptions({maxParallel: 2})
-```
+Allows resetting stream options.It's much easier to use this in chain than constructing new stream:```javascript    stream.map(myMapper).filter(myFilter).setOptions({maxParallel: 2})```
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -240,9 +201,7 @@ It's much easier to use this in chain than constructing new stream:
 <a name="DataStream+tee"></a>
 
 ### dataStream.tee(func) ↺
-Duplicate the stream
-
-Creates a duplicate stream instance and passes it to the callback.
+Duplicate the streamCreates a duplicate stream instance and passes it to the callback.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -258,10 +217,7 @@ Creates a duplicate stream instance and passes it to the callback.
 <a name="DataStream+each"></a>
 
 ### dataStream.each(func) ↺
-Performs an operation on every chunk, without changing the stream
-
-This is a shorthand for ```stream.on("data", func)``` but with flow control.
-Warning: this resumes the stream!
+Performs an operation on every chunk, without changing the streamThis is a shorthand for ```stream.on("data", func)``` but with flow control.Warning: this resumes the stream!
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -273,9 +229,7 @@ Warning: this resumes the stream!
 <a name="DataStream+while"></a>
 
 ### dataStream.while(func) ↺
-Reads the stream while the function outcome is truthy.
-
-Stops reading and emits end as soon as it ends.
+Reads the stream while the function outcome is truthy.Stops reading and emits end as soon as it ends.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -291,9 +245,7 @@ Stops reading and emits end as soon as it ends.
 <a name="DataStream+until"></a>
 
 ### dataStream.until(func) ↺
-Reads the stream until the function outcome is truthy.
-
-Works opposite of while.
+Reads the stream until the function outcome is truthy.Works opposite of while.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -309,13 +261,7 @@ Works opposite of while.
 <a name="DataStream+catch"></a>
 
 ### dataStream.catch(callback) ↺
-Provides a way to catch errors in chained streams.
-
-The handler will be called as asynchronous
- - if it resolves then the error will be muted.
- - if it rejects then the error will be passed to the next handler
-
-If no handlers will resolve the error, an `error` event will be emitted
+Provides a way to catch errors in chained streams.The handler will be called as asynchronous - if it resolves then the error will be muted. - if it rejects then the error will be passed to the next handlerIf no handlers will resolve the error, an `error` event will be emitted
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -331,9 +277,7 @@ If no handlers will resolve the error, an `error` event will be emitted
 <a name="DataStream+raise"></a>
 
 ### dataStream.raise(err) ⇄
-Executes all error handlers and if none resolves, then emits an error.
-
-The returned promise will always be resolved even if there are no successful handlers.
+Executes all error handlers and if none resolves, then emits an error.The returned promise will always be resolved even if there are no successful handlers.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 
@@ -348,9 +292,7 @@ The returned promise will always be resolved even if there are no successful han
 <a name="DataStream+pipe"></a>
 
 ### dataStream.pipe(to, options) : Writable ↺
-Override of node.js Readable pipe.
-
-Except for calling overridden method it proxies errors to piped stream.
+Override of node.js Readable pipe.Except for calling overridden method it proxies errors to piped stream.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -399,9 +341,7 @@ Creates a StringStream
 <a name="DataStream+toArray"></a>
 
 ### dataStream.toArray(initial) : Array ⇄
-Aggregates the stream into a single Array
-
-In fact it's just a shorthand for reducing the stream into an Array.
+Aggregates the stream into a single ArrayIn fact it's just a shorthand for reducing the stream into an Array.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 
@@ -412,9 +352,7 @@ In fact it's just a shorthand for reducing the stream into an Array.
 <a name="DataStream+toGenerator"></a>
 
 ### dataStream.toGenerator() : Iterable.<Promise.<*>>
-Returns an async generator
-
-Ready for https://github.com/tc39/proposal-async-iteration
+Returns an async generatorReady for https://github.com/tc39/proposal-async-iteration
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Returns**: <code>Iterable.&lt;Promise.&lt;\*&gt;&gt;</code> - Returns an iterator that returns a promise for each item.  
@@ -484,9 +422,7 @@ Create a DataStream from an Array
 <a name="DataStream.fromIterator"></a>
 
 ### DataStream:fromIterator(iter) : DataStream
-Create a DataStream from an Iterator
-
-Doesn't end the stream until it reaches end of the iterator.
+Create a DataStream from an IteratorDoesn't end the stream until it reaches end of the iterator.
 
 **Kind**: static method of [<code>DataStream</code>](#DataStream)  
 
@@ -512,8 +448,7 @@ Doesn't end the stream until it reaches end of the iterator.
 
 ## FilterCallback : Promise | Boolean
 **Kind**: global typedef  
-**Returns**: <code>Promise</code> \| <code>Boolean</code> - information if the object should remain in
-                            the filtered stream.  
+**Returns**: <code>Promise</code> \| <code>Boolean</code> - information if the object should remain in                            the filtered stream.  
 
 | Param | Type | Description |
 | --- | --- | --- |

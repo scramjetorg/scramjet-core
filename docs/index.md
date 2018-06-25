@@ -3,17 +3,7 @@
 <a name="module_scramjet"></a>
 
 ## scramjet : Object
-Scramjet main exports expose all the stream classes and a number of methods.
-
-All scramjet streams allow writing, reading or transform modes - currently
-exclusively (meaning you can't have two at once). Any of the scramjet streams
-can be constructed with the following options passed to mimic node.js standard streams:
-
-* `async promiseTransform(chunk)` - transform method that resolves with a single output chunk
-* `async promiseWrite(chunk)` - write method that that resolves when chunk is written
-* `async promiseRead(count)` - read method that resolves with an array of chunks when called
-
-See [node.js API for stream implementers for details](https://nodejs.org/api/stream.html#stream_api_for_stream_implementers)
+Scramjet main exports expose all the stream classes and a number of methods.All scramjet streams allow writing, reading or transform modes - currentlyexclusively (meaning you can't have two at once). Any of the scramjet streamscan be constructed with the following options passed to mimic node.js standard streams:* `async promiseTransform(chunk)` - transform method that resolves with a single output chunk* `async promiseWrite(chunk)` - write method that that resolves when chunk is written* `async promiseRead(count)` - read method that resolves with an array of chunks when calledSee [node.js API for stream implementers for details](https://nodejs.org/api/stream.html#stream_api_for_stream_implementers)
 
 **Extends**: <code>Object</code>  
 
