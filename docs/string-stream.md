@@ -3,13 +3,7 @@
 <a name="StringStream"></a>
 
 ## StringStream : DataStream
-A stream of string objects for further transformation on top of DataStream.
-
-Example:
-
-```javascript
-StringStream.fromString()
-```
+A stream of string objects for further transformation on top of DataStream.Example:```javascriptStringStream.fromString()```
 
 **Kind**: global class  
 **Extends**: <code>DataStream</code>  
@@ -38,10 +32,7 @@ Constructs the stream with the given encoding
 <a name="StringStream+shift"></a>
 
 ### stringStream.shift(bytes, func) ↺
-Shifts given length of chars from the original stream
-
-Works the same way as {@see DataStream.shift}, but in this case extracts
-the given number of characters.
+Shifts given length of chars from the original streamWorks the same way as {@see DataStream.shift}, but in this case extractsthe given number of characters.
 
 **Kind**: instance method of [<code>StringStream</code>](#StringStream)  
 **Chainable**  
@@ -90,11 +81,7 @@ Finds matches in the string stream and streams the match results
 <a name="StringStream+toBufferStream"></a>
 
 ### stringStream.toBufferStream() : BufferStream ↺
-Transforms the StringStream to BufferStream
-
-Creates a buffer stream from the given string stream. Still it returns a
-DataStream derivative and isn't the typical node.js stream so you can do
-all your transforms when you like.
+Transforms the StringStream to BufferStreamCreates a buffer stream from the given string stream. Still it returns aDataStream derivative and isn't the typical node.js stream so you can doall your transforms when you like.
 
 **Kind**: instance method of [<code>StringStream</code>](#StringStream)  
 **Chainable**  
@@ -107,10 +94,7 @@ all your transforms when you like.
 <a name="StringStream+parse"></a>
 
 ### stringStream.parse(parser) : DataStream ↺
-Parses every string to object
-
-The method MUST parse EVERY string into a single object, so the string
-stream here should already be split.
+Parses every string to objectThe method MUST parse EVERY string into a single object, so the stringstream here should already be split.
 
 **Kind**: instance method of [<code>StringStream</code>](#StringStream)  
 **Chainable**  
@@ -127,10 +111,7 @@ stream here should already be split.
 <a name="StringStream+pop"></a>
 
 ### stringStream.pop(bytes, func) ↺
-Shifts given length of chars from the original stream
-
-Works the same way as {@see DataStream.shift}, but in this case extracts
-the given number of characters.
+Shifts given length of chars from the original streamWorks the same way as {@see DataStream.shift}, but in this case extractsthe given number of characters.
 
 **Kind**: instance method of [<code>StringStream</code>](#StringStream)  
 **Chainable**  

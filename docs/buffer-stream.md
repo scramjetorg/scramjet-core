@@ -3,23 +3,7 @@
 <a name="BufferStream"></a>
 
 ## BufferStream : DataStream
-A factilitation stream created for easy splitting or parsing buffers.
-
-Useful for working on built-in Node.js streams from files, parsing binary formats etc.
-
-A simple use case would be:
-
-```javascript
- fs.createReadStream('pixels.rgba')
-     .pipe(new BufferStream)         // pipe a buffer stream into scramjet
-     .breakup(4)                     // split into 4 byte fragments
-     .parse(buf => [
-         buf.readInt8(0),            // the output is a stream of R,G,B and Alpha
-         buf.readInt8(1),            // values from 0-255 in an array.
-         buf.readInt8(2),
-         buf.readInt8(3)
-     ]);
-```
+A factilitation stream created for easy splitting or parsing buffers.Useful for working on built-in Node.js streams from files, parsing binary formats etc.A simple use case would be:```javascript fs.createReadStream('pixels.rgba')     .pipe(new BufferStream)         // pipe a buffer stream into scramjet     .breakup(4)                     // split into 4 byte fragments     .parse(buf => [         buf.readInt8(0),            // the output is a stream of R,G,B and Alpha         buf.readInt8(1),            // values from 0-255 in an array.         buf.readInt8(2),         buf.readInt8(3)     ]);```
 
 **Kind**: global class  
 **Extends**: <code>DataStream</code>  
@@ -48,10 +32,7 @@ Creates the BufferStream
 <a name="BufferStream+shift"></a>
 
 ### bufferStream.shift(chars, func) : BufferStream ↺
-Shift given number of bytes from the original stream
-
-Works the same way as {@see DataStream.shift}, but in this case extracts
-the given number of bytes.
+Shift given number of bytes from the original streamWorks the same way as {@see DataStream.shift}, but in this case extractsthe given number of bytes.
 
 **Kind**: instance method of [<code>BufferStream</code>](#BufferStream)  
 **Chainable**  
@@ -103,10 +84,7 @@ Breaks up a stream apart into chunks of the specified length
 <a name="BufferStream+stringify"></a>
 
 ### bufferStream.stringify(encoding) : StringStream
-Creates a string stream from the given buffer stream
-
-Still it returns a DataStream derivative and isn't the typical node.js
-stream so you can do all your transforms when you like.
+Creates a string stream from the given buffer streamStill it returns a DataStream derivative and isn't the typical node.jsstream so you can do all your transforms when you like.
 
 **Kind**: instance method of [<code>BufferStream</code>](#BufferStream)  
 **Returns**: <code>StringStream</code> - The converted stream.  
@@ -122,10 +100,7 @@ stream so you can do all your transforms when you like.
 <a name="BufferStream+parse"></a>
 
 ### bufferStream.parse(parser) : DataStream
-Parses every buffer to object
-
-The method MUST parse EVERY buffer into a single object, so the buffer
-stream here should already be split or broken up.
+Parses every buffer to objectThe method MUST parse EVERY buffer into a single object, so the bufferstream here should already be split or broken up.
 
 **Kind**: instance method of [<code>BufferStream</code>](#BufferStream)  
 **Returns**: <code>DataStream</code> - The parsed objects stream.  
@@ -141,10 +116,7 @@ stream here should already be split or broken up.
 <a name="BufferStream+toStringStream"></a>
 
 ### bufferStream.toStringStream(encoding) : StringStream
-Creates a string stream from the given buffer stream
-
-Still it returns a DataStream derivative and isn't the typical node.js
-stream so you can do all your transforms when you like.
+Creates a string stream from the given buffer streamStill it returns a DataStream derivative and isn't the typical node.jsstream so you can do all your transforms when you like.
 
 **Kind**: instance method of [<code>BufferStream</code>](#BufferStream)  
 **Returns**: <code>StringStream</code> - The converted stream.  
@@ -160,10 +132,7 @@ stream so you can do all your transforms when you like.
 <a name="BufferStream+pop"></a>
 
 ### bufferStream.pop(chars, func) : BufferStream ↺
-Shift given number of bytes from the original stream
-
-Works the same way as {@see DataStream.shift}, but in this case extracts
-the given number of bytes.
+Shift given number of bytes from the original streamWorks the same way as {@see DataStream.shift}, but in this case extractsthe given number of bytes.
 
 **Kind**: instance method of [<code>BufferStream</code>](#BufferStream)  
 **Chainable**  
@@ -181,10 +150,7 @@ the given number of bytes.
 <a name="BufferStream+toDataStream"></a>
 
 ### bufferStream.toDataStream(parser) : DataStream
-Parses every buffer to object
-
-The method MUST parse EVERY buffer into a single object, so the buffer
-stream here should already be split or broken up.
+Parses every buffer to objectThe method MUST parse EVERY buffer into a single object, so the bufferstream here should already be split or broken up.
 
 **Kind**: instance method of [<code>BufferStream</code>](#BufferStream)  
 **Returns**: <code>DataStream</code> - The parsed objects stream.  

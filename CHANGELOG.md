@@ -1,5 +1,12 @@
 # Scramjet core
 
+## Scramjet Core 4.14.0
+
+* Use tape runner from separate module
+* Depencencies update
+* Fix code quality issues
+* Fix readable only streams.
+
 ## Scramjet Core 4.13.2
 
 * Documentation fixes
