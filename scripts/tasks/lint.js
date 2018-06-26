@@ -1,19 +1,31 @@
-const gulp = require("gulp");
-const eslint = require("gulp-eslint");
+const {CLIEngine} = require("eslint");
+const path = require("path");
+const log = require("fancy-log");
 
-module.exports = (files = ["**/*.js", "!node_modules/**"]) => () => {
-    // ESLint ignores files with "node_modules" paths.
-    // So, it's best to have gulp ignore the directory as well.
-    // Also, Be sure to return the stream from the task;
-    // Otherwise, the task may end before the stream has finished.
-    return gulp.src(files)
-        // eslint() attaches the lint output to the "eslint" property
-        // of the file object so it can be used by other modules.
-        .pipe(eslint())
-        // eslint.format() outputs the lint results to the console.
-        // Alternatively use eslint.formatEach() (see Docs).
-        .pipe(eslint.format())
-        // To have the process exit with an error code (1) on
-        // lint error, return the stream and pipe to failAfterError last.
-        .pipe(eslint.failAfterError());
+module.exports = (files = ["**/*.js"]) => (cb) => {
+    const report = new CLIEngine({
+        reportUnusedDisableDirectives: 1,
+        cache: true,
+        cwd: path.resolve(__dirname, "../../")
+    }).executeOnFiles(files);
+
+    for (let file of report.results) {
+        if (file.errorCount || file.warningCount) {
+            log.error(`Eslint errors in ${file.filePath}:`);
+            file.messages.forEach(
+                ({ruleId, message, line}) => log.error(` -> ${file.filePath}:${line} ${message} (${ruleId})`)
+            );
+        } else {
+            log.info(`File "${file.filePath}" linted correctly.`);
+        }
+    }
+
+    if (report.fixableErrorCount || report.fixableWarningCount) {
+        log.info("Some eslint errors may be fixable, run `npm fix`");
+    }
+
+    if (report.errorCount || report.warningCount)
+        return cb(new Error("Lint errors or warnings found."));
+
+    cb();
 };
