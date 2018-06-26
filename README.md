@@ -98,6 +98,40 @@ Note that:
 
 The quick reference of the exposed classes:
 
+### BufferStream
+
+A factilitation stream created for easy splitting or parsing buffers.
+
+Useful for working on built-in Node.js streams from files, parsing binary formats etc.
+
+A simple use case would be:
+
+```javascript
+ fs.createReadStream('pixels.rgba')
+     .pipe(new BufferStream)         // pipe a buffer stream into scramjet
+     .breakup(4)                     // split into 4 byte fragments
+     .parse(buf => [
+         buf.readInt8(0),            // the output is a stream of R,G,B and Alpha
+         buf.readInt8(1),            // values from 0-255 in an array.
+         buf.readInt8(2),
+         buf.readInt8(3)
+     ]);
+```
+
+[Detailed BufferStream docs here](docs/buffer-stream.md)
+
+**Most popular methods:**
+
+* `new BufferStream(opts)` - Creates the BufferStream
+* [`bufferStream.shift(chars, func) : BufferStream ↺`](docs/buffer-stream.md#BufferStream+shift) - Shift given number of bytes from the original stream
+* [`bufferStream.split(splitter) : BufferStream ↺`](docs/buffer-stream.md#BufferStream+split) - Splits the buffer stream into buffer objects
+* [`bufferStream.breakup(number) : BufferStream ↺`](docs/buffer-stream.md#BufferStream+breakup) - Breaks up a stream apart into chunks of the specified length
+* [`bufferStream.stringify(encoding) : StringStream`](docs/buffer-stream.md#BufferStream+stringify) - Creates a string stream from the given buffer stream
+* [`bufferStream.parse(parser) : DataStream`](docs/buffer-stream.md#BufferStream+parse) - Parses every buffer to object
+* [`bufferStream.toStringStream(encoding) : StringStream`](docs/buffer-stream.md#BufferStream+toStringStream) - Creates a string stream from the given buffer stream
+* [`bufferStream.pop(chars, func) : BufferStream ↺`](docs/buffer-stream.md#BufferStream+pop) - Shift given number of bytes from the original stream
+* [`bufferStream.toDataStream(parser) : DataStream`](docs/buffer-stream.md#BufferStream+toDataStream) - Parses every buffer to object
+
 ### DataStream
 
 DataStream is the primary stream type for Scramjet. When you parse your
@@ -150,42 +184,6 @@ await (DataStream.from(aStream) // create a DataStream
 * [`DataStream:fromArray(arr) : DataStream`](docs/data-stream.md#DataStream.fromArray) - Create a DataStream from an Array
 * [`DataStream:fromIterator(iter) : DataStream`](docs/data-stream.md#DataStream.fromIterator) - Create a DataStream from an Iterator
 
-### StringStream
-
-A stream of string objects for further transformation on top of DataStream.Example:```javascriptStringStream.fromString()```
-
-[Detailed StringStream docs here](docs/string-stream.md)
-
-**Most popular methods:**
-
-* `new StringStream(encoding)` - Constructs the stream with the given encoding
-* [`stringStream.shift(bytes, func) ↺`](docs/string-stream.md#StringStream+shift) - Shifts given length of chars from the original stream
-* [`stringStream.split(splitter) ↺`](docs/string-stream.md#StringStream+split) - Splits the string stream by the specified regexp or string
-* [`stringStream.match(matcher) ↺`](docs/string-stream.md#StringStream+match) - Finds matches in the string stream and streams the match results
-* [`stringStream.toBufferStream() : BufferStream ↺`](docs/string-stream.md#StringStream+toBufferStream) - Transforms the StringStream to BufferStream
-* [`stringStream.parse(parser) : DataStream ↺`](docs/string-stream.md#StringStream+parse) - Parses every string to object
-* [`stringStream.pop(bytes, func) ↺`](docs/string-stream.md#StringStream+pop) - Shifts given length of chars from the original stream
-* [`StringStream:SPLIT_LINE`](docs/string-stream.md#StringStream.SPLIT_LINE) - A handly split by line regex to quickly get a line-by-line stream
-* [`StringStream:fromString(str, encoding) : StringStream`](docs/string-stream.md#StringStream.fromString) - Creates a StringStream and writes a specific string.
-
-### BufferStream
-
-A factilitation stream created for easy splitting or parsing buffers.Useful for working on built-in Node.js streams from files, parsing binary formats etc.A simple use case would be:```javascript fs.createReadStream('pixels.rgba')     .pipe(new BufferStream)         // pipe a buffer stream into scramjet     .breakup(4)                     // split into 4 byte fragments     .parse(buf => [         buf.readInt8(0),            // the output is a stream of R,G,B and Alpha         buf.readInt8(1),            // values from 0-255 in an array.         buf.readInt8(2),         buf.readInt8(3)     ]);```
-
-[Detailed BufferStream docs here](docs/buffer-stream.md)
-
-**Most popular methods:**
-
-* `new BufferStream(opts)` - Creates the BufferStream
-* [`bufferStream.shift(chars, func) : BufferStream ↺`](docs/buffer-stream.md#BufferStream+shift) - Shift given number of bytes from the original stream
-* [`bufferStream.split(splitter) : BufferStream ↺`](docs/buffer-stream.md#BufferStream+split) - Splits the buffer stream into buffer objects
-* [`bufferStream.breakup(number) : BufferStream ↺`](docs/buffer-stream.md#BufferStream+breakup) - Breaks up a stream apart into chunks of the specified length
-* [`bufferStream.stringify(encoding) : StringStream`](docs/buffer-stream.md#BufferStream+stringify) - Creates a string stream from the given buffer stream
-* [`bufferStream.parse(parser) : DataStream`](docs/buffer-stream.md#BufferStream+parse) - Parses every buffer to object
-* [`bufferStream.toStringStream(encoding) : StringStream`](docs/buffer-stream.md#BufferStream+toStringStream) - Creates a string stream from the given buffer stream
-* [`bufferStream.pop(chars, func) : BufferStream ↺`](docs/buffer-stream.md#BufferStream+pop) - Shift given number of bytes from the original stream
-* [`bufferStream.toDataStream(parser) : DataStream`](docs/buffer-stream.md#BufferStream+toDataStream) - Parses every buffer to object
-
 ### MultiStream
 
 An object consisting of multiple streams than can be refined or muxed.
@@ -203,6 +201,30 @@ An object consisting of multiple streams than can be refined or muxed.
 * [`multiStream.mux(cmp) : DataStream`](docs/multi-stream.md#MultiStream+mux) - Muxes the streams into a single one
 * [`multiStream.add(stream)`](docs/multi-stream.md#MultiStream+add) - Adds a stream to the MultiStream
 * [`multiStream.remove(stream)`](docs/multi-stream.md#MultiStream+remove) - Removes a stream from the MultiStream
+
+### StringStream
+
+A stream of string objects for further transformation on top of DataStream.
+
+Example:
+
+```javascript
+StringStream.fromString()
+```
+
+[Detailed StringStream docs here](docs/string-stream.md)
+
+**Most popular methods:**
+
+* `new StringStream(encoding)` - Constructs the stream with the given encoding
+* [`stringStream.shift(bytes, func) ↺`](docs/string-stream.md#StringStream+shift) - Shifts given length of chars from the original stream
+* [`stringStream.split(splitter) ↺`](docs/string-stream.md#StringStream+split) - Splits the string stream by the specified regexp or string
+* [`stringStream.match(matcher) ↺`](docs/string-stream.md#StringStream+match) - Finds matches in the string stream and streams the match results
+* [`stringStream.toBufferStream() : BufferStream ↺`](docs/string-stream.md#StringStream+toBufferStream) - Transforms the StringStream to BufferStream
+* [`stringStream.parse(parser) : DataStream ↺`](docs/string-stream.md#StringStream+parse) - Parses every string to object
+* [`stringStream.pop(bytes, func) ↺`](docs/string-stream.md#StringStream+pop) - Shifts given length of chars from the original stream
+* [`StringStream:SPLIT_LINE`](docs/string-stream.md#StringStream.SPLIT_LINE) - A handly split by line regex to quickly get a line-by-line stream
+* [`StringStream:fromString(str, encoding) : StringStream`](docs/string-stream.md#StringStream.fromString) - Creates a StringStream and writes a specific string.
 
 
 

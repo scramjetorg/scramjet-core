@@ -1,7 +1,8 @@
 # Scramjet core
 
-## Scramjet Core 4.14.0
+## Scramjet Core 4.14.1
 
+* Expose gulp tasks and linter config for derived modules
 * Use tape runner from separate module
 * Depencencies update
 * Fix code quality issues
