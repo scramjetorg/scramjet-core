@@ -1,7 +1,7 @@
 const gulp = require("gulp");
-const eslint = require('gulp-eslint');
+const eslint = require("gulp-eslint");
 
-module.exports = (files = ['**/*.js', '!node_modules/**']) => () => {
+module.exports = (files = ["**/*.js", "!node_modules/**"]) => () => {
     // ESLint ignores files with "node_modules" paths.
     // So, it's best to have gulp ignore the directory as well.
     // Also, Be sure to return the stream from the task;
