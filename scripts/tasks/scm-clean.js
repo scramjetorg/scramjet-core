@@ -5,7 +5,7 @@ module.exports = () => function scmClean (cb) {
         if (err) {
             cb(err);
         } else if (stdout.trim()) {
-            cb(new Error("Workdir not clean!"));
+            cb(new Error("Workdir not clean: \n  " + stdout.trim().replace("\n", "  \n")));
         } else {
             cb();
         }
