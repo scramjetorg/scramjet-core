@@ -1,5 +1,5 @@
-const {MultiStream, DataStream} = require(process.env.SCRAMJET_TEST_HOME || '../../');
-const {EventEmitter} = require('events');
+const {MultiStream, DataStream} = require(process.env.SCRAMJET_TEST_HOME || "../../");
+const {EventEmitter} = require("events");
 
 const getStream = (n, z, k) => {
     z = z || 100;
@@ -77,17 +77,17 @@ module.exports = {
         ];
 
         let noWarnings = 0;
-        process.on('warning', ({name, message, stack}) => {
+        process.on("warning", ({name, stack}) => {
             console.error(stack);
 
-            if (name === 'MaxListenersExceededWarning')
+            if (name === "MaxListenersExceededWarning")
                 noWarnings++;
         });
 
         const mux = new MultiStream(streams).mux();
         mux.run().then(
             () => {
-                test.equals(noWarnings, 0, 'should not warn on multiple event emitters');
+                test.equals(noWarnings, 0, "should not warn on multiple event emitters");
                 test.done();
             }
         );
@@ -108,8 +108,8 @@ module.exports = {
         mux.on("error", () => test.fail(true, "Should not error!"));
 
         process.once(
-            'unhandledRejection',
-            (reason) => console.log('Unhandled rejection: ' + (reason && reason.stack), test.fail(1, "Unhandled rejection"))
+            "unhandledRejection",
+            (reason) => console.log("Unhandled rejection: " + (reason && reason.stack), test.fail(1, "Unhandled rejection"))
         );
 
         mux.reduce(
@@ -125,7 +125,7 @@ module.exports = {
                 test.done();
             }
         ).catch(
-            (reason) => console.log('Thrown: ' + reason.stack, test.fail(1, "Unhandled rejection"))
+            (reason) => console.log("Thrown: " + reason.stack, test.fail(1, "Unhandled rejection"))
         );
     },
     test_map(test) {

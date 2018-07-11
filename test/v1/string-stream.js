@@ -1,5 +1,5 @@
-const {StringStream, DataStream} = require(process.env.SCRAMJET_TEST_HOME || '../../');
-const Readable = require('stream').Readable;
+const {StringStream, DataStream} = require(process.env.SCRAMJET_TEST_HOME || "../../");
+const Readable = require("stream").Readable;
 
 const getStream = (arr) => {
     const ret = new Readable({
@@ -22,13 +22,13 @@ module.exports = {
 
         const firstChunk = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do ";
         const stream = getStream([
-                firstChunk,
-                "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut ",
-                "enim ad minim veniam, quis nostrud exercitation ullamco laboris ",
-                "nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in ",
-                "reprehenderit in voluptate velit esse cillum dolore eu fugiat ",
-                "nulla pariatur. Excepteur sint occaecat cupidatat non proident, ",
-                "sunt in culpa qui officia deserunt mollit anim id est laborum."
+            firstChunk,
+            "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut ",
+            "enim ad minim veniam, quis nostrud exercitation ullamco laboris ",
+            "nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in ",
+            "reprehenderit in voluptate velit esse cillum dolore eu fugiat ",
+            "nulla pariatur. Excepteur sint occaecat cupidatat non proident, ",
+            "sunt in culpa qui officia deserunt mollit anim id est laborum."
         ]).pipe(new StringStream());
 
         test.ok(stream instanceof DataStream, "Extends data stream");
@@ -158,7 +158,7 @@ module.exports = {
         let z;
         const stream = orgStream
             .pipe(
-                z = new StringStream('utf-8')
+                z = new StringStream("utf-8")
             )
             .parse(
                 (ticker) => {
@@ -181,7 +181,7 @@ module.exports = {
                 (acc, data) => (acc.push(data), acc), []
             )
             .then(
-               (data) => {
+                (data) => {
                     test.equals(data[0].symbol, "AAL", "Data should be parsed according to the function");
                     test.strictEqual(data[1].price, 110.06, "Data should be parsed according to the function");
                     test.done();

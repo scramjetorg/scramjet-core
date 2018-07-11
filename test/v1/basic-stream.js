@@ -1,4 +1,4 @@
-const {DataStream} = require(process.env.SCRAMJET_TEST_HOME || '../../');
+const {DataStream} = require(process.env.SCRAMJET_TEST_HOME || "../../");
 
 const arr = [
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
@@ -25,7 +25,7 @@ module.exports = {
             });
 
             await (src.pipe(
-                new DataStream({ promiseTransform(chunk) { return chunk+2 }})
+                new DataStream({ promiseTransform(chunk) { return chunk+2; }})
             ).pipe(
                 tgt
             ).whenFinished());
@@ -38,7 +38,7 @@ module.exports = {
         async starve(test) {
             test.expect(2);
             const comp = arr.slice();
-            const stream = new DataStream({promiseRead(many) {
+            const stream = new DataStream({promiseRead() {
                 return comp.splice(0, 1);
             }});
             test.ok(stream instanceof DataStream, "Stream still implements a DataStream");
@@ -72,7 +72,7 @@ module.exports = {
             const comp = [];
             await stream.pipe(
                 new DataStream({
-                    async promiseWrite(chunk, encoding) {
+                    async promiseWrite(chunk/*, encoding*/) {
                         comp.push(chunk);
                     }
                 })
@@ -86,7 +86,7 @@ module.exports = {
             const arr = [];
             await stream.pipe(
                 new DataStream({
-                    promiseWrite(chunk, encoding) {
+                    promiseWrite(chunk/*, encoding*/) {
                         return new Promise(res => setTimeout(() => {
                             arr.push(chunk);
                             res();

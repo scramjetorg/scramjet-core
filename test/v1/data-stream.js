@@ -1,4 +1,4 @@
-const { DataStream, StringStream } = require(process.env.SCRAMJET_TEST_HOME || '../../');
+const { DataStream, StringStream } = require(process.env.SCRAMJET_TEST_HOME || "../../");
 const {PassThrough} = require("stream");
 
 const getStream = (x = 100) => {
@@ -21,7 +21,7 @@ module.exports = {
             const stream = getStream().each(a => a);
 
             stream.on("end", () => {
-                ended = true
+                ended = true;
             });
 
             (async () => {
@@ -30,11 +30,11 @@ module.exports = {
                 test.ok(ended, "Stream is ended");
                 test.done();
             })()
-            .catch(
-                (err) => {
-                    test.ok(false, "Should not throw: " + err.stack)
-                }
-            )
+                .catch(
+                    (err) => {
+                        test.ok(false, "Should not throw: " + err.stack);
+                    }
+                )
             ;
 
             test.ok(notDone, "Does not resolve before the stream ends");
@@ -98,13 +98,13 @@ module.exports = {
             str.while(
                 (data) => data.val < 50
             )
-            .toArray()
-            .then(
-                (data) => {
-                    test.equals(data.length, 50, "Must not read beyond last matching item");
-                    test.done();
-                }
-            );
+                .toArray()
+                .then(
+                    (data) => {
+                        test.equals(data.length, 50, "Must not read beyond last matching item");
+                        test.done();
+                    }
+                );
         },
         until(test) {
             const str = getStream();
@@ -113,13 +113,13 @@ module.exports = {
             str.until(
                 (data) => data.val >= 50
             )
-            .toArray()
-            .then(
-                (data) => {
-                    test.equals(data.length, 50, "Must not read beyond last not matching item");
-                    test.done();
-                }
-            );
+                .toArray()
+                .then(
+                    (data) => {
+                        test.equals(data.length, 50, "Must not read beyond last not matching item");
+                        test.done();
+                    }
+                );
         }
     },
     test_tee: {
@@ -205,7 +205,7 @@ module.exports = {
                         test.done();
                     }
                 ).catch(
-                    (e) => (console.log(e), test.ok(false, "Should not throw error: " + e))
+                    (e) => (test.ok(false, "Should not throw error: " + e.stack))
                 );
 
             test.ok(
@@ -312,7 +312,7 @@ module.exports = {
             test.expect(1);
             const arr = [1,2,3,4,5,6,7,8,9];
             const str = DataStream.fromArray(arr);
-            test.deepEqual(await str.toArray(), arr, 'Should resolve to the same array');
+            test.deepEqual(await str.toArray(), arr, "Should resolve to the same array");
             test.done();
         },
         async iteratorMap(test) {
@@ -328,9 +328,9 @@ module.exports = {
                 .map(x => x*2)
                 .toArray();
 
-            test.equals(arr[0], 8, "Test some elements...")
-            test.equals(arr[48], 200, "Test some elements...")
-            test.equals(arr[98], 400, "Test some elements...")
+            test.equals(arr[0], 8, "Test some elements...");
+            test.equals(arr[48], 200, "Test some elements...");
+            test.equals(arr[98], 400, "Test some elements...");
 
             test.equals(arr.length, 100, "Should have all elements");
 
@@ -345,10 +345,10 @@ module.exports = {
             })();
             const str = DataStream.fromIterator(arr);
             str.catch(e => {
-                console.error(e);
+                console.error(e.stack);
                 throw e;
-            })
-            test.deepEqual(await str.toArray(), [1,2,3,4,5,6,7,8,9], 'Should resolve to the same array');
+            });
+            test.deepEqual(await str.toArray(), [1,2,3,4,5,6,7,8,9], "Should resolve to the same array");
             test.done();
         },
     },
@@ -376,7 +376,7 @@ module.exports = {
                     test.equals(err, e, "Should pass the same error");
                     return Promise.reject(err2);
                 });
-            ;
+
 
             const pipedStream = orgStream.pipe(new DataStream())
                 .catch(e => {
@@ -386,7 +386,7 @@ module.exports = {
                 });
 
             pipedStream.on("error", (e) => {
-                test.fail("Caught error should not be thrown");
+                test.fail("Caught error should not be thrown " + e.stack);
             });
 
             pipedStream.on("end", () => test.done());
@@ -414,7 +414,7 @@ module.exports = {
             try {
                 const ret = await (
                     DataStream.fromArray([0,1,2,3,4])
-                        .use('../lib/modtest')
+                        .use("../lib/modtest")
                         .toArray()
                 );
                 test.deepEqual(ret, [1,2,3,4,5], "Should identify and load the right module, relative to __dirname");
