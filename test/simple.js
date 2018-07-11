@@ -1,5 +1,4 @@
-const DataStream = require(process.env.SCRAMJET_TEST_HOME || '../').DataStream;
-
+const DataStream = require(process.env.SCRAMJET_TEST_HOME || "../").DataStream;
 
 const defer = (ms = 20) => new Promise(res => setTimeout(res, ms));
 const str = new DataStream();
@@ -38,9 +37,8 @@ str.whenWrote({x: 19})
         str.end({ x: 30 });
     });
 
-process.on('unhandledRejection', e => {
-    console.error('e', e.stack)
-    debugger;
+process.on("unhandledRejection", e => {
+    console.error("e", e.stack);
 });
 
 let erd = str
@@ -49,4 +47,4 @@ let erd = str
 
 // erd.on("end", () => console.log('end'))
 erd
-    .on('end', () => console.log('end'));
+    .on("end", () => console.log("end"));
