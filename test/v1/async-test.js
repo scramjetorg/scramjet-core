@@ -1,4 +1,4 @@
-const DataStream = require(process.env.SCRAMJET_TEST_HOME || '../../').DataStream;
+const DataStream = require(process.env.SCRAMJET_TEST_HOME || "../../").DataStream;
 
 const getStream = () => {
     const ret = new DataStream();
@@ -63,7 +63,7 @@ module.exports = {
                 test.equals(chunk.val, 22, "Should error on and pass catch 22... I mean chunk...");
                 test.done();
             })
-            .once("end", e => {
+            .once("end", () => {
                 test.fail("Should not end!");
                 test.done();
             });
