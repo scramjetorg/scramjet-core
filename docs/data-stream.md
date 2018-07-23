@@ -26,6 +26,7 @@ await (DataStream.from(aStream) // create a DataStream
     * [dataStream.map(func, Clazz)](#DataStream+map) ↺
     * [dataStream.filter(func)](#DataStream+filter) ↺
     * [dataStream.reduce(func, into)](#DataStream+reduce)
+    * [dataStream.do(func)](#DataStream+do) ↺
     * [dataStream.into(func, into)](#DataStream+into) ↺
     * [dataStream.use(func)](#DataStream+use) ↺
     * [dataStream.run()](#DataStream+run)
@@ -122,6 +123,21 @@ it's much slower than parallel functions.
 ```js
 [../samples/data-stream-reduce.js](../samples/data-stream-reduce.js)
 ```
+<a name="DataStream+do"></a>
+
+### dataStream.do(func) ↺
+Perform an asynchroneous operation without changing the stream.
+
+In essence the stream will use the call to keep the backpressure, but the resolving value
+has no impact on the streamed data (except for possile mutation of the chunk itself)
+
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Chainable**  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| func | [<code>DoCallback</code>](#DoCallback) | the async function |
+
 <a name="DataStream+into"></a>
 
 ### dataStream.into(func, into) ↺
@@ -529,6 +545,15 @@ Doesn't end the stream until it reaches end of the iterator.
 | --- | --- | --- |
 | acc | <code>\*</code> | the accumulator - the object initially passed or returned                by the previous reduce operation |
 | chunk | <code>Object</code> | the stream chunk. |
+
+<a name="DoCallback"></a>
+
+## DoCallback : function ⇄
+**Kind**: global typedef  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| chunk | <code>Object</code> | source stream chunk |
 
 <a name="IntoCallback"></a>
 
