@@ -38,6 +38,16 @@ module.exports = {
                 ScramjetOptions.declare(B, "option8", {chained: false, value: 6});
             });
             test.done();
+        },
+        frozen(test) {
+            test.throws(() => {
+                ScramjetOptions.declare(B, "option9", {chained: false, frozen: true});
+            });
+            test.doesNotThrow(() => {
+                ScramjetOptions.declare(B, "optionA", {chained: true, frozen: true});
+                ScramjetOptions.declare(B, "optionB", {chained: true, frozen: true, value: 7});
+            });
+            test.done();
         }
     },
     test_read: {
@@ -101,6 +111,34 @@ module.exports = {
                 test.equals(c.options.option8, 6, "'option8' setters on B should not affect A");
 
             }, "Does not throw on standard operations");
+
+            test.done();
+        },
+        frozen(test) {
+            const a = new A();
+            const b = new A(a.options);
+            const c = new A();
+
+            test.doesNotThrow(() => {
+                a.options.optionA = 11;
+            }, "Allows to override emtpy and default value options");
+
+            test.doesNotThrow(() => {
+                c.options.optionB = 12;
+            }, "Allows to override default value options in place");
+            try {
+                b.options.optionA = 13;
+                throw new Error();
+            } catch(e) {
+                test.ok(e instanceof ScramjetOptions.FrozenOptionOverrideError, "Should throw an override error on set option");
+            }
+
+            try {
+                b.options.optionB = 14;
+                throw new Error();
+            } catch(e) {
+                test.ok(e instanceof ScramjetOptions.FrozenOptionOverrideError, "Should throw an override error in chain override on default value");
+            }
 
             test.done();
         }
