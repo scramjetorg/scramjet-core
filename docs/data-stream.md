@@ -50,7 +50,7 @@ await (DataStream.from(aStream) // create a DataStream
     * [dataStream.toGenerator()](#DataStream+toGenerator)  <code>Iterable.&lt;Promise.&lt;\*&gt;&gt;</code>
     * [dataStream.toBufferStream(serializer)](#DataStream+toBufferStream) ↺ <code>BufferStream</code>
     * [dataStream.toStringStream(serializer)](#DataStream+toStringStream) ↺ <code>StringStream</code>
-    * [DataStream:from(stream, options)](#DataStream.from) ↺
+    * [DataStream:from(str, options)](#DataStream.from) ↺
     * [DataStream:fromArray(arr)](#DataStream.fromArray)  [<code>DataStream</code>](#DataStream)
     * [DataStream:fromIterator(iter)](#DataStream.fromIterator)  [<code>DataStream</code>](#DataStream)
 
@@ -471,16 +471,21 @@ Creates a StringStream
 ```
 <a name="DataStream.from"></a>
 
-### DataStream:from(stream, options) ↺
-Returns a DataStream from any node.js Readable Stream
+### DataStream:from(str, options) ↺
+Returns a DataStream from pretty much anything sensibly possible.
+
+Depending on type:
+* `self` will return self immediately
+* `Readable` stream will get piped to the current stream with errors forwarded
+* `Array` will get iterated and all items will be pushed to the returned stream. The stream will also be ended in such case.
 
 **Kind**: static method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
 
-| Param | Type |
-| --- | --- |
-| stream | <code>ReadableStream</code> | 
-| options | [<code>StreamOptions</code>](#StreamOptions) | 
+| Param | Type | Description |
+| --- | --- | --- |
+| str | <code>Array</code> \| <code>Iterable</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>Readable</code> | any node.js readable stream, function (`objectMode: true` is advised) |
+| options | [<code>StreamOptions</code>](#StreamOptions) \| <code>Writable</code> |  |
 
 <a name="DataStream.fromArray"></a>
 

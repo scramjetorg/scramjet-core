@@ -1,5 +1,12 @@
 # Scramjet core
 
+## Scramjet Core 4.16
+
+This is the last intended minor API change to `scramjet-core` before the v5 series.
+
+* Added `DataStream..do` method for simple operations without affecting the stream, but keeping backpressure.
+* Modified `DataStream.from` static method to accept pretty much any sensible input
+
 ## Scramjet Core 4.14.1
 
 * Expose gulp tasks and linter config for derived modules

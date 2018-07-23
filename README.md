@@ -181,7 +181,7 @@ await (DataStream.from(aStream) // create a DataStream
 * [`dataStream.toGenerator() : Iterable.<Promise.<*>>`](docs/data-stream.md#DataStream+toGenerator) - Returns an async generator
 * [`dataStream.toBufferStream(serializer) : BufferStream ↺`](docs/data-stream.md#DataStream+toBufferStream) - Creates a BufferStream
 * [`dataStream.toStringStream(serializer) : StringStream ↺`](docs/data-stream.md#DataStream+toStringStream) - Creates a StringStream
-* [`DataStream:from(stream, options) ↺`](docs/data-stream.md#DataStream.from) - Returns a DataStream from any node.js Readable Stream
+* [`DataStream:from(str, options) ↺`](docs/data-stream.md#DataStream.from) - Returns a DataStream from pretty much anything sensibly possible.
 * [`DataStream:fromArray(arr) : DataStream`](docs/data-stream.md#DataStream.fromArray) - Create a DataStream from an Array
 * [`DataStream:fromIterator(iter) : DataStream`](docs/data-stream.md#DataStream.fromIterator) - Create a DataStream from an Iterator
 
