@@ -477,14 +477,20 @@ Returns a DataStream from pretty much anything sensibly possible.
 Depending on type:
 * `self` will return self immediately
 * `Readable` stream will get piped to the current stream with errors forwarded
-* `Array` will get iterated and all items will be pushed to the returned stream. The stream will also be ended in such case.
+* `Array` will get iterated and all items will be pushed to the returned stream.
+  The stream will also be ended in such case.
+* `GeneratorFunction` will get executed to return the iterator which will be used as source for items
+* `Iterable`s iterator will be used as a source for streams
+
+You can also pass a `Function` or `AsyncFunction` that will result in anything passed to `from`
+subsequently. You can use your stream immediately though.
 
 **Kind**: static method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| str | <code>Array</code> \| <code>Iterable</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>Readable</code> | any node.js readable stream, function (`objectMode: true` is advised) |
+| str | <code>Array</code> \| <code>Iterable</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>Readable</code> | argument to be turned into new stream |
 | options | [<code>StreamOptions</code>](#StreamOptions) \| <code>Writable</code> |  |
 
 <a name="DataStream.fromArray"></a>
