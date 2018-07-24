@@ -63,6 +63,78 @@ module.exports = {
             test.deepEqual(["aaa"], z, "Should be the same as the stream");
             test.ok(y instanceof StringStream, "Should return the derived class");
             test.done();
+        },
+        async typeArray(test) {
+            const arr = [1,2,3];
+
+            const z = DataStream.from(arr);
+            test.ok(z instanceof DataStream, "Should return the called class");
+            test.deepEqual(await z.toArray(), [1,2,3], "Should work on type Array");
+            test.done();
+        },
+        async typeDataStream(test) {
+            const x = DataStream.from(["1","2","3"]);
+            const y = DataStream.from(x);
+            const z = StringStream.from(x);
+            const u = DataStream.from(z);
+
+            test.ok(x instanceof DataStream, "Should return the called class");
+            test.strictEqual(x, y, "Should return the same stream if type is equal");
+            test.notStrictEqual(x, z, "Should not return the same stream as derived type");
+            test.notStrictEqual(x, u, "Should not return the same stream as ancestor type");
+
+            test.deepEqual(await u.toArray(), ["1","2","3"], "Should pipe, but not convert the stream.");
+
+            test.done();
+        },
+        async typeGenerator(test) {
+            const x = DataStream.from(function*(){
+                yield 1;
+                yield 2;
+                return 3;
+            });
+
+            test.ok(x instanceof DataStream, "Should return the called class");
+            test.deepEqual(await x.toArray(), [1,2,3], "Return data as generated.");
+
+            test.done();
+        },
+        async typeIterable(test) {
+            const x = DataStream.from({
+                [Symbol.iterator]: () => ({
+                    x: 0,
+                    next() {
+                        if (this.x < 3) return {value: ++this.x, done: false};
+                        return {done: true};
+                    }
+                })
+            });
+
+            test.ok(x instanceof DataStream, "Should return the called class");
+            test.deepEqual(await x.toArray(), [1,2,3], "Return data as generated.");
+
+            test.done();
+        },
+        async typeFunction(test) {
+            const x = DataStream.from(function() {
+                return [1,2,3];
+            });
+
+            test.ok(x instanceof DataStream, "Should return the called class");
+            test.deepEqual(await x.toArray(), [1,2,3], "Return data as generated.");
+
+            test.done();
+        },
+        async typeAsyncFunction(test) {
+            const x = DataStream.from(async function() {
+                return new Promise(res => process.nextTick(res))
+                    .then(() => [1,2,3]);
+            });
+
+            test.ok(x instanceof DataStream, "Should return the called class");
+            test.deepEqual(await x.toArray(), [1,2,3], "Return data as generated.");
+
+            test.done();
         }
     },
     test_options: {

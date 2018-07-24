@@ -24,6 +24,7 @@ StringStream.fromString()
     * [stringStream.pop(bytes, func)](#StringStream+pop) ↺
     * [StringStream:SPLIT_LINE](#StringStream.SPLIT_LINE)
     * [StringStream:fromString(str, encoding)](#StringStream.fromString)  [<code>StringStream</code>](#StringStream)
+    * [StringStream:from()](#StringStream.from)
 
 <a name="new_StringStream_new"></a>
 
@@ -163,6 +164,13 @@ Creates a StringStream and writes a specific string.
 | str | <code>String</code> | the string to push the your stream |
 | encoding | <code>String</code> | optional encoding |
 
+<a name="StringStream.from"></a>
+
+### StringStream:from()
+Create StringStream from anything.
+
+**Kind**: static method of [<code>StringStream</code>](#StringStream)  
+**See**: module:scramjet.from  
 <a name="toDataStream"></a>
 
 ## toDataStream()
@@ -176,7 +184,7 @@ Alias for [parse](#StringStream+parse)
 
 | Param | Type | Description |
 | --- | --- | --- |
-| shifted | <code>String</code> | Pooped chars |
+| shifted | <code>String</code> | Popped chars |
 
 <a name="ParseCallback"></a>
 
