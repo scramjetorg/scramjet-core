@@ -1,6 +1,6 @@
 # Scramjet core
 
-## Scramjet Core 4.16
+## Scramjet Core 4.16.1
 
 This is the last intended minor API change to `scramjet-core` before the v5 series.
 
