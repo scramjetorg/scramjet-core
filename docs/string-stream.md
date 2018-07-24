@@ -184,7 +184,7 @@ Alias for [parse](#StringStream+parse)
 
 | Param | Type | Description |
 | --- | --- | --- |
-| shifted | <code>String</code> | Pooped chars |
+| shifted | <code>String</code> | Popped chars |
 
 <a name="ParseCallback"></a>
 
