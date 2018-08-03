@@ -49,12 +49,12 @@
     "eslint-plugin-node": "^7.0.1",
     "fancy-log": "^1.3.2",
     "gulp": "^4.0.0",
-    "gulp-rename": "^1.3.0",
+    "gulp-rename": "^1.4.0",
     "jsdoc": "^3.5.5",
     "jsdoc-api": "^4.0.3",
     "jsdoc-parse": "^3.0.1",
     "nodeunit-tape-compat": "^1.0.1",
-    "scramjet": "^4.17.1",
+    "scramjet": "^4.18.0",
     "tape": "^4.9.1"
   }
 }
