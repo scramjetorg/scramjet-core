@@ -1,11 +1,12 @@
 # Scramjet core
 
-## Scramjet Core 4.16.1
+## Scramjet Core 4.16.2
 
 This is the last intended minor API change to `scramjet-core` before the v5 series.
 
 * Added `DataStream..do` method for simple operations without affecting the stream, but keeping backpressure.
 * Modified `DataStream.from` static method to accept pretty much any sensible input
+* Error handling rethrow fixes. `cause` now carries the error that actually spawned the issue.
 
 ## Scramjet Core 4.14.1
 
