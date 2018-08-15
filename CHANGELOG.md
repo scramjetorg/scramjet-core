@@ -1,9 +1,10 @@
 # Scramjet core
 
-## Scramjet Core 4.16.2
+## Scramjet Core 4.16.4
 
 This is the last intended minor API change to `scramjet-core` before the v5 series.
 
+* Fixed bug causing "out of sequence" errors on a number of raised and handled errors.
 * Added `DataStream..do` method for simple operations without affecting the stream, but keeping backpressure.
 * Modified `DataStream.from` static method to accept pretty much any sensible input
 * Error handling rethrow fixes. `cause` now carries the error that actually spawned the issue.
