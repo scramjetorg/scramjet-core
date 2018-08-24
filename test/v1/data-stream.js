@@ -9,6 +9,7 @@ const getStream = (x = 100) => {
     process.nextTick(() => ret.end());
     return ret;
 };
+const defer = (x) => new Promise(res => process.nextTick(() => res(x)));
 
 module.exports = {
     test_when: {
@@ -92,6 +93,39 @@ module.exports = {
                 yield 1;
                 yield 2;
                 return 3;
+            });
+
+            test.ok(x instanceof DataStream, "Should return the called class");
+            test.deepEqual(await x.toArray(), [1,2,3], "Return data as generated.");
+
+            test.done();
+        },
+        async typeAsyncGenerator(test) {
+            try {
+                const generator = require("../lib/async-generator-test");
+                const x = DataStream.from(generator);
+
+                test.ok(x instanceof DataStream, "Should return the called class");
+                test.deepEqual(await x.toArray(), [1,2,3], "Return data as generated.");
+
+                test.done();
+            } catch (e) {
+                test.ok(true, "Not tested, no support for async generator");
+                test.done();
+            }
+
+
+        },
+        async testAsyncIterable(test) {
+            const x = DataStream.from({
+                [Symbol.asyncIterator]: () => ({
+                    x: 0,
+                    async next() {
+                        await defer();
+                        if (this.x < 3) return {value: ++this.x, done: false};
+                        return {done: true};
+                    }
+                })
             });
 
             test.ok(x instanceof DataStream, "Should return the called class");
