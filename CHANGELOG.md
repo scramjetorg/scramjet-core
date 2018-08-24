@@ -1,9 +1,11 @@
+
 # Scramjet core
 
-## Scramjet Core 4.16.4
+## Scramjet Core 4.16.5
 
 This is the last intended minor API change to `scramjet-core` before the v5 series.
 
+* Async iterator and async generators fix of `DataStream.from` in node 10
 * Fixed bug causing "out of sequence" errors on a number of raised and handled errors.
 * Added `DataStream..do` method for simple operations without affecting the stream, but keeping backpressure.
 * Modified `DataStream.from` static method to accept pretty much any sensible input
