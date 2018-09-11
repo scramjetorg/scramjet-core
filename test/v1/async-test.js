@@ -9,20 +9,28 @@ const getStream = () => {
     return ret;
 };
 
-const decorateAsynchronously = async (cb, chunk) => new Promise((res) => {
+const decorateAsynchronously = async (chunk) => new Promise((res) => {
     setTimeout(
-        () => (cb(chunk), res(Object.assign({ref: true}, chunk))),
+        () => res(Object.assign({ref: true}, chunk)),
         7+3*(chunk.val%4)
     );
 });
 
-const decorateAsynchronouslyWithError = async (cb, chunk) => {
+const decorateAsynchronouslyWithError = async (chunk) => {
     if (chunk.val === 22) {
         return new Promise((res, rej) => {
             setTimeout(() => rej(new Error("Err")), 100);
         });
     } else {
-        return decorateAsynchronously(cb, chunk);
+        return decorateAsynchronously(chunk);
+    }
+};
+
+const decorateAsynchronouslyWithLotsOfErrors = async (chunk) => {
+    if (!(chunk.val % 4)) {
+        throw new Error("err");
+    } else {
+        return decorateAsynchronously(chunk);
     }
 };
 
@@ -31,7 +39,7 @@ module.exports = {
         test.expect(3);
         const a = [];
         getStream()
-            .map(decorateAsynchronously.bind(null, () => 0))
+            .map(decorateAsynchronously)
             .each((i) => a.push(i))
             .on(
                 "end",
@@ -56,7 +64,7 @@ module.exports = {
     test_err(test) {
         test.expect(3);
         getStream()
-            .map(decorateAsynchronouslyWithError.bind(null, () => 0))
+            .map(decorateAsynchronouslyWithError)
             .once("error", (e, chunk) => {
                 test.ok(true, "Should emit error");
                 test.ok(e instanceof Error, "Thrown should be an instance of Error");
@@ -68,4 +76,69 @@ module.exports = {
                 test.done();
             });
     },
+    test_error_flow(test) {
+        test.expect(2);
+
+        let z = 0;
+        getStream()
+            .map(decorateAsynchronouslyWithLotsOfErrors)
+            .catch((e, chunk) => (z++, chunk))
+            .toArray()
+            .then(
+                ret => {
+                    test.equals(z, 25, "Should call catch on every fourth element");
+                    test.equals(ret.length, 100, "Should contain all elements");
+                    test.done();
+                },
+                err => {
+                    test.fail(err, "Should not throw");
+                    test.done();
+                }
+            )
+        ;
+    },
+    test_error_filtering(test) {
+        test.expect(2);
+
+        let z = 0;
+        getStream()
+            .map(decorateAsynchronouslyWithLotsOfErrors)
+            .catch(() => (z++, undefined))
+            .toArray()
+            .then(
+                ret => {
+                    test.equals(z, 25, "Should call catch on every fourth element");
+                    test.equals(ret.length, 75, "Should contain all elements");
+                    test.done();
+                },
+                err => {
+                    test.fail(err, "Should not throw");
+                    test.done();
+                }
+            )
+        ;
+    },
+    test_catch(test) {
+        test.expect(5);
+
+        getStream()
+            .map(decorateAsynchronouslyWithError)
+            .catch(({cause, chunk}) => {
+                test.equal(cause.message, "Err", "Should pass the error in {cause}");
+                test.equal(chunk.val, 22, "Should fail on the catch 22... chunk...");
+            })
+            .toArray()
+            .then(
+                ret => {
+                    test.equals(ret.length, 99, "Should contain all items except one");
+                    test.equals(ret[21].val, 21, "Should preserver order of elements (part 1)");
+                    test.equals(ret[22].val, 23, "Should preserver order of elements (part 2)");
+                    test.done();
+                },
+                err => {
+                    test.fail(err);
+                    test.done();
+                }
+            );
+    }
 };
