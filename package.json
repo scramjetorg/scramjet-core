@@ -1,6 +1,6 @@
 {
   "name": "scramjet-core",
-  "version": "4.16.7",
+  "version": "4.16.8",
   "description": "A pluggable minimal version of Scramjet that focuses only on stream transform and exposes only core features",
   "main": "lib/index.js",
   "directories": {
