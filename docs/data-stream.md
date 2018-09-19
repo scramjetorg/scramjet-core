@@ -43,6 +43,7 @@ await (DataStream.from(aStream) // create a DataStream
     * [dataStream.until(func)](#DataStream+until) ↺
     * [dataStream.catch(callback)](#DataStream+catch) ↺
     * [dataStream.raise(err)](#DataStream+raise)
+    * [dataStream.pipe(to, options)](#DataStream+pipe) ↺ <code>Writable</code>
     * [dataStream.bufferify(serializer)](#DataStream+bufferify) ↺ <code>BufferStream</code>
     * [dataStream.stringify(serializer)](#DataStream+stringify) ↺ <code>StringStream</code>
     * [dataStream.toArray(initial)](#DataStream+toArray) ⇄ <code>Array</code>
@@ -360,6 +361,22 @@ The returned promise will always be resolved even if there are no successful han
 ```js
 [../samples/data-stream-raise.js](../samples/data-stream-raise.js)
 ```
+<a name="DataStream+pipe"></a>
+
+### dataStream.pipe(to, options) : Writable ↺
+Override of node.js Readable pipe.
+
+Except for calling overridden method it proxies errors to piped stream.
+
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Chainable**  
+**Returns**: <code>Writable</code> - the `to` stream  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| to | <code>Writable</code> | Writable stream to write to |
+| options | <code>WritableOptions</code> |  |
+
 <a name="DataStream+bufferify"></a>
 
 ### dataStream.bufferify(serializer) : BufferStream ↺
@@ -508,22 +525,6 @@ Doesn't end the stream until it reaches end of the iterator.
 ```js
 [../samples/data-stream-fromiterator.js](../samples/data-stream-fromiterator.js)
 ```
-<a name="pipe"></a>
-
-## pipe : Writable ↺
-Override of node.js Readable pipe.
-
-Except for calling overridden method it proxies errors to piped stream.
-
-**Kind**: global variable  
-**Chainable**  
-**Returns**: <code>Writable</code> - the `to` stream  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| to | <code>Writable</code> | Writable stream to write to |
-| options | <code>WritableOptions</code> |  |
-
 <a name="MapCallback"></a>
 
 ## MapCallback : Promise | *
