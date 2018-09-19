@@ -6,6 +6,7 @@
 This is the last intended minor API change to `scramjet-core` before the v5 series.
 
 * Fix order of chunks resolved within `catch` logic.
+* Fix order of chunks vs flush promise.
 * `BufferStream.from` and `StringStream.from` have now correct types.
 * Errors in a function passed to `DataStream.from` now do not result in uncaught promise.
 * Async iterator and async generators fix of `DataStream.from` in node 10.

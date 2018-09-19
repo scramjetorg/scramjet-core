@@ -478,15 +478,15 @@ module.exports = {
             let err2 = new Error("Hello 2!");
 
             const orgStream = new DataStream()
-                .catch(e => {
-                    test.equals(err, e, "Should pass the same error");
+                .catch(({cause}) => {
+                    test.equals(err, cause, "Should pass the same error");
                     return Promise.reject(err2);
                 });
 
 
             const pipedStream = orgStream.pipe(new DataStream())
-                .catch(e => {
-                    test.equals(err2, e, "Should pass the error via pipe");
+                .catch(({cause}) => {
+                    test.equals(err2, cause, "Should pass the error via pipe");
                     orgStream.end({});
                     return true;
                 });
