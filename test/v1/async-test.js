@@ -1,4 +1,5 @@
 const DataStream = require(process.env.SCRAMJET_TEST_HOME || "../../").DataStream;
+const StreamError = require(process.env.SCRAMJET_TEST_HOME || "../../").errors.StreamError;
 
 const getStream = () => {
     const ret = new DataStream();
@@ -140,5 +141,51 @@ module.exports = {
                     test.done();
                 }
             );
+    },
+    test_catch_chaining(test) {
+        test.expect(10);
+
+        let cause1 = null;
+
+        getStream()
+            .map(decorateAsynchronouslyWithError)
+            .catch(({cause, chunk}) => {
+                test.equal(cause.message, "Err", "Should pass the error in {cause}");
+                test.equal(chunk.val, 22, "Should fail on the catch 22... chunk...");
+                cause1 = cause;
+                throw cause;
+            })
+            .catch((err) => {
+                const {cause, chunk} = err;
+
+                test.ok(err instanceof StreamError, "Should be passing StreamErrors");
+                test.equal(cause1, cause, "Should pass on the same cause");
+                test.equal(chunk.val, 22, "Should pass on the same chunk");
+                throw (cause1 = new Error("Err2"));
+            })
+            .pipe(new DataStream())
+            .catch(({cause}) => {
+                test.equal(cause1, cause, "Should pass the new error");
+                throw cause;
+            })
+            .pipe(new DataStream())
+            .catch(({cause}) => {
+                test.equal(cause1, cause, "Should pass the new error");
+            })
+            .toArray()
+            .then(
+                ret => {
+                    test.equals(ret.length, 99, "Should not reject and contain all items except one");
+                    test.equals(ret[21].val, 21, "Should preserver order of elements (part 1)");
+                    test.equals(ret[22].val, 23, "Should preserver order of elements (part 2)");
+                    test.done();
+                },
+                err => {
+                    test.fail(err);
+                    test.done();
+                }
+            );
+
+
     }
 };
