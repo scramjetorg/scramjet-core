@@ -5,6 +5,7 @@
 
 This is the last intended minor API change to `scramjet-core` before the v5 series.
 
+* Fix execution of flushPromise on read only streams.
 * Fix order of chunks resolved within `catch` logic.
 * Fix order of chunks vs flush promise.
 * `BufferStream.from` and `StringStream.from` have now correct types.
