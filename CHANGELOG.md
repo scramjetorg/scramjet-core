@@ -1,21 +1,107 @@
 
 # Scramjet core
 
-## Scramjet Core 4.16.8
-
 This is the last intended minor API change to `scramjet-core` before the v5 series.
 
-* Fix execution of flushPromise on read only streams.
-* Fix order of chunks resolved within `catch` logic.
-* Fix order of chunks vs flush promise.
-* `BufferStream.from` and `StringStream.from` have now correct types.
-* Errors in a function passed to `DataStream.from` now do not result in uncaught promise.
-* Async iterator and async generators fix of `DataStream.from` in node 10.
-* Fixed bug causing "out of sequence" errors on a number of raised and handled errors.
-* Added `DataStream..do` method for simple operations without affecting the stream, but keeping backpressure.
-* Modified `DataStream.from` static method to accept pretty much any sensible input
-* Error handling rethrow fixes. `cause` now carries the error that actually spawned the issue.
-* Fix `DataStream.from` operation in derived classes, now return the same class of stream as context of the call.
+* 700c9d2 - Use unpipe in while when data is no longer needed.
+* b410644 - Fixes the case when a transform is pushed onto a stream with standard transform
+
+## Scramjet Core 4.16.13 - Fix travis environment failures
+
+* b47a711 - Dependencies update.
+* d062814 - Omit errors occuring on travis environment if TRAVIS=true
+
+## Scramjet Core 4.16.12 - Dependencies update
+
+* 30cd99f - Dependencies update.
+
+## Scramjet Core 4.16.11 - Fix execution of flushPromise on read only streams.
+
+* a3eabd1 - Fix execution of flushPromise on read only streams.
+
+## Scramjet Core 4.16.10 - Documentation fix
+
+* 4ed1804 - Update docs
+* 8c65108 - Fix documentation of pipe()
+
+## Scramjet Core 4.16.9 - Fix flush promise error handling
+
+* faaf91d - Changelog and docs
+* 2a4729c - Update dependencies
+* 87eb936 - Fix tests to reflect the expected flow, fix "error" event handling in pipe()
+* ebd073e - Fix error to be handled before flush promise, make errors passed consistently between streams
+
+## Scramjet Core 4.16.8 - Error handling and ordering fixes.
+
+* b821baa - Changelog update
+* d4e3664 - Dependencies update.
+* 01d983e - New tests for processing using error handling
+* 4f8ab46 - Fix resolution or errors and chunks returned from catch as well as ordering of those
+* 8f5f5fb - Improve type docs on BufferStream.from and StringStream.from
+* ba2af04 - Fix error handling in DataStream.from
+
+## Scramjet Core 4.16.7 - Dependencies update.
+
+* 9188cd3 - Dependencies update
+* 519a6c8 - remove typo
+
+## Scramjet Core 4.16.6 - Fix `DataStream.from` operation
+
+* 4509fdc - Dependencies update.
+* dd7bf6b - Fix `DataStream.from` operation in child classes.
+
+## Scramjet Core 4.16.5 - Datastream.from async generator and iterator fix
+
+* 8dd5470 - Update docs and changelog
+* 056c58c - Dependencies update.
+* d2c6643 - Async iterator fix and allow AsyncGenerators in node v10.
+
+## Scramjet Core 4.16.4 - Error handling fixes
+
+* a6eff31 - Changelog update
+* f7975dc - Dependencies update.
+* c7f71b5 - Fix promise resolution order in multiple handled errors scenario.
+* 65470d6 - Better run operation
+
+## Scramjet Core 4.16.3 - Error handling fixes.
+
+* 409493e - Fix error handling
+* 4fbe189 - Dependencies update
+
+## Scramjet Core 4.16.2 - Dependencies update
+
+* 5b2337f - Fix push operation after error handling
+* 8bbe1c6 - Update dependencies
+
+## Scramjet Core 4.16.1 - Fix from to work for non-standard streams (i.e. userland version from npm)
+
+* bc5fe87 - Assume readable stream if protocol is sustained
+
+## Scramjet Core 4.16.0 - do and from methods final feature release in v4
+
+* 4f5a798 - Change CRLF to LF in docs generation on windows
+* e4c4a3a - Fix a typo... Oops...
+* fe8016f - Update docs
+* bc58039 - Eslint fix
+* b894623 - Dependencies update
+* b251a35 - Fixes in from method
+* df91eeb - DataStream.from method extension + Changelog
+* d56bc10 - DataStream..do method
+
+## Scramjet Core 4.15.1 - Dependencies update
+
+* 8b80ab9 - Dependencies update.
+* 7b5efe2 - Dependencies update.
+* 04bf18b - Eslint fixes
+* 7a9c762 - Fully tested options class
+
+## Scramjet Core 4.15.0 - Allow tee'ing to streams directly, not only functions
+
+* f16ee1a - Docs changes
+* 78f739c - Dependencies update.
+* 73eb6c5 - New feature tested
+* f534bc5 - More messaging from the shared gulp task
+* 6881f4b - Allow DataStream..tee to handle simple stream
 
 ## Scramjet Core 4.14.1
 
