@@ -198,12 +198,11 @@ module.exports = {
     },
     test_while_until: {
         while(test) {
-            const str = getStream();
             test.expect(1);
-
-            str.while(
-                (data) => data.val < 50
-            )
+            getStream()
+                .while(
+                    (data) => data.val < 50
+                )
                 .toArray()
                 .then(
                     (data) => {
@@ -213,12 +212,11 @@ module.exports = {
                 );
         },
         until(test) {
-            const str = getStream();
             test.expect(1);
-
-            str.until(
-                (data) => data.val >= 50
-            )
+            getStream()
+                .until(
+                    (data) => data.val >= 50
+                )
                 .toArray()
                 .then(
                     (data) => {
