@@ -18,21 +18,20 @@ const decorateAsynchronously = async (chunk) => new Promise((res) => {
 });
 
 const decorateAsynchronouslyWithError = async (chunk) => {
-    if (chunk.val === 22) {
+    if (chunk.val === 22)
         return new Promise((res, rej) => {
             setTimeout(() => rej(new Error("Err")), 100);
         });
-    } else {
-        return decorateAsynchronously(chunk);
-    }
+    return decorateAsynchronously(chunk);
+
 };
 
 const decorateAsynchronouslyWithLotsOfErrors = async (chunk) => {
-    if (!(chunk.val % 4)) {
+    if (!(chunk.val % 4))
         throw new Error("err");
-    } else {
+    else
         return decorateAsynchronously(chunk);
-    }
+
 };
 
 module.exports = {
@@ -80,6 +79,8 @@ module.exports = {
                 test.fail("Should not end!");
                 test.done();
             });
+
+        return null;
     },
     test_error_flow(test) {
         test.expect(2);
@@ -165,7 +166,7 @@ module.exports = {
                 test.ok(err instanceof StreamError, "Should be passing StreamErrors");
                 test.equal(cause1, cause, "Should pass on the same cause");
                 test.equal(chunk.val, 22, "Should pass on the same chunk");
-                throw (cause1 = new Error("Err2"));
+                throw cause1 = new Error("Err2");
             })
             .pipe(new DataStream())
             .catch(({cause}) => {

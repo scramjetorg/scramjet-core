@@ -2,13 +2,31 @@
     "plugins": ["node"],
     "extends": ["eslint:recommended", "plugin:node/recommended"],
     "rules": {
-        "node/exports-style": ["error", "module.exports"],
-        "quotes": ["error", "double"],
+        "node/no-unsupported-features/es-syntax": 0,
+        "quotes": [2, "double"],
         "semi": [2, "always"],
-        "linebreak-style": ["error", "unix"],
-        "indent": ["error", 4],
+        "linebreak-style": [2, "unix"],
+        "indent": [2, 4],
         "no-extra-semi": 2,
-        "semi-spacing": [2, { "before": false, "after": true }]
+        "semi-spacing": [2, { "before": false, "after": true }],
+        "no-extra-parens": 2,
+        "no-template-curly-in-string": 2,
+        "accessor-pairs": [2, { "setWithoutGet": true }],
+        "array-callback-return": 2,
+        "complexity": [1, {"max": 10}],
+        "consistent-return": 2,
+        "no-eval": 2,
+        "no-else-return": 2,
+        "no-invalid-this": 2,
+        "no-multi-spaces": 1,
+        "no-useless-return": 1,
+        "curly": [1, "multi"],
+        "dot-location": [1, "property"],
+        "dot-notation": 1,
+        "no-extra-bind": 1
+    },
+    "parserOptions": {
+        "sourceType": "module"
     },
     "env": {
         "node": true

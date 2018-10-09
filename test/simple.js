@@ -42,7 +42,7 @@ process.on("unhandledRejection", e => {
 });
 
 let erd = str
-    .map(({x}) => defer((x % 4)*10).then(() => ({x, mod: x % 4})))
+    .map(({x}) => defer(x % 4*10).then(() => ({x, mod: x % 4})))
     .each(x => console.log(x));
 
 // erd.on("end", () => console.log('end'))

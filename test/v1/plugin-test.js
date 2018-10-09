@@ -17,12 +17,11 @@ const {DataStream, StringStream, staticValue} = require(process.env.SCRAMJET_TES
             }
         },
         StringStream: {
-            constructor({xSymbol: optionsX}) {
-                if (optionsX === xSymbol) {
+            constructor({xSymbol: optionsX}) { // eslint-disable-line
+                if (optionsX === xSymbol)
                     return {
                         x: xSymbol
                     };
-                }
             }
         }
     }

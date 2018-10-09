@@ -1,5 +1,13 @@
 const {DataStream} = require(process.env.SCRAMJET_TEST_HOME || "../../");
 
+const getStream = (x = 100) => {
+    const ret = new DataStream();
+    let cnt = 0;
+    for (let i = 0; i < x; i++)
+        ret.write({val: cnt++});
+    process.nextTick(() => ret.end());
+    return ret;
+};
 const arr = [
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
     10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -24,11 +32,11 @@ module.exports = {
                 promiseWrite(chunk) { if (output.indexOf(chunk) > -1) output.splice(output.indexOf(chunk), 1); }
             });
 
-            await (src.pipe(
+            await src.pipe(
                 new DataStream({ promiseTransform(chunk) { return chunk+2; }})
             ).pipe(
                 tgt
-            ).whenFinished());
+            ).whenFinished();
 
             test.deepEqual(output, [0,1], "All chunks but two removed");
             test.done();
@@ -106,6 +114,60 @@ module.exports = {
         },
         async async(test) {
             // TODO: Implement tests here.
+            test.done();
+        }
+    },
+    test_when: {
+        end(test) {
+            test.expect(2);
+
+            let ended = false;
+            let notDone = true;
+
+            const stream = getStream().each(a => a);
+
+            stream.on("end", () => {
+                ended = true;
+            });
+
+            (async () => {
+                await stream.whenEnd();
+                notDone = false;
+                test.ok(ended, "Stream is ended");
+                test.done();
+            })()
+                .catch(
+                    (err) => {
+                        test.ok(false, "Should not throw: " + err.stack);
+                    }
+                )
+            ;
+
+            test.ok(notDone, "Does not resolve before the stream ends");
+        }
+    },
+    test_options: {
+        set(test) {
+            const x = new DataStream({test:1});
+            test.equals(x._options.test, 1, "Option can be set in constructor");
+
+            x.setOptions({test:2, maxParallel: 17});
+            test.equals(x._options.test, 2, "Any option can be set");
+            test.equals(x._options.maxParallel, 17, "Default options can be set at any point");
+
+            test.done();
+        },
+        fromReferrer(test) {
+            const x = new DataStream({test:1});
+            const y = new DataStream({test:3});
+
+            x.pipe(y);
+            x.setOptions({test:2, maxParallel: 17});
+
+            test.equals(y._options.referrer, x, "Referrer is set correctly");
+            test.equals(x._options.test, 2, "Any option can be set");
+            test.equals(y._options.test, 3, "Own option is always more important than referrer's");
+            test.equals(y._options.maxParallel, 17, "Options are passed from referrer even if set after the reference");
             test.done();
         }
     }
