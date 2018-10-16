@@ -23,7 +23,6 @@ const decorateAsynchronouslyWithError = async (chunk) => {
             setTimeout(() => rej(new Error("Err")), 100);
         });
     return decorateAsynchronously(chunk);
-
 };
 
 const decorateAsynchronouslyWithLotsOfErrors = async (chunk) => {
@@ -31,7 +30,6 @@ const decorateAsynchronouslyWithLotsOfErrors = async (chunk) => {
         throw new Error("err");
     else
         return decorateAsynchronously(chunk);
-
 };
 
 module.exports = {
@@ -91,12 +89,12 @@ module.exports = {
             .catch((e, chunk) => (z++, chunk))
             .toArray()
             .then(
-                ret => {
+                (ret) => {
                     test.equals(z, 25, "Should call catch on every fourth element");
                     test.equals(ret.length, 100, "Should contain all elements");
                     test.done();
                 },
-                err => {
+                (err) => {
                     test.fail(err, "Should not throw");
                     test.done();
                 }
@@ -112,12 +110,12 @@ module.exports = {
             .catch(() => (z++, undefined))
             .toArray()
             .then(
-                ret => {
+                (ret) => {
                     test.equals(z, 25, "Should call catch on every fourth element");
                     test.equals(ret.length, 75, "Should contain all elements");
                     test.done();
                 },
-                err => {
+                (err) => {
                     test.fail(err, "Should not throw");
                     test.done();
                 }
@@ -135,13 +133,13 @@ module.exports = {
             })
             .toArray()
             .then(
-                ret => {
+                (ret) => {
                     test.equals(ret.length, 99, "Should contain all items except one");
                     test.equals(ret[21].val, 21, "Should preserver order of elements (part 1)");
                     test.equals(ret[22].val, 23, "Should preserver order of elements (part 2)");
                     test.done();
                 },
-                err => {
+                (err) => {
                     test.fail(err);
                     test.done();
                 }
@@ -179,18 +177,16 @@ module.exports = {
             })
             .toArray()
             .then(
-                ret => {
+                (ret) => {
                     test.equals(ret.length, 99, "Should not reject and contain all items except one");
                     test.equals(ret[21].val, 21, "Should preserver order of elements (part 1)");
                     test.equals(ret[22].val, 23, "Should preserver order of elements (part 2)");
                     test.done();
                 },
-                err => {
+                (err) => {
                     test.fail(err);
                     test.done();
                 }
             );
-
-
-    }
+    },
 };

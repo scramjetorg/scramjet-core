@@ -1,7 +1,9 @@
-let xSymbol = Symbol("x");
+const xSymbol = Symbol("x");
 let cnt = 0;
 
-let addX = function addX(test) { test.equals(this[xSymbol], xSymbol, "this must point to the stream context"); return this; };
+const addX = function addX(test) {
+    test.equals(this[xSymbol], xSymbol, "this must point to the stream context"); return this;
+};
 
 const {DataStream, StringStream, staticValue} = require(process.env.SCRAMJET_TEST_HOME || "../../").plugin(
     {
@@ -14,16 +16,16 @@ const {DataStream, StringStream, staticValue} = require(process.env.SCRAMJET_TES
             addX,
             get test() {
                 return xSymbol;
-            }
+            },
         },
         StringStream: {
             constructor({xSymbol: optionsX}) { // eslint-disable-line
                 if (optionsX === xSymbol)
                     return {
-                        x: xSymbol
+                        x: xSymbol,
                     };
-            }
-        }
+            },
+        },
     }
 );
 
@@ -32,7 +34,7 @@ module.exports = {
         test.expect(7);
         cnt = 0;
 
-        const stream = DataStream.fromArray([1,2,3,4,5,6,7,8,9,10]);
+        const stream = DataStream.fromArray([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         const stream2 = new StringStream({xSymbol});
 
         test.equals(staticValue, xSymbol, "DataStream must be extended");
@@ -44,5 +46,5 @@ module.exports = {
         stream.addX(test);
 
         test.done();
-    }
+    },
 };

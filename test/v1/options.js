@@ -38,7 +38,7 @@ module.exports = {
                 ScramjetOptions.declare(B, "option8", {chained: false, value: 6});
             });
             test.done();
-        }
+        },
     },
     test_read: {
         single(test) {
@@ -99,10 +99,9 @@ module.exports = {
                 b.options.option8 = 10;
                 test.equals(c.options.option7, 9, "'option7' setters on A should be readable from B");
                 test.equals(c.options.option8, 6, "'option8' setters on B should not affect A");
-
             }, "Does not throw on standard operations");
 
             test.done();
-        }
-    }
+        },
+    },
 };

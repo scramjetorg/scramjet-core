@@ -1,4 +1,4 @@
-const { StreamError } = require("./stream-errors");
+const {StreamError} = require("./stream-errors");
 
 /**
  * Generate write methods on the stream class.
@@ -11,7 +11,7 @@ module.exports = () => function mkWrite(newOptions) {
     this.tap().setOptions(
         {
             // transforms: [],
-            promiseWrite: newOptions.promiseWrite
+            promiseWrite: newOptions.promiseWrite,
         }
     );
 
@@ -27,5 +27,4 @@ module.exports = () => function mkWrite(newOptions) {
                 (e) => this.raise(new StreamError(e, this, "EXTERNAL", chunk), chunk)
             );
     };
-
 };

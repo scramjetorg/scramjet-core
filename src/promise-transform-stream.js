@@ -2,7 +2,7 @@ import {Transform, Readable} from "stream";
 import {EventEmitter} from "events";
 import ScramjetOptions from "./util/options";
 import {StreamError} from "./util/stream-errors";
-import { cpus } from "os";
+import {cpus} from "os";
 
 const DefaultHighWaterMark = cpus().length * 2;
 
@@ -12,7 +12,7 @@ export const storector = Symbol("storector");
 
 let seq = 0;
 
-const mkTransform = require("./util/mk-transform")({ filter, DefaultHighWaterMark, plgctor, storector });
+const mkTransform = require("./util/mk-transform")({filter, DefaultHighWaterMark, plgctor, storector});
 const mkRead = require("./util/mk-read")();
 const mkWrite = require("./util/mk-write")();
 
@@ -42,7 +42,6 @@ const checkOptions = (options) => {
  * @extends stream.PassThrough
  */
 export class PromiseTransformStream extends Transform {
-
     constructor(options) {
         options = options || {};
         const newOptions = Object.assign({
@@ -52,7 +51,7 @@ export class PromiseTransformStream extends Transform {
             promiseTransform: null,
             promiseFlush: null,
             beforeTransform: null,
-            afterTransform: null
+            afterTransform: null,
         }, options);
 
         checkOptions(newOptions);
@@ -64,7 +63,7 @@ export class PromiseTransformStream extends Transform {
         this._error_handlers = [];
         this._scramjet_options = {
             referrer: options.referrer,
-            constructed: new Error().stack
+            constructed: new Error().stack,
         };
 
         this.seq = seq++;
@@ -84,10 +83,8 @@ export class PromiseTransformStream extends Transform {
             return options.referrer.pushTransform(options);
 
 
-
         const pluginConstructors = this.constructor[plgctor].get();
         if (pluginConstructors.length) {
-
             let ret;
             pluginConstructors.find(
                 (Ctor) => ret = Ctor.call(this, options)
@@ -95,7 +92,6 @@ export class PromiseTransformStream extends Transform {
 
             if (typeof ret !== "undefined")
                 return ret;
-
         }
     }
 
@@ -162,7 +158,7 @@ export class PromiseTransformStream extends Transform {
                 ({promiseFlush}) => Promise
                     .resolve()
                     .then(promiseFlush)
-                    .catch(e => this.raise(e))
+                    .catch((e) => this.raise(e))
             );
 
 
@@ -205,7 +201,7 @@ export class PromiseTransformStream extends Transform {
      */
     async whenWrote(...data) {
         let ret;
-        for (var item of data)
+        for (const item of data)
             ret = this.write(item);
 
         return ret || this.whenDrained();
@@ -350,7 +346,7 @@ export class PromiseTransformStream extends Transform {
 
         if (this !== to && to instanceof PromiseTransformStream) {
             to.setOptions({referrer: this});
-            this.on("error", err => to.raise(err));
+            this.on("error", (err) => to.raise(err));
             this.tap().catch(async (err, ...args) => {
                 await to.raise(err, ...args);
                 return filter;
@@ -365,7 +361,7 @@ export class PromiseTransformStream extends Transform {
     graph(func) {
         let referrer = this;
         const ret = [];
-        while(referrer) {
+        while (referrer) {
             ret.push(referrer);
             referrer = referrer._options.referrer;
         }
@@ -387,9 +383,7 @@ export class PromiseTransformStream extends Transform {
     }
 
     pushTransform(options) {
-
         if (typeof options.promiseTransform === "function") {
-
             const before = typeof options.beforeTransform === "function";
             const after = typeof options.afterTransform === "function";
 
@@ -402,7 +396,6 @@ export class PromiseTransformStream extends Transform {
                 });
             else
                 this._scramjet_options.transforms.push(options.promiseTransform.bind(this));
-
         }
 
         if (options.promiseFlush)
@@ -434,7 +427,7 @@ export class PromiseTransformStream extends Transform {
     _transform(chunk, encoding, callback) {
         try {
             callback(null, chunk);
-        } catch(err) {
+        } catch (err) {
             callback(err);
         }
     }
@@ -446,20 +439,21 @@ export class PromiseTransformStream extends Transform {
                 .then(
                     (data) => {
                         if (Array.isArray(data))
-                            data.forEach(item => this.push(item));
+                            data.forEach((item) => this.push(item));
                         else if (data)
                             this.push(data);
 
                         callback();
                     },
-                    e => this.raise(e)
+                    (e) => this.raise(e)
                 );
         else
             callback();
-
     }
 
-    static get filter() { return filter; }
+    static get filter() {
+        return filter;
+    }
 }
 
 ScramjetOptions.declare(PromiseTransformStream, "objectMode");

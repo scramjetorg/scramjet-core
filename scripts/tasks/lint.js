@@ -6,23 +6,22 @@ module.exports = (files = ["**/*.js"]) => (cb) => {
     const report = new CLIEngine({
         reportUnusedDisableDirectives: 1,
         cache: true,
-        cwd: path.resolve(__dirname, "../../")
+        cwd: path.resolve(__dirname, "../../"),
     }).executeOnFiles(files);
 
-    for (let file of report.results) 
+    for (const file of report.results)
         if (file.errorCount || file.warningCount) {
             log.error(`Eslint errors in ${file.filePath}:`);
             file.messages.forEach(
                 ({ruleId, message, line}) => log.error(` -> ${file.filePath}:${line} ${message} (${ruleId})`)
             );
-        } else 
+        } else
             log.info(`File "${file.filePath}" linted correctly.`);
-        
-    
 
-    if (report.fixableErrorCount || report.fixableWarningCount) 
+
+    if (report.fixableErrorCount || report.fixableWarningCount)
         log.info("Some eslint errors may be fixable, run `npm fix`");
-    
+
 
     if (report.errorCount || report.warningCount)
         return cb(new Error("Lint errors or warnings found."));

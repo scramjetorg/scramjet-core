@@ -7,7 +7,7 @@ const {lint, test_legacy, readme, docs, scm_clean} = require("./scripts/tasks");
 
 gulp.task("lint", lint());
 gulp.task("test_legacy", test_legacy("test/v1/*.js"));
-gulp.task("readme", readme({files: ["lib/*-stream.js"], plugin: "jsdoc2md/plugin.js" }, path.join(__dirname, "README.md")));
+gulp.task("readme", readme({files: ["lib/*-stream.js"], plugin: "jsdoc2md/plugin.js"}, path.join(__dirname, "README.md")));
 gulp.task("make_docs", docs("lib/*.js", {plugin: "jsdoc2md/plugin-docs.js"}, "docs/"));
 
 gulp.task("test", gulp.series("lint", "test_legacy"));

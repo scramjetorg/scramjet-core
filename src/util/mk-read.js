@@ -1,4 +1,4 @@
-const { StreamError } = require("./stream-errors");
+const {StreamError} = require("./stream-errors");
 
 /**
  * Generate read methods on the stream class.
@@ -11,14 +11,14 @@ module.exports = () => function mkRead(newOptions) {
     this.setOptions(
         {
             // transforms: [],
-            promiseRead: newOptions.promiseRead
+            promiseRead: newOptions.promiseRead,
         }
     );
 
     let chunks = [];
     let done = false;
     // TODO: implement the actual parallel logic - items can be promises and should be flushed when resolved.
-    const pushSome = () => Array.prototype.findIndex.call(chunks, chunk => {
+    const pushSome = () => Array.prototype.findIndex.call(chunks, (chunk) => {
         return !this.push(chunk);
     }) + 1;
 
@@ -30,7 +30,6 @@ module.exports = () => function mkRead(newOptions) {
     });
 
     this._read = async (size) => {
-
         // for (let i = processing.length; i < size; i++)
         //     last = Promise.all([
         //         this._options.readPromise(size),
@@ -61,9 +60,8 @@ module.exports = () => function mkRead(newOptions) {
             // TODO: but in both cases transform methods must be there... which aren't there now.
             // TODO: at least the subset that makes the transform - yes, otherwise all that transform stuff
             // TODO: is useless and can be bypassed...
-        } catch(e) {
+        } catch (e) {
             this.raise(new StreamError(e, this));
         }
     };
-
 };

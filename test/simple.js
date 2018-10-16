@@ -1,6 +1,6 @@
 const DataStream = require(process.env.SCRAMJET_TEST_HOME || "../").DataStream;
 
-const defer = (ms = 20) => new Promise(res => setTimeout(res, ms));
+const defer = (ms = 20) => new Promise((res) => setTimeout(res, ms));
 const str = new DataStream();
 
 str.write({x: 1});
@@ -24,26 +24,26 @@ str.write({x: 18});
 
 str.whenWrote({x: 19})
     .then(() => {
-        str.write({ x: 20 });
-        str.write({ x: 21 });
-        str.write({ x: 22 });
-        str.write({ x: 23 });
-        str.write({ x: 24 });
-        str.write({ x: 25 });
-        str.write({ x: 26 });
-        str.write({ x: 27 });
-        str.write({ x: 28 });
-        str.write({ x: 29 });
-        str.end({ x: 30 });
+        str.write({x: 20});
+        str.write({x: 21});
+        str.write({x: 22});
+        str.write({x: 23});
+        str.write({x: 24});
+        str.write({x: 25});
+        str.write({x: 26});
+        str.write({x: 27});
+        str.write({x: 28});
+        str.write({x: 29});
+        str.end({x: 30});
     });
 
-process.on("unhandledRejection", e => {
+process.on("unhandledRejection", (e) => {
     console.error("e", e.stack);
 });
 
-let erd = str
+const erd = str
     .map(({x}) => defer(x % 4*10).then(() => ({x, mod: x % 4})))
-    .each(x => console.log(x));
+    .each((x) => console.log(x));
 
 // erd.on("end", () => console.log('end'))
 erd

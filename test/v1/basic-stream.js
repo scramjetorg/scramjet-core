@@ -26,21 +26,27 @@ module.exports = {
             const output = arr.slice();
 
             const src = new DataStream({
-                promiseRead(many) { return input.splice(0, many); }
+                promiseRead(many) {
+                    return input.splice(0, many);
+                },
             });
             const tgt = new DataStream({
-                promiseWrite(chunk) { if (output.indexOf(chunk) > -1) output.splice(output.indexOf(chunk), 1); }
+                promiseWrite(chunk) {
+                    if (output.indexOf(chunk) > -1) output.splice(output.indexOf(chunk), 1);
+                },
             });
 
             await src.pipe(
-                new DataStream({ promiseTransform(chunk) { return chunk+2; }})
+                new DataStream({promiseTransform(chunk) {
+                    return chunk+2;
+                }})
             ).pipe(
                 tgt
             ).whenFinished();
 
-            test.deepEqual(output, [0,1], "All chunks but two removed");
+            test.deepEqual(output, [0, 1], "All chunks but two removed");
             test.done();
-        }
+        },
     },
     test_read: {
         async starve(test) {
@@ -67,12 +73,12 @@ module.exports = {
             test.expect(2);
             const comp = arr.slice();
             const stream = new DataStream({async promiseRead(many) {
-                return new Promise(res => process.nextTick(() => res(comp.splice(0, many))));
+                return new Promise((res) => process.nextTick(() => res(comp.splice(0, many))));
             }});
             test.ok(stream instanceof DataStream, "Stream still implements a DataStream");
             test.deepEqual(await stream.toArray(), arr, "Stream must read the array in async");
             test.done();
-        }
+        },
     },
     test_write: {
         async sync(test) {
@@ -80,9 +86,9 @@ module.exports = {
             const comp = [];
             await stream.pipe(
                 new DataStream({
-                    async promiseWrite(chunk/*, encoding*/) {
+                    async promiseWrite(chunk/* , encoding*/) {
                         comp.push(chunk);
-                    }
+                    },
                 })
             ).whenFinished();
 
@@ -94,18 +100,18 @@ module.exports = {
             const arr = [];
             await stream.pipe(
                 new DataStream({
-                    promiseWrite(chunk/*, encoding*/) {
-                        return new Promise(res => setTimeout(() => {
+                    promiseWrite(chunk/* , encoding*/) {
+                        return new Promise((res) => setTimeout(() => {
                             arr.push(chunk);
                             res();
                         }, 30 + chunk % 2 * 40));
-                    }
+                    },
                 })
             ).whenFinished();
 
             test.deepEqual(arr, [1, 2, 3, 4], "Should write all chunks in order");
             test.done();
-        }
+        },
     },
     test_transform: {
         sync(test) {
@@ -115,7 +121,7 @@ module.exports = {
         async async(test) {
             // TODO: Implement tests here.
             test.done();
-        }
+        },
     },
     test_when: {
         end(test) {
@@ -124,7 +130,7 @@ module.exports = {
             let ended = false;
             let notDone = true;
 
-            const stream = getStream().each(a => a);
+            const stream = getStream().each((a) => a);
 
             stream.on("end", () => {
                 ended = true;
@@ -144,31 +150,31 @@ module.exports = {
             ;
 
             test.ok(notDone, "Does not resolve before the stream ends");
-        }
+        },
     },
     test_options: {
         set(test) {
-            const x = new DataStream({test:1});
+            const x = new DataStream({test: 1});
             test.equals(x._options.test, 1, "Option can be set in constructor");
 
-            x.setOptions({test:2, maxParallel: 17});
+            x.setOptions({test: 2, maxParallel: 17});
             test.equals(x._options.test, 2, "Any option can be set");
             test.equals(x._options.maxParallel, 17, "Default options can be set at any point");
 
             test.done();
         },
         fromReferrer(test) {
-            const x = new DataStream({test:1});
-            const y = new DataStream({test:3});
+            const x = new DataStream({test: 1});
+            const y = new DataStream({test: 3});
 
             x.pipe(y);
-            x.setOptions({test:2, maxParallel: 17});
+            x.setOptions({test: 2, maxParallel: 17});
 
             test.equals(y._options.referrer, x, "Referrer is set correctly");
             test.equals(x._options.test, 2, "Any option can be set");
             test.equals(y._options.test, 3, "Own option is always more important than referrer's");
             test.equals(y._options.maxParallel, 17, "Options are passed from referrer even if set after the reference");
             test.done();
-        }
-    }
+        },
+    },
 };

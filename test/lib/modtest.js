@@ -1,1 +1,1 @@
-module.exports = (stream) => stream.map(x => x + 1);
+module.exports = (stream) => stream.map((x) => x + 1);

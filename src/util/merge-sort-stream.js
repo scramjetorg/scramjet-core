@@ -9,7 +9,6 @@ const DefaultComparator = (a, b) => {
 };
 
 module.exports = (multi, passedComparator, bufferLength, Clazz) => {
-
     bufferLength = bufferLength || DefaultBufferLength;
 
     Clazz = Clazz || DataStream;
@@ -25,13 +24,13 @@ module.exports = (multi, passedComparator, bufferLength, Clazz) => {
     const onceTouchedStream = (stream) => {
         return Promise.race([
             new Promise((res) => stream.on("readable", res)),
-            endIndex.get(stream)
+            endIndex.get(stream),
         ]);
     };
 
     const getMoreItemsForEntry = (stream, arr) => {
         while (arr.length < bufferLength) {
-            let haveMore = stream.read();
+            const haveMore = stream.read();
 
             if (haveMore !== null)
                 arr.push(haveMore);
@@ -51,7 +50,7 @@ module.exports = (multi, passedComparator, bufferLength, Clazz) => {
 
     const getMoreItems = () => {
         const ret = [];
-        for (let entry of readIndex.entries())
+        for (const entry of readIndex.entries())
             ret.push(getMoreItemsForEntry(...entry));
 
 
@@ -79,7 +78,7 @@ module.exports = (multi, passedComparator, bufferLength, Clazz) => {
         while (true) {  // eslint-disable-line
             let cnt = 0;
 
-            for (let ary of arys)
+            for (const ary of arys)
                 cnt += ary.length > j;
 
             if (cnt === arys.length) {
@@ -89,14 +88,12 @@ module.exports = (multi, passedComparator, bufferLength, Clazz) => {
                 min_length = ++j;
             } else
                 break;
-
         }
 
         arr.sort(comparator);
 
         const ret = [];
         while (min_length > 0 && arr.length > 0) {
-
             const item = arr.shift();
             arys[item[1]].shift(item[2]);
             ret.push(item[0]);
@@ -109,7 +106,7 @@ module.exports = (multi, passedComparator, bufferLength, Clazz) => {
     const writeSorted = (sorted) => {
         let ret = true;
 
-        for (var i = 0; i < sorted.length; i++)
+        for (let i = 0; i < sorted.length; i++)
             ret = out.write(sorted[i]);
 
 
@@ -119,7 +116,6 @@ module.exports = (multi, passedComparator, bufferLength, Clazz) => {
     let removing = null;
     let pushing = null;
     const pushMoreItems = () => {
-
         if (pushing)
             return pushing;
 
@@ -181,7 +177,7 @@ module.exports = (multi, passedComparator, bufferLength, Clazz) => {
                             rest.push(...items);
                         }
                     ),
-                removing
+                removing,
             ]).then(
                 () => readIndex.size ? pushMoreItems() : onEmpty()
             );
@@ -189,7 +185,7 @@ module.exports = (multi, passedComparator, bufferLength, Clazz) => {
     ).then(
         pushMoreItems
     ).catch(
-        e => out.emit("error", e)
+        (e) => out.emit("error", e)
     );
 
     return out;

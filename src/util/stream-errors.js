@@ -13,7 +13,6 @@ const combineStack = (stack, ...errors) => {
 };
 
 class StreamError extends Error {
-
     constructor(cause, stream, code = "GENERAL", chunk = null) {
         code = cause.code || code;
         stream = cause.stream || stream;
@@ -31,7 +30,7 @@ class StreamError extends Error {
 
         const stack = this.stack;
         Object.defineProperty(this, "stack", {
-            get: function () {
+            get: function() {
                 return combineStack(
                     stack,
                     "  caused by:",
@@ -39,14 +38,13 @@ class StreamError extends Error {
                     `  --- raised in ${stream.name} constructed ---`,
                     stream.constructed
                 );
-            }
+            },
         });
 
         /** Needed to fix babel errors. */
         this.constructor = StreamError;
         this.__proto__ = StreamError.prototype;
     }
-
 }
 
 /**

@@ -1,6 +1,6 @@
 {
     "plugins": ["node"],
-    "extends": ["eslint:recommended", "plugin:node/recommended"],
+    "extends": ["eslint:recommended", "plugin:node/recommended", "google"],
     "rules": {
         "node/no-unsupported-features/es-syntax": 0,
         "quotes": [2, "double"],

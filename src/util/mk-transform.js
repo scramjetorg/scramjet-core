@@ -1,5 +1,5 @@
 const ignore = () => 0;
-const { StreamError } = require("./stream-errors");
+const {StreamError} = require("./stream-errors");
 
 
 /**
@@ -16,30 +16,29 @@ module.exports = ({filter}) => function mkTransform(newOptions) {
             transforms: [],
             beforeTransform: newOptions.beforeTransform,
             afterTransform: newOptions.afterTransform,
-            promiseFlush: newOptions.promiseFlush
+            promiseFlush: newOptions.promiseFlush,
         }
     );
 
     this.cork();
-    if (newOptions.referrer instanceof this.constructor && !newOptions.referrer._tapped && !newOptions.referrer._options.flushPromise) 
+    if (newOptions.referrer instanceof this.constructor && !newOptions.referrer._tapped && !newOptions.referrer._options.flushPromise)
         return true;
-    
+
 
     process.nextTick(this.uncork.bind(this));
 
     this.pushTransform(newOptions);
 
     if (this._scramjet_options.transforms.length) {
-
         const processing = [];
         let last = Promise.resolve();
 
         this._transform = (chunk, encoding, callback) => {
-            if (!this._scramjet_options.transforms.length) 
+            if (!this._scramjet_options.transforms.length)
                 return last.then(
                     () => callback(null, chunk)
                 );
-            
+
 
             const prev = last;
             const ref = last = Promise
@@ -50,35 +49,33 @@ module.exports = ({filter}) => function mkTransform(newOptions) {
                     ).catch(
                         (err) => err === filter ? filter : Promise.reject(err)
                     ),
-                    prev
+                    prev,
                 ])
                 .catch(
                     async (e) => {
-                        if (e instanceof Error) 
+                        if (e instanceof Error)
                             return Promise.all([
                                 this.raise(new StreamError(e, this, "EXTERNAL", chunk), chunk),
-                                prev
+                                prev,
                             ]);
                         throw new Error("New stream error raised without cause!");
-                        
                     }
                 )
                 .then(
                     (args) => {
-                        if (args && args[0] !== filter && typeof args[0] !== "undefined") 
+                        if (args && args[0] !== filter && typeof args[0] !== "undefined")
                             this.push(args[0]);
-                        
                     }
                 );
 
             processing.push(ref); // append item to queue
-            if (processing.length >= this._options.maxParallel) 
+            if (processing.length >= this._options.maxParallel)
                 processing[processing.length - this._options.maxParallel]
                     .then(() => callback())
                     .catch(ignore);
-            else 
+            else
                 callback();
-            
+
 
             ref.then(
                 () => {
@@ -86,27 +83,25 @@ module.exports = ({filter}) => function mkTransform(newOptions) {
                     return ref !== next && this.raise(new StreamError(new Error(`Promise resolved out of sequence in ${this.name}!`), this, "TRANSFORM_OUT_OF_SEQ", chunk), chunk);
                 }
             );
-
         };
 
         this._flush = (callback) => {
-            if (this._scramjet_options.promiseFlush) 
+            if (this._scramjet_options.promiseFlush)
                 last
                     .then(this._scramjet_options.promiseFlush)
                     .then(
                         (data) => {
                             if (Array.isArray(data))
-                                data.forEach(item => this.push(item));
+                                data.forEach((item) => this.push(item));
                             else if (data)
                                 this.push(data);
 
                             callback();
                         },
-                        e => this.raise(e)
+                        (e) => this.raise(e)
                     );
-            else 
+            else
                 last.then(() => callback());
-            
         };
     }
 };

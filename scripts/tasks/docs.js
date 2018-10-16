@@ -8,7 +8,7 @@ module.exports = (source, jd2mdConfig, dest) => {
     return function makeDocs() {
         return DataStream.from(gulp.src(source))
             .map(async (file) => {
-                const output = await jsdoc2md(Object.assign({}, jd2mdConfig, { newLine: "\n", files: [file.path] }));
+                const output = await jsdoc2md(Object.assign({}, jd2mdConfig, {newLine: "\n", files: [file.path]}));
                 file.contents = Buffer.from(output);
                 return file;
             })

@@ -1,10 +1,10 @@
-const { EventEmitter } = require("events");
+const {EventEmitter} = require("events");
 const _declarations = Symbol("declarations");
 const _values = Symbol("values");
 const _chain = Symbol("chain");
 const _owner = Symbol("owner");
 
-const isClass = cls => cls && typeof cls === "function" && cls.prototype.constructor === cls && cls !== Object;
+const isClass = (cls) => cls && typeof cls === "function" && cls.prototype.constructor === cls && cls !== Object;
 const _superClass = (cls) => {
     return isClass(cls) && cls.prototype.__proto__ && cls.prototype.__proto__.constructor;
 };
@@ -26,7 +26,7 @@ const inheritedProxy = (parent) => {
 
             target[prop] = value;
             return true;
-        }
+        },
     });
 };
 
@@ -35,9 +35,9 @@ const findProxyForInstance = (ref, instance) => {
 };
 
 const findProxyForClass = (map, cls) => {
-    if (!isClass(cls)) 
+    if (!isClass(cls))
         throw new Error("Cannot get options declaration for a non-constructor");
-    
+
 
     if (map.has(cls))
         return map.get(cls);
@@ -82,14 +82,13 @@ module.exports = class ScramjetOptions extends EventEmitter {
                 return Object.keys(target[_values]);
             },
             getOwnPropertyDescriptor(target, key) {
-                if (key in target[_values]) 
+                if (key in target[_values])
                     return {
                         value: this.get(target, key),
                         enumerable: true,
                         configurable: true,
-                        writable: true
+                        writable: true,
                     };
-                
             },
             get(target, key) {
                 if (key in target[_declarations]) {
@@ -111,10 +110,10 @@ module.exports = class ScramjetOptions extends EventEmitter {
                 }
 
                 throw new Error(`Attempting to set undeclared option: ${key}`);
-            }
+            },
         });
 
-        Object.defineProperty(this, "proxy", { value });
+        Object.defineProperty(this, "proxy", {value});
         return value;
     }
 
@@ -125,10 +124,10 @@ module.exports = class ScramjetOptions extends EventEmitter {
      * @param {String} name
      * @param {Object} definition
      */
-    static declare(cls, name, { chained = false, value } = DefaultDefinition) {
+    static declare(cls, name, {chained = false, value} = DefaultDefinition) {
         this[_declarations] = this[_declarations] || new Map();
         const optionsList = findProxyForClass(this[_declarations], cls);
 
-        optionsList[name] = { chained, value };
+        optionsList[name] = {chained, value};
     }
 };
