@@ -1,6 +1,6 @@
 import {Transform, Readable} from "stream";
 import {EventEmitter} from "events";
-import ScramjetOptions from "./util/options";
+import {ScramjetOptions} from "./util/options";
 import {StreamError} from "./util/stream-errors";
 import {cpus} from "os";
 

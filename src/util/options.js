@@ -56,7 +56,7 @@ const DefaultDefinition = {};
 /**
  * Scramjet options for streams
  */
-module.exports = class ScramjetOptions extends EventEmitter {
+export class ScramjetOptions extends EventEmitter {
 
     /**
      * Constructor of the options class
@@ -141,4 +141,4 @@ module.exports = class ScramjetOptions extends EventEmitter {
         optionsList[name] = {chained, value};
     }
 
-};
+}

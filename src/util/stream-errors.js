@@ -1,12 +1,20 @@
-const os = require("os");
-const combineStack = (stack, ...errors) => {
+import {EOL} from "os";
+
+/**
+ * Combines multiple stack instances.
+ *
+ * @param {String} stack main stack
+ * @param  {...String} errors cause stacks
+ * @return {String} combined stack
+ */
+export const combineStack = (stack, ...errors) => {
     return errors.reduce(
         (stack, trace) => {
             if (!trace) return stack;
             if (trace.indexOf("\n") >= 0)
-                return stack + os.EOL + trace.substr(trace.indexOf("\n") + 1);
+                return stack + EOL + trace.substr(trace.indexOf("\n") + 1);
 
-            return stack + os.EOL + trace;
+            return stack + EOL + trace;
         },
         stack
     );
@@ -15,7 +23,7 @@ const combineStack = (stack, ...errors) => {
 /**
  * Stream error class
  */
-class StreamError extends Error {
+export class StreamError extends Error {
 
     /**
      * Stream error constructor
@@ -59,11 +67,3 @@ class StreamError extends Error {
 
 }
 
-/**
- * Stream errors class
- *
- * @module scramjet/errors
- * @prop {Class.<StreamError>} StreamError
- * @prop {Function} combineStack
- */
-module.exports = {StreamError, combineStack};
