@@ -57,10 +57,13 @@ const DefaultDefinition = {};
  * Scramjet options for streams
  */
 module.exports = class ScramjetOptions extends EventEmitter {
+
     /**
+     * Constructor of the options class
      *
-     * @param {PromiseTransformStream} owner
-     * @param {ScramjetOptions} chain
+     * @param {PromiseTransformStream} owner the options object parent
+     * @param {ScramjetOptions} chain previous options
+     * @param {ScramjetOptions} initial initial options
      */
     constructor(owner, chain, initial) {
         super();
@@ -71,6 +74,11 @@ module.exports = class ScramjetOptions extends EventEmitter {
         Object.assign(this[_values], initial);
     }
 
+    /**
+     * Getter for proxy object
+     *
+     * @returns {Proxy} options proxy object
+     */
     get proxy() {
         const value = new Proxy(this, {
             has(target, key) {
@@ -89,6 +97,8 @@ module.exports = class ScramjetOptions extends EventEmitter {
                         configurable: true,
                         writable: true,
                     };
+
+                return null;
             },
             get(target, key) {
                 if (key in target[_declarations]) {
@@ -120,9 +130,9 @@ module.exports = class ScramjetOptions extends EventEmitter {
     /**
      * Declares a usable option.
      *
-     * @param {Function<PromiseTransformStream>} cls
-     * @param {String} name
-     * @param {Object} definition
+     * @param {Function<PromiseTransformStream>} cls class derived from PTS
+     * @param {String} name configuration entry name
+     * @param {Object} definition definition of the option
      */
     static declare(cls, name, {chained = false, value} = DefaultDefinition) {
         this[_declarations] = this[_declarations] || new Map();
@@ -130,4 +140,5 @@ module.exports = class ScramjetOptions extends EventEmitter {
 
         optionsList[name] = {chained, value};
     }
+
 };

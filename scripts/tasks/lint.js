@@ -27,4 +27,6 @@ module.exports = (files = ["**/*.js"]) => (cb) => {
         return cb(new Error("Lint errors or warnings found."));
 
     cb();
+
+    return null;
 };

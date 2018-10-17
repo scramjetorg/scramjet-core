@@ -12,7 +12,18 @@ const combineStack = (stack, ...errors) => {
     );
 };
 
+/**
+ * Stream error class
+ */
 class StreamError extends Error {
+
+    /**
+     * Stream error constructor
+     * @param {Error|String} cause the cause of the error
+     * @param {PromiseTransformStream} stream the stream
+     * @param {String} code informative category
+     * @param {*} chunk the chunk on which the error occured
+     */
     constructor(cause, stream, code = "GENERAL", chunk = null) {
         code = cause.code || code;
         stream = cause.stream || stream;
@@ -45,6 +56,7 @@ class StreamError extends Error {
         this.constructor = StreamError;
         this.__proto__ = StreamError.prototype;
     }
+
 }
 
 /**

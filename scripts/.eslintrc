@@ -1,5 +1,6 @@
 {
     "rules": {
-        "node/no-unpublished-require": 0
+        "node/no-unpublished-require": 0,
+        "require-jsdoc": 0
     }
 }

@@ -1,6 +1,8 @@
+/* eslint require-jsdoc:0 */
 const {ScramjetOptions} = require(process.env.SCRAMJET_TEST_HOME || "../../");
 
 class A {
+
     constructor(ref) {
         this._options = new ScramjetOptions(this, ref, {option0: -1});
     }
@@ -8,6 +10,7 @@ class A {
     get options() {
         return this._options.proxy;
     }
+
 }
 
 class B extends A {}

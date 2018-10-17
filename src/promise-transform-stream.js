@@ -29,7 +29,11 @@ const checkOptions = (options) => {
     rename(options, "parallelTransform", "promiseTransform");
     rename(options, "flushPromise", "promiseFlush");
 
-    if (["promiseRead", "promiseWrite", "promiseTransform"].reduce((acc, key) => acc += options[key] ? 1 : 0, 0) > 1)
+    if (
+        ["promiseRead", "promiseWrite", "promiseTransform"]
+            .reduce((acc, key) => acc += options[key] ? 1 : 0, 0)
+        > 1
+    )
         throw new Error("Scramjet stream can be either Read, Write or Transform");
 };
 
@@ -42,6 +46,12 @@ const checkOptions = (options) => {
  * @extends stream.PassThrough
  */
 export class PromiseTransformStream extends Transform {
+
+    /**
+     * PromiseTransformStream constructor
+     *
+     * @param {ScramjetOptions} options stream options
+     */
     constructor(options) {
         options = options || {};
         const newOptions = Object.assign({
@@ -72,14 +82,14 @@ export class PromiseTransformStream extends Transform {
         this.setOptions(newOptions);
 
         if (newOptions.promiseRead) {
-            mkRead.call(this, newOptions);
+            mkRead(this, newOptions);
             this.tap();
         } else if (newOptions.promiseWrite)
-            mkWrite.call(this, newOptions);
+            mkWrite(this, newOptions);
         else if (newOptions.transform || !newOptions.promiseTransform)
             this.tap();
-        else
-        if (newOptions.promiseTransform && mkTransform.call(this, newOptions)) // returns true if transform can be pushed to referring stream
+        // returns true if transform can be pushed to referring stream
+        else if (newOptions.promiseTransform && mkTransform(this, newOptions))
             return options.referrer.pushTransform(options);
 
 
@@ -98,7 +108,7 @@ export class PromiseTransformStream extends Transform {
     /**
      * Gets the name of the stream with it's type included
      *
-     * @prop {String} name
+     * @prop {String} name the stream name
      */
     get name() {
         return `${this.constructor.name}(${this._options.name || this.seq})`;
@@ -106,6 +116,8 @@ export class PromiseTransformStream extends Transform {
 
     /**
      * Sets the name of the stream
+     *
+     * @param {String} name set name
      */
     set name(name) {
         this.setOptions({name});
@@ -125,7 +137,11 @@ export class PromiseTransformStream extends Transform {
      */
     get _options() {
         if (this._scramjet_options.referrer && this._scramjet_options.referrer !== this)
-            return Object.assign({maxParallel: DefaultHighWaterMark}, this._scramjet_options.referrer._options, this._scramjet_options);
+            return Object.assign(
+                {maxParallel: DefaultHighWaterMark},
+                this._scramjet_options.referrer._options,
+                this._scramjet_options
+            );
 
         return Object.assign({maxParallel: DefaultHighWaterMark}, this._scramjet_options);
     }
@@ -144,8 +160,9 @@ export class PromiseTransformStream extends Transform {
      * @memberof DataStream#
      * @name setOptions
      * @method
-     * @param {StreamOptions} options
+     * @param {StreamOptions} options options to be set
      * @chainable
+     * @returns {PromiseTransfromStream} returns self
      */
     setOptions(...options) {
         Object.assign(this._scramjet_options, ...options);
@@ -165,6 +182,12 @@ export class PromiseTransformStream extends Transform {
         return this;
     }
 
+    /**
+     * Sets max listeners
+     *
+     * @override
+     * @param {number} value the number of max listeners
+     */
     setMaxListeners(value) {
         return super.setMaxListeners.call(this, value + EventEmitter.defaultMaxListeners);
     }
@@ -173,6 +196,7 @@ export class PromiseTransformStream extends Transform {
      * Reads a chunk from the stream and resolves the promise when read.
      *
      * @async
+     * @param {number} count how many items to read
      * @name whenRead
      * @memberof DataStream#
      * @method
@@ -287,6 +311,7 @@ export class PromiseTransformStream extends Transform {
      * @memberof DataStream#
      * @method
      * @param {Function} callback Error handler (async function)
+     * @returns {PromiseTransfromStream} returns self
      *
      * @example {@link ../samples/data-stream-catch.js}
      */
@@ -305,6 +330,7 @@ export class PromiseTransformStream extends Transform {
      * @memberof DataStream#
      * @method
      * @param {Error} err The thrown error
+     * @returns {PromiseTransfromStream} returns self
      *
      * @example {@link ../samples/data-stream-raise.js}
      */
@@ -336,7 +362,7 @@ export class PromiseTransformStream extends Transform {
      * @method
      * @memberof DataStream#
      * @param  {Writable} to  Writable stream to write to
-     * @param  {WritableOptions} options
+     * @param  {Object} options pipe options
      * @return {Writable}  the `to` stream
      */
     pipe(to, options) {
@@ -358,6 +384,13 @@ export class PromiseTransformStream extends Transform {
         return super.pipe(to, options || {end: true});
     }
 
+    /**
+     * Returns a graph of chained transforms
+     *
+     * @param {Function} func callback funciton
+     * @chainable
+     * @returns {PromiseTransfromStream} returns self
+     */
     graph(func) {
         let referrer = this;
         const ret = [];
@@ -376,12 +409,22 @@ export class PromiseTransformStream extends Transform {
      * @memberof DataStream#
      * @method
      * @example {@link ../samples/data-stream-tap.js}
+     * @chainable
+     * @returns {PromiseTransfromStream} returns self
      */
     tap() {
         this._tapped = true;
         return this;
     }
 
+    /**
+     * Adds transforms to the list
+     *
+     * @internal
+     * @param {ScramjetOptions} options the stream options
+     * @chainable
+     * @returns {PromiseTransfromStream} returns self
+     */
     pushTransform(options) {
         if (typeof options.promiseTransform === "function") {
             const before = typeof options.beforeTransform === "function";
@@ -417,13 +460,16 @@ export class PromiseTransformStream extends Transform {
      * @memberof DataStream#
      * @name _selfInstance
      * @method
-     * @return {DataStream}  an empty instance of the same class.
+     * @return {PromiseTransformStream}  an empty instance of the same class.
      * @example {@link ../samples/data-stream-selfinstance.js}
      */
     _selfInstance(...args) {
         return new this.constructor(...args);
     }
 
+    /**
+     * @override
+     */
     _transform(chunk, encoding, callback) {
         try {
             callback(null, chunk);
@@ -432,6 +478,9 @@ export class PromiseTransformStream extends Transform {
         }
     }
 
+    /**
+     * @override
+     */
     _flush(callback) {
         if (this._scramjet_options.promiseFlush)
             Promise.resolve()
@@ -451,9 +500,13 @@ export class PromiseTransformStream extends Transform {
             callback();
     }
 
+    /**
+     * Getter for the filter symbol.
+     */
     static get filter() {
         return filter;
     }
+
 }
 
 ScramjetOptions.declare(PromiseTransformStream, "objectMode");

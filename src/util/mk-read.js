@@ -7,8 +7,8 @@ const {StreamError} = require("./stream-errors");
  * @param  {ScramjetOptions} newOptions Sanitized options passed to scramjet stream
  * @return {Boolean} returns true if creation of new stream is not necessary (promise can be pushed to queue)
  */
-module.exports = () => function mkRead(newOptions) {
-    this.setOptions(
+module.exports = () => function mkRead(that, newOptions) {
+    that.setOptions(
         {
             // transforms: [],
             promiseRead: newOptions.promiseRead,
@@ -19,20 +19,20 @@ module.exports = () => function mkRead(newOptions) {
     let done = false;
     // TODO: implement the actual parallel logic - items can be promises and should be flushed when resolved.
     const pushSome = () => Array.prototype.findIndex.call(chunks, (chunk) => {
-        return !this.push(chunk);
+        return !that.push(chunk);
     }) + 1;
 
     // let last = Promise.resolve();
     // let processing = [];
 
-    this.on("pipe", () => {
+    that.on("pipe", () => {
         throw new Error("Cannot pipe to a Readable stream");
     });
 
-    this._read = async (size) => {
+    that._read = async (size) => {
         // for (let i = processing.length; i < size; i++)
         //     last = Promise.all([
-        //         this._options.readPromise(size),
+        //         that._options.readPromise(size),
         //         last
         //     ]).then(
         //         ([read]) =>
@@ -41,7 +41,7 @@ module.exports = () => function mkRead(newOptions) {
         try {
             let add = 0;
             if (!done) {
-                const nw = await this._options.promiseRead(size);
+                const nw = await that._options.promiseRead(size);
                 chunks.push(...nw);
                 add = nw.length;
             }
@@ -51,8 +51,8 @@ module.exports = () => function mkRead(newOptions) {
             done = done || !add;
 
             if (done && !chunks.length) {
-                await new Promise((res, rej) => this._flush((err) => err ? rej(err) : res()));
-                this.push(null);
+                await new Promise((res, rej) => that._flush((err) => err ? rej(err) : res()));
+                that.push(null);
             }
 
             // console.log("read", pushed, chunks, add, size);
@@ -61,7 +61,7 @@ module.exports = () => function mkRead(newOptions) {
             // TODO: at least the subset that makes the transform - yes, otherwise all that transform stuff
             // TODO: is useless and can be bypassed...
         } catch (e) {
-            this.raise(new StreamError(e, this));
+            that.raise(new StreamError(e, that));
         }
     };
 };

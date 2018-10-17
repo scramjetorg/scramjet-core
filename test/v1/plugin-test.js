@@ -1,3 +1,5 @@
+/* eslint no-invalid-this:0 */
+
 const xSymbol = Symbol("x");
 let cnt = 0;
 

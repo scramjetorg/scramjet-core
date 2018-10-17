@@ -23,7 +23,10 @@
         "curly": [1, "multi"],
         "dot-location": [1, "property"],
         "dot-notation": 1,
-        "no-extra-bind": 1
+        "no-extra-bind": 1,
+        "max-len": [2, {"code": 120}],
+        "padded-blocks": [2, { "classes": "always" }],
+        "valid-jsdoc": [1, { "requireReturn": false } ]
     },
     "parserOptions": {
         "sourceType": "module"

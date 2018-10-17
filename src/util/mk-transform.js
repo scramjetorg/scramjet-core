@@ -10,8 +10,8 @@ const {StreamError} = require("./stream-errors");
  * @param  {ScramjetOptions} newOptions Sanitized options passed to scramjet stream
  * @return {Boolean} returns true if creation of new stream is not necessary (promise can be pushed to queue)
  */
-module.exports = ({filter}) => function mkTransform(newOptions) {
-    this.setOptions(
+module.exports = ({filter}) => function mkTransform(that, newOptions) {
+    that.setOptions(
         {
             transforms: [],
             beforeTransform: newOptions.beforeTransform,
@@ -20,21 +20,25 @@ module.exports = ({filter}) => function mkTransform(newOptions) {
         }
     );
 
-    this.cork();
-    if (newOptions.referrer instanceof this.constructor && !newOptions.referrer._tapped && !newOptions.referrer._options.flushPromise)
+    that.cork();
+    if (
+        newOptions.referrer instanceof that.constructor
+        && !newOptions.referrer._tapped
+        && !newOptions.referrer._options.flushPromise
+    )
         return true;
 
 
-    process.nextTick(this.uncork.bind(this));
+    process.nextTick(that.uncork.bind(that));
 
-    this.pushTransform(newOptions);
+    that.pushTransform(newOptions);
 
-    if (this._scramjet_options.transforms.length) {
+    if (that._scramjet_options.transforms.length) {
         const processing = [];
         let last = Promise.resolve();
 
-        this._transform = (chunk, encoding, callback) => {
-            if (!this._scramjet_options.transforms.length)
+        that._transform = (chunk, encoding, callback) => {
+            if (!that._scramjet_options.transforms.length)
                 return last.then(
                     () => callback(null, chunk)
                 );
@@ -43,7 +47,7 @@ module.exports = ({filter}) => function mkTransform(newOptions) {
             const prev = last;
             const ref = last = Promise
                 .all([
-                    this._scramjet_options.transforms.reduce(
+                    that._scramjet_options.transforms.reduce(
                         (prev, transform) => prev.then(transform),
                         Promise.resolve(chunk)
                     ).catch(
@@ -55,7 +59,7 @@ module.exports = ({filter}) => function mkTransform(newOptions) {
                     async (e) => {
                         if (e instanceof Error)
                             return Promise.all([
-                                this.raise(new StreamError(e, this, "EXTERNAL", chunk), chunk),
+                                that.raise(new StreamError(e, that, "EXTERNAL", chunk), chunk),
                                 prev,
                             ]);
                         throw new Error("New stream error raised without cause!");
@@ -64,13 +68,13 @@ module.exports = ({filter}) => function mkTransform(newOptions) {
                 .then(
                     (args) => {
                         if (args && args[0] !== filter && typeof args[0] !== "undefined")
-                            this.push(args[0]);
+                            that.push(args[0]);
                     }
                 );
 
             processing.push(ref); // append item to queue
-            if (processing.length >= this._options.maxParallel)
-                processing[processing.length - this._options.maxParallel]
+            if (processing.length >= that._options.maxParallel)
+                processing[processing.length - that._options.maxParallel]
                     .then(() => callback())
                     .catch(ignore);
             else
@@ -80,28 +84,40 @@ module.exports = ({filter}) => function mkTransform(newOptions) {
             ref.then(
                 () => {
                     const next = processing.shift();
-                    return ref !== next && this.raise(new StreamError(new Error(`Promise resolved out of sequence in ${this.name}!`), this, "TRANSFORM_OUT_OF_SEQ", chunk), chunk);
+                    return ref !== next && that.raise(
+                        new StreamError(
+                            new Error(`Promise resolved out of sequence in ${that.name}!`),
+                            that,
+                            "TRANSFORM_OUT_OF_SEQ",
+                            chunk
+                        ),
+                        chunk
+                    );
                 }
             );
+
+            return null;
         };
 
-        this._flush = (callback) => {
-            if (this._scramjet_options.promiseFlush)
+        that._flush = (callback) => {
+            if (that._scramjet_options.promiseFlush)
                 last
-                    .then(this._scramjet_options.promiseFlush)
+                    .then(that._scramjet_options.promiseFlush)
                     .then(
                         (data) => {
                             if (Array.isArray(data))
-                                data.forEach((item) => this.push(item));
+                                data.forEach((item) => that.push(item));
                             else if (data)
-                                this.push(data);
+                                that.push(data);
 
                             callback();
                         },
-                        (e) => this.raise(e)
+                        (e) => that.raise(e)
                     );
             else
                 last.then(() => callback());
         };
     }
+
+    return false;
 };
