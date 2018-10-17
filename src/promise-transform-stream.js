@@ -61,7 +61,7 @@ export class PromiseTransformStream extends Transform {
             promiseTransform: null,
             promiseFlush: null,
             beforeTransform: null,
-            afterTransform: null,
+            afterTransform: null
         }, options);
 
         checkOptions(newOptions);
@@ -73,7 +73,7 @@ export class PromiseTransformStream extends Transform {
         this._error_handlers = [];
         this._scramjet_options = {
             referrer: options.referrer,
-            constructed: new Error().stack,
+            constructed: new Error().stack
         };
 
         this.seq = seq++;
@@ -157,7 +157,6 @@ export class PromiseTransformStream extends Transform {
      *
      * @meta.conditions keep-order,chain
      *
-     * @memberof DataStream#
      * @name setOptions
      * @method
      * @param {StreamOptions} options options to be set
@@ -198,7 +197,6 @@ export class PromiseTransformStream extends Transform {
      * @async
      * @param {number} count how many items to read
      * @name whenRead
-     * @memberof DataStream#
      * @method
      */
     async whenRead(count) {
@@ -217,9 +215,6 @@ export class PromiseTransformStream extends Transform {
      * Writes a chunk to the stream and returns a Promise resolved when more chunks can be written.
      *
      * @async
-     * @name whenWrote
-     * @memberof DataStream#
-     * @method
      * @param {*} chunk a chunk to write
      * @param {...*} [more] more chunks to write
      */
@@ -235,9 +230,7 @@ export class PromiseTransformStream extends Transform {
      * Returns a promise that resolves when the stream is drained after the call.
      *
      * @async
-     * @name whenDrained
-     * @memberof DataStream#
-     * @method
+     * @returns {void}
      */
     async whenDrained() {
         return this._scramjet_drainPromise || (this._scramjet_drainPromise = new Promise(
@@ -254,9 +247,7 @@ export class PromiseTransformStream extends Transform {
      * Returns a promise that resolves (!) when the stream is errors
      *
      * @async
-     * @name whenError
-     * @memberof DataStream#
-     * @method
+     * @returns {Error} thrown error
      */
     async whenError() {
         return this._scramjet_errPromise || (this._scramjet_errPromise = new Promise((res) => {
@@ -271,9 +262,7 @@ export class PromiseTransformStream extends Transform {
      * Resolves when stream ends - rejects on uncaught error
      *
      * @async
-     * @name whenEnd
-     * @memberof DataStream#
-     * @method
+     * @return {void}
      */
     async whenEnd() {
         return this._scramjet_endPromise || (this._scramjet_endPromise = new Promise((res, rej) => {
@@ -286,9 +275,7 @@ export class PromiseTransformStream extends Transform {
      * Resolves when stream is finished (all the data has been ingested) - rejects on uncaught error
      *
      * @async
-     * @name whenEnd
-     * @memberof DataStream#
-     * @method
+     * @return {void}
      */
     async whenFinished() {
         return this._scramjet_finishPromise || (this._scramjet_finishPromise = new Promise((res, rej) => {
@@ -330,7 +317,7 @@ export class PromiseTransformStream extends Transform {
      * @memberof DataStream#
      * @method
      * @param {Error} err The thrown error
-     * @returns {PromiseTransfromStream} returns self
+     * @returns {*} resolved chunk
      *
      * @example {@link ../samples/data-stream-raise.js}
      */
@@ -357,10 +344,7 @@ export class PromiseTransformStream extends Transform {
      *
      * Except for calling overridden method it proxies errors to piped stream.
      *
-     * @name pipe
      * @chainable
-     * @method
-     * @memberof DataStream#
      * @param  {Writable} to  Writable stream to write to
      * @param  {Object} options pipe options
      * @return {Writable}  the `to` stream
@@ -405,12 +389,10 @@ export class PromiseTransformStream extends Transform {
     /**
      * Stops merging transform callbacks at the current place in the command chain.
      *
-     * @name tap
-     * @memberof DataStream#
-     * @method
-     * @example {@link ../samples/data-stream-tap.js}
      * @chainable
      * @returns {PromiseTransfromStream} returns self
+     *
+     * @example {@link ../samples/data-stream-tap.js}
      */
     tap() {
         this._tapped = true;
@@ -457,9 +439,6 @@ export class PromiseTransformStream extends Transform {
      * override the object construction in {@link tee}...
      *
      * @meta.noReadme
-     * @memberof DataStream#
-     * @name _selfInstance
-     * @method
      * @return {PromiseTransformStream}  an empty instance of the same class.
      * @example {@link ../samples/data-stream-selfinstance.js}
      */

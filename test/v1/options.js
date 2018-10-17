@@ -41,7 +41,7 @@ module.exports = {
                 ScramjetOptions.declare(B, "option8", {chained: false, value: 6});
             });
             test.done();
-        },
+        }
     },
     test_read: {
         single(test) {
@@ -105,6 +105,6 @@ module.exports = {
             }, "Does not throw on standard operations");
 
             test.done();
-        },
-    },
+        }
+    }
 };

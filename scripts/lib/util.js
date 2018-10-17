@@ -11,5 +11,5 @@ const jsdoc2md = async ({files, plugin}) => {
 };
 
 module.exports = {
-    jsdoc2md,
+    jsdoc2md
 };

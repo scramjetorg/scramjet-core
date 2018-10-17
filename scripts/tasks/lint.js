@@ -6,7 +6,7 @@ module.exports = (files = ["**/*.js"]) => (cb) => {
     const report = new CLIEngine({
         reportUnusedDisableDirectives: 1,
         cache: true,
-        cwd: path.resolve(__dirname, "../../"),
+        cwd: path.resolve(__dirname, "../../")
     }).executeOnFiles(files);
 
     for (const file of report.results)

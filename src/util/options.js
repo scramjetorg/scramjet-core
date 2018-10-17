@@ -26,7 +26,7 @@ const inheritedProxy = (parent) => {
 
             target[prop] = value;
             return true;
-        },
+        }
     });
 };
 
@@ -95,7 +95,7 @@ module.exports = class ScramjetOptions extends EventEmitter {
                         value: this.get(target, key),
                         enumerable: true,
                         configurable: true,
-                        writable: true,
+                        writable: true
                     };
 
                 return null;
@@ -120,7 +120,7 @@ module.exports = class ScramjetOptions extends EventEmitter {
                 }
 
                 throw new Error(`Attempting to set undeclared option: ${key}`);
-            },
+            }
         });
 
         Object.defineProperty(this, "proxy", {value});

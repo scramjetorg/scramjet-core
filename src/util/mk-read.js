@@ -11,7 +11,7 @@ module.exports = () => function mkRead(that, newOptions) {
     that.setOptions(
         {
             // transforms: [],
-            promiseRead: newOptions.promiseRead,
+            promiseRead: newOptions.promiseRead
         }
     );
 

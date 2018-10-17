@@ -49,7 +49,7 @@ class StreamError extends Error {
                     `  --- raised in ${stream.name} constructed ---`,
                     stream.constructed
                 );
-            },
+            }
         });
 
         /** Needed to fix babel errors. */

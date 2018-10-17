@@ -188,5 +188,5 @@ module.exports = {
                     test.done();
                 }
             );
-    },
+    }
 };

@@ -3,5 +3,5 @@ module.exports = {
     test_legacy: require("./test-legacy"),
     readme: require("./readme"),
     docs: require("./docs"),
-    scm_clean: require("./scm-clean"),
+    scm_clean: require("./scm-clean")
 };

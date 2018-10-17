@@ -18,16 +18,16 @@ const {DataStream, StringStream, staticValue} = require(process.env.SCRAMJET_TES
             addX,
             get test() {
                 return xSymbol;
-            },
+            }
         },
         StringStream: {
             constructor({xSymbol: optionsX}) { // eslint-disable-line
                 if (optionsX === xSymbol)
                     return {
-                        x: xSymbol,
+                        x: xSymbol
                     };
-            },
-        },
+            }
+        }
     }
 );
 
@@ -48,5 +48,5 @@ module.exports = {
         stream.addX(test);
 
         test.done();
-    },
+    }
 };

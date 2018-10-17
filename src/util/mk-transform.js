@@ -16,7 +16,7 @@ module.exports = ({filter}) => function mkTransform(that, newOptions) {
             transforms: [],
             beforeTransform: newOptions.beforeTransform,
             afterTransform: newOptions.afterTransform,
-            promiseFlush: newOptions.promiseFlush,
+            promiseFlush: newOptions.promiseFlush
         }
     );
 
@@ -53,14 +53,14 @@ module.exports = ({filter}) => function mkTransform(that, newOptions) {
                     ).catch(
                         (err) => err === filter ? filter : Promise.reject(err)
                     ),
-                    prev,
+                    prev
                 ])
                 .catch(
                     async (e) => {
                         if (e instanceof Error)
                             return Promise.all([
                                 that.raise(new StreamError(e, that, "EXTERNAL", chunk), chunk),
-                                prev,
+                                prev
                             ]);
                         throw new Error("New stream error raised without cause!");
                     }

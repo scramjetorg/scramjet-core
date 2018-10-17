@@ -15,7 +15,7 @@ const arr = [
     30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
     40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
     50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-    60, 61, 62, 63, 64, 65, 66, 67, 68, 69,
+    60, 61, 62, 63, 64, 65, 66, 67, 68, 69
 ];
 
 module.exports = {
@@ -28,12 +28,12 @@ module.exports = {
             const src = new DataStream({
                 promiseRead(many) {
                     return input.splice(0, many);
-                },
+                }
             });
             const tgt = new DataStream({
                 promiseWrite(chunk) {
                     if (output.indexOf(chunk) > -1) output.splice(output.indexOf(chunk), 1);
-                },
+                }
             });
 
             await src.pipe(
@@ -46,7 +46,7 @@ module.exports = {
 
             test.deepEqual(output, [0, 1], "All chunks but two removed");
             test.done();
-        },
+        }
     },
     test_read: {
         async starve(test) {
@@ -78,7 +78,7 @@ module.exports = {
             test.ok(stream instanceof DataStream, "Stream still implements a DataStream");
             test.deepEqual(await stream.toArray(), arr, "Stream must read the array in async");
             test.done();
-        },
+        }
     },
     test_write: {
         async sync(test) {
@@ -88,7 +88,7 @@ module.exports = {
                 new DataStream({
                     async promiseWrite(chunk/* , encoding*/) {
                         comp.push(chunk);
-                    },
+                    }
                 })
             ).whenFinished();
 
@@ -105,13 +105,13 @@ module.exports = {
                             arr.push(chunk);
                             res();
                         }, 30 + chunk % 2 * 40));
-                    },
+                    }
                 })
             ).whenFinished();
 
             test.deepEqual(arr, [1, 2, 3, 4], "Should write all chunks in order");
             test.done();
-        },
+        }
     },
     test_transform: {
         sync(test) {
@@ -121,7 +121,7 @@ module.exports = {
         async async(test) {
             // TODO: Implement tests here.
             test.done();
-        },
+        }
     },
     test_when: {
         end(test) {
@@ -150,7 +150,7 @@ module.exports = {
             ;
 
             test.ok(notDone, "Does not resolve before the stream ends");
-        },
+        }
     },
     test_options: {
         set(test) {
@@ -175,6 +175,6 @@ module.exports = {
             test.equals(y._options.test, 3, "Own option is always more important than referrer's");
             test.equals(y._options.maxParallel, 17, "Options are passed from referrer even if set after the reference");
             test.done();
-        },
-    },
+        }
+    }
 };

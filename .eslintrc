@@ -26,7 +26,8 @@
         "no-extra-bind": 1,
         "max-len": [2, {"code": 120}],
         "padded-blocks": [2, { "classes": "always" }],
-        "valid-jsdoc": [1, { "requireReturn": false } ]
+        "valid-jsdoc": [1, { "requireReturn": false } ],
+        "comma-dangle": [2, "never"]
     },
     "parserOptions": {
         "sourceType": "module"

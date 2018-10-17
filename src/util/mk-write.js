@@ -11,7 +11,7 @@ module.exports = () => function mkWrite(that, newOptions) {
     that.tap().setOptions(
         {
             // transforms: [],
-            promiseWrite: newOptions.promiseWrite,
+            promiseWrite: newOptions.promiseWrite
         }
     );
 
