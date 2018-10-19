@@ -1,8 +1,3 @@
-import {PromiseTransformStream, plgctor} from "./promise-transform-stream";
-import {MultiTransform} from "./multi-transform";
-
-export default {
-    PromiseTransformStream,
-    MultiTransform,
-    plgctor
-};
+export {MultiTransform} from "./multi-transform";
+export {PromiseTransformStream, plgctor} from "./promise-transform-stream";
+export {ScramjetOptions} from "./util/options";

@@ -1,8 +1,7 @@
-const DataStream = require(process.env.SCRAMJET_TEST_HOME || "../../").DataStream;
-const StreamError = require(process.env.SCRAMJET_TEST_HOME || "../../").errors.StreamError;
-
 const getStream = () => {
-    const ret = new DataStream();
+    const PromiseTransformStream = require(process.env.SCRAMJET_TEST_HOME || "../../").PromiseTransformStream;
+
+    const ret = new PromiseTransformStream();
     let cnt = 0;
     for (let i = 0; i < 100; i++)
         ret.write({val: cnt++});
@@ -147,6 +146,7 @@ module.exports = {
     },
     test_catch_chaining(test) {
         test.expect(10);
+        const {PromiseTransformStream, errors: {StreamError}} = require(process.env.SCRAMJET_TEST_HOME || "../../");
 
         let cause1 = null;
 
@@ -166,12 +166,12 @@ module.exports = {
                 test.equal(chunk.val, 22, "Should pass on the same chunk");
                 throw cause1 = new Error("Err2");
             })
-            .pipe(new DataStream())
+            .pipe(new PromiseTransformStream())
             .catch(({cause}) => {
                 test.equal(cause1, cause, "Should pass the new error");
                 throw cause;
             })
-            .pipe(new DataStream())
+            .pipe(new PromiseTransformStream())
             .catch(({cause}) => {
                 test.equal(cause1, cause, "Should pass the new error");
             })
