@@ -1,5 +1,6 @@
+import {StreamError} from "./stream-errors";
+
 const ignore = () => 0;
-const {StreamError} = require("./stream-errors");
 
 
 /**
@@ -10,7 +11,7 @@ const {StreamError} = require("./stream-errors");
  * @param  {ScramjetOptions} newOptions Sanitized options passed to scramjet stream
  * @return {Boolean} returns true if creation of new stream is not necessary (promise can be pushed to queue)
  */
-module.exports = ({filter}) => function mkTransform(that, newOptions) {
+export default ({filter}) => function mkTransform(that, newOptions) {
     that.setOptions(
         {
             transforms: [],

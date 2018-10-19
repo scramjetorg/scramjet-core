@@ -12,9 +12,13 @@ export const storector = Symbol("storector");
 
 let seq = 0;
 
-const mkTransform = require("./util/mk-transform")({filter, DefaultHighWaterMark, plgctor, storector});
-const mkRead = require("./util/mk-read")();
-const mkWrite = require("./util/mk-write")();
+import _mkTransform from "./util/mk-transform";
+import _mkRead from "./util/mk-read";
+import _mkWrite from "./util/mk-write";
+
+const mkTransform = _mkTransform({filter, DefaultHighWaterMark, plgctor, storector});
+const mkRead = _mkRead();
+const mkWrite = _mkWrite();
 
 const rename = (ob, fr, to) => {
     if (ob[fr]) {

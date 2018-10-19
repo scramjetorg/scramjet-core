@@ -1,4 +1,4 @@
-const {StreamError} = require("./stream-errors");
+import {StreamError} from "./stream-errors";
 
 /**
  * Generate read methods on the stream class.
@@ -7,7 +7,7 @@ const {StreamError} = require("./stream-errors");
  * @param  {ScramjetOptions} newOptions Sanitized options passed to scramjet stream
  * @return {Boolean} returns true if creation of new stream is not necessary (promise can be pushed to queue)
  */
-module.exports = () => function mkRead(that, newOptions) {
+export default () => function mkRead(that, newOptions) {
     that.setOptions(
         {
             // transforms: [],
