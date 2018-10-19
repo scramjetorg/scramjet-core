@@ -7,7 +7,8 @@ export class MultiTransform {
     constructor(options) {
         this._seq = 0;
         this.transforms = {};
-        this.options = options;
+        this.options = options || {};
+        this._rebuild();
     }
 
     get options() {
@@ -17,14 +18,26 @@ export class MultiTransform {
     }
 
     set options({maxParallel, followOrder}) {
-        this._maxParallel = +maxParallel;
-        this._followOrder = !!followOrder;
+        this._maxParallel = +maxParallel || 32;
+        this._followOrder = typeof followOrder === undefined ? true : !!followOrder;
     }
 
     pushTransform(transform) {
         const idx = ++ this._seq;
         this.transforms[idx] = {transform};
         this._rebuild();
+
+        return {idx};
+    }
+
+    pushTrap({idx}, trap) {
+        this.transforms[idx].trap = trap;
+
+        return {idx};
+    }
+
+    pushHook({idx}, hook) {
+        this.transforms[idx].hook = hook;
 
         return {idx};
     }
@@ -66,13 +79,15 @@ export class MultiTransform {
                             async (argument) => transform(_argument = argument)
                         );
 
+                        // Breakpoint is where the transform result must come
+                        const currentBreakPoint = breakPoint++;
                         // if we need the output we need to sig
                         if (hook) out = out
                             .then(async (argument) => (
-                                await breakpointAdvanced(prevReference, currentReference, breakPoint++),
+                                await breakpointAdvanced(prevReference, currentReference, currentBreakPoint),
                                 argument
                             ))
-                            .then((argument) => hook(argument));
+                            .then((argument) => hook(argument, chunk));
 
                         // if an error occurs somewhere along the lines.
                         // it's up to the implementation to handle all transforms between current
@@ -94,13 +109,46 @@ export class MultiTransform {
         };
     }
 
-    _rebuildASAP() {
+    _rebuildASAP(transforms) {
+        return (chunk) => {
+            if (!transforms.length)
+                return chunk;
 
+            return transforms
+                .reduce(
+                    (prev, {transform, hook, trap}) => {
+                        // if there's no need to hold up here, just continue with the transform
+                        if (!trap && !hook)
+                            return prev.then(transform);
+
+                        let _argument;
+                        // each promise is first transformed
+                        let out = prev.then(async (argument) => transform(_argument = argument));
+
+                        // if we need the output we need to sig
+                        if (hook) out = out.then((argument) => hook(argument, chunk));
+
+                        // if an error occurs somewhere along the lines.
+                        // it's up to the implementation to handle all transforms between current
+                        // and previous catch.
+                        if (trap) out = out.catch(async (err) => err ? trap(err, _argument) : Promise.reject());
+
+                        return out;
+                    },
+
+                    // this is the initial promise
+                    Promise.resolve(chunk)
+                )
+                .catch(
+                    // empty resolution is resolved with empty item
+                    (err) => err && Promise.reject(err)
+                );
+        };
     }
 
     _rebuild() {
         const processing = [];
-        const transforms = Object.values(transforms).map(
+        const transforms = Object.values(this.transforms).map(
             ({transform, hook}) => ({transform, hook})
         );
 
@@ -110,21 +158,15 @@ export class MultiTransform {
         ;
     }
 
-    generateReadImpl({idx} = {}) {
-        if (idx) {
-            this.transforms[idx].hook = function() {};
-            this._rebuild();
-        }
-
-        return async function* () {
-
-        };
-    }
-
-    generateWriteImpl() {
-        return async function() {
-
-        };
+    /**
+     * Executes the series of transforms on a chunk
+     *
+     * @async
+     * @param {*} chunk the chunk to execute the operations on
+     * @returns {void}
+     */
+    async execute(chunk) {
+        return this._execute(chunk);
     }
 
 }
