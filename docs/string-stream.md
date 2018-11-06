@@ -21,6 +21,7 @@ StringStream.fromString()
     * [stringStream.match(matcher)](#StringStream+match) ↺
     * [stringStream.toBufferStream()](#StringStream+toBufferStream) ↺ <code>BufferStream</code>
     * [stringStream.parse(parser)](#StringStream+parse) ↺ <code>DataStream</code>
+    * [stringStream.toDataStream()](#StringStream+toDataStream)
     * [stringStream.pop(bytes, func)](#StringStream+pop) ↺
     * [StringStream:SPLIT_LINE](#StringStream.SPLIT_LINE)
     * [StringStream:fromString(str, encoding)](#StringStream.fromString)  [<code>StringStream</code>](#StringStream)
@@ -125,6 +126,12 @@ stream here should already be split.
 ```js
 [../samples/string-stream-parse.js](../samples/string-stream-parse.js)
 ```
+<a name="StringStream+toDataStream"></a>
+
+### stringStream.toDataStream()
+Alias for [parse](#StringStream+parse)
+
+**Kind**: instance method of [<code>StringStream</code>](#StringStream)  
 <a name="StringStream+pop"></a>
 
 ### stringStream.pop(bytes, func) ↺
@@ -171,19 +178,17 @@ Create StringStream from anything.
 
 **Kind**: static method of [<code>StringStream</code>](#StringStream)  
 **Returns**: [<code>StringStream</code>](#StringStream) - new StringStream.  
-**See**: module:scramjet.from  
+**See**
+
+- DataStream.from
+- module:scramjet.from
+
 
 | Param | Type | Description |
 | --- | --- | --- |
 | str | <code>String</code> \| <code>Array</code> \| <code>Iterable</code> \| <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>Readable</code> | argument to be turned into new stream |
 | options | <code>StreamOptions</code> \| <code>Writable</code> |  |
 
-<a name="toDataStream"></a>
-
-## toDataStream()
-Alias for [parse](#StringStream+parse)
-
-**Kind**: global function  
 <a name="ShiftCallback"></a>
 
 ## ShiftCallback : function

@@ -6,6 +6,16 @@ This is the last intended minor API change to `scramjet-core` before the v5 seri
 * 700c9d2 - Use unpipe in while when data is no longer needed.
 * b410644 - Fixes the case when a transform is pushed onto a stream with standard transform
 
+* 9b9ff16 - Dependencies update.
+* 4b7cb13 - Fix ts.d documentation base
+* 14fb6d4 - cleanup package-lock.json
+
+## Scramjet Core 4.16.14 - 4.16.14: Non-promise based transforms fix
+
+* cabf6fd - Changelog update
+* 700c9d2 - Use unpipe in while.
+* b410644 - Fixes the case when a transform is pushed onto a stream with standard transform
+
 ## Scramjet Core 4.16.13 - Fix travis environment failures
 
 * b47a711 - Dependencies update.

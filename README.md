@@ -219,11 +219,13 @@ StringStream.fromString()
 **Most popular methods:**
 
 * `new StringStream(encoding)` - Constructs the stream with the given encoding
+* [`stringStream.toStringStream()`](docs/buffer-stream.md#StringStream+toStringStream) - Alias for {@link BufferStream#stringify}
 * [`stringStream.shift(bytes, func) ↺`](docs/string-stream.md#StringStream+shift) - Shifts given length of chars from the original stream
 * [`stringStream.split(splitter) ↺`](docs/string-stream.md#StringStream+split) - Splits the string stream by the specified regexp or string
 * [`stringStream.match(matcher) ↺`](docs/string-stream.md#StringStream+match) - Finds matches in the string stream and streams the match results
 * [`stringStream.toBufferStream() : BufferStream ↺`](docs/string-stream.md#StringStream+toBufferStream) - Transforms the StringStream to BufferStream
 * [`stringStream.parse(parser) : DataStream ↺`](docs/string-stream.md#StringStream+parse) - Parses every string to object
+* [`stringStream.toDataStream()`](docs/string-stream.md#StringStream+toDataStream) - Alias for {@link StringStream#parse}
 * [`stringStream.pop(bytes, func) ↺`](docs/string-stream.md#StringStream+pop) - Shifts given length of chars from the original stream
 * [`StringStream:SPLIT_LINE`](docs/string-stream.md#StringStream.SPLIT_LINE) - A handly split by line regex to quickly get a line-by-line stream
 * [`StringStream:fromString(str, encoding) : StringStream`](docs/string-stream.md#StringStream.fromString) - Creates a StringStream and writes a specific string.
