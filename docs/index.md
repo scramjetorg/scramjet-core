@@ -63,6 +63,7 @@ Provides a lazy-load accessor to BufferStream
 Provides a lazy-load accessor to DataStream
 
 **Kind**: static property of [<code>scramjet</code>](#module_scramjet)  
+**Read only**: true  
 **Inject**: DataStream  
 **See**: [data-stream.md](data-stream.md)  
 <a name="module_scramjet.MultiStream"></a>
@@ -71,6 +72,7 @@ Provides a lazy-load accessor to DataStream
 Provides a lazy-load accessor to MultiStream
 
 **Kind**: static property of [<code>scramjet</code>](#module_scramjet)  
+**Read only**: true  
 **Inject**: MultiStream  
 **See**: [multi-stream.md](multi-stream.md)  
 <a name="module_scramjet.StringStream"></a>
@@ -79,6 +81,7 @@ Provides a lazy-load accessor to MultiStream
 Provides a lazy-load accessor to StringStream
 
 **Kind**: static property of [<code>scramjet</code>](#module_scramjet)  
+**Read only**: true  
 **Inject**: StringStream  
 **See**: [string-stream.md](string-stream.md)  
 <a name="module_scramjet.from"></a>
