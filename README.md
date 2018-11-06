@@ -1,4 +1,5 @@
 ![Scramjet Logo](https://signicode.com/scramjet-logo-light.svg)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fsignicode%2Fscramjet-core.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fsignicode%2Fscramjet-core?ref=badge_shield)
 
 [![Master Build Status](https://travis-ci.org/signicode/scramjet-core.svg?branch=master)](https://travis-ci.org/signicode/scramjet-core)
 [![Develop Build Status](https://travis-ci.org/signicode/scramjet-core.svg?branch=develop)](https://travis-ci.org/signicode/scramjet-core)
@@ -242,6 +243,9 @@ Check out the command line interface for simplified scramjet usage with [scramje
 ## License and contributions
 
 As of version 2.0 Scramjet is MIT Licensed.
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fsignicode%2Fscramjet-core.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fsignicode%2Fscramjet-core?ref=badge_large)
 
 ## Help wanted
 
