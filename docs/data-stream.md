@@ -72,16 +72,13 @@ does.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
+**Test**: test/methods/data-stream-map.js  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | func | [<code>MapCallback</code>](#MapCallback) | The function that creates the new object |
 | Clazz | <code>Class</code> | (optional) The class to be mapped to. |
 
-**Example**  
-```js
-[../samples/data-stream-map.js](../samples/data-stream-map.js)
-```
 <a name="DataStream+filter"></a>
 
 ### dataStream.filter(func) ↺
@@ -90,15 +87,12 @@ Array.prototype.filter.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
+**Test**: test/methods/data-stream-filter.js  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | func | [<code>FilterCallback</code>](#FilterCallback) | The function that filters the object |
 
-**Example**  
-```js
-[../samples/data-stream-filter.js](../samples/data-stream-filter.js)
-```
 <a name="DataStream+reduce"></a>
 
 ### dataStream.reduce(func, into) ⇄
@@ -113,16 +107,13 @@ occur only after the previous entry is fully processed. This does mean
 it's much slower than parallel functions.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Test**: test/methods/data-stream-reduce.js  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | func | [<code>ReduceCallback</code>](#ReduceCallback) | The into object will be passed as the  first argument, the data object from the stream as the second. |
 | into | <code>Object</code> | Any object passed initially to the transform function |
 
-**Example**  
-```js
-[../samples/data-stream-reduce.js](../samples/data-stream-reduce.js)
-```
 <a name="DataStream+do"></a>
 
 ### dataStream.do(func) ↺
@@ -151,16 +142,13 @@ It returns the DataStream passed as the second argument.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
+**Test**: test/methods/data-stream-into.js  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | func | [<code>IntoCallback</code>](#IntoCallback) | the method that processes incoming chunks |
 | into | [<code>DataStream</code>](#DataStream) | the DataStream derived class |
 
-**Example**  
-```js
-[../samples/data-stream-into.js](../samples/data-stream-into.js)
-```
 <a name="DataStream+use"></a>
 
 ### dataStream.use(func) ↺
@@ -172,16 +160,13 @@ from the command line.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
+**Test**: test/methods/data-stream-use.js  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | func | <code>function</code> \| <code>String</code> | if passed, the function will be called on self to add an option to inspect the stream in place, while not breaking the transform chain. Alternatively this can be a relative path to a scramjet-module. |
 | [...args] | <code>\*</code> | any additional args top be passed to the module |
 
-**Example**  
-```js
-[../samples/data-stream-use.js](../samples/data-stream-use.js)
-```
 <a name="DataStream+run"></a>
 
 ### dataStream.run() ⇄
@@ -194,10 +179,7 @@ Consumes all stream items doing nothing. Resolves when the stream is ended.
 Stops merging transform callbacks at the current place in the command chain.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
-**Example**  
-```js
-[../samples/data-stream-tap.js](../samples/data-stream-tap.js)
-```
+**Test**: test/methods/data-stream-tap.js  
 <a name="DataStream+whenRead"></a>
 
 ### dataStream.whenRead() ⇄
@@ -262,15 +244,12 @@ Creates a duplicate stream instance and passes it to the callback.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
+**Test**: test/methods/data-stream-tee.js  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | func | [<code>TeeCallback</code>](#TeeCallback) \| <code>Writable</code> | The duplicate stream will be passed as first argument. |
 
-**Example**  
-```js
-[../samples/data-stream-tee.js](../samples/data-stream-tee.js)
-```
 <a name="DataStream+each"></a>
 
 ### dataStream.each(func) ↺
@@ -295,15 +274,12 @@ Stops reading and emits end as soon as it ends.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
+**Test**: test/methods/data-stream-while.js  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | func | [<code>FilterCallback</code>](#FilterCallback) | The condition check |
 
-**Example**  
-```js
-[../samples/data-stream-while.js](../samples/data-stream-while.js)
-```
 <a name="DataStream+until"></a>
 
 ### dataStream.until(func) ↺
@@ -313,15 +289,12 @@ Works opposite of while.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
+**Test**: test/methods/data-stream-until.js  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | func | [<code>FilterCallback</code>](#FilterCallback) | The condition check |
 
-**Example**  
-```js
-[../samples/data-stream-until.js](../samples/data-stream-until.js)
-```
 <a name="DataStream+catch"></a>
 
 ### dataStream.catch(callback) ↺
@@ -335,15 +308,12 @@ If no handlers will resolve the error, an `error` event will be emitted
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
+**Test**: test/methods/data-stream-catch.js  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | callback | <code>function</code> | Error handler (async function) |
 
-**Example**  
-```js
-[../samples/data-stream-catch.js](../samples/data-stream-catch.js)
-```
 <a name="DataStream+raise"></a>
 
 ### dataStream.raise(err) ⇄
@@ -352,15 +322,12 @@ Executes all error handlers and if none resolves, then emits an error.
 The returned promise will always be resolved even if there are no successful handlers.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+**Test**: test/methods/data-stream-raise.js  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | err | <code>Error</code> | The thrown error |
 
-**Example**  
-```js
-[../samples/data-stream-raise.js](../samples/data-stream-raise.js)
-```
 <a name="DataStream+pipe"></a>
 
 ### dataStream.pipe(to, options) : Writable ↺
@@ -386,15 +353,12 @@ Creates a BufferStream
 **Chainable**  
 **Returns**: <code>BufferStream</code> - the resulting stream  
 **Meta.noreadme**:   
+**Test**: test/methods/data-stream-tobufferstream.js  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | serializer | [<code>MapCallback</code>](#MapCallback) | A method that converts chunks to buffers |
 
-**Example**  
-```js
-[../samples/data-stream-tobufferstream.js](../samples/data-stream-tobufferstream.js)
-```
 <a name="DataStream+stringify"></a>
 
 ### dataStream.stringify(serializer) : StringStream ↺
@@ -403,15 +367,12 @@ Creates a StringStream
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
 **Returns**: <code>StringStream</code> - the resulting stream  
+**Test**: test/methods/data-stream-tostringstream.js  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | serializer | [<code>MapCallback</code>](#MapCallback) | A method that converts chunks to strings |
 
-**Example**  
-```js
-[../samples/data-stream-tostringstream.js](../samples/data-stream-tostringstream.js)
-```
 <a name="DataStream+toArray"></a>
 
 ### dataStream.toArray(initial) : Array ⇄
@@ -443,15 +404,12 @@ Creates a BufferStream
 **Chainable**  
 **Returns**: <code>BufferStream</code> - the resulting stream  
 **Meta.noreadme**:   
+**Test**: test/methods/data-stream-tobufferstream.js  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | serializer | [<code>MapCallback</code>](#MapCallback) | A method that converts chunks to buffers |
 
-**Example**  
-```js
-[../samples/data-stream-tobufferstream.js](../samples/data-stream-tobufferstream.js)
-```
 <a name="DataStream+toStringStream"></a>
 
 ### dataStream.toStringStream(serializer) : StringStream ↺
@@ -460,15 +418,12 @@ Creates a StringStream
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
 **Returns**: <code>StringStream</code> - the resulting stream  
+**Test**: test/methods/data-stream-tostringstream.js  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | serializer | [<code>MapCallback</code>](#MapCallback) | A method that converts chunks to strings |
 
-**Example**  
-```js
-[../samples/data-stream-tostringstream.js](../samples/data-stream-tostringstream.js)
-```
 <a name="DataStream.from"></a>
 
 ### DataStream:from(str, options) : DataStream
@@ -499,15 +454,12 @@ subsequently. You can use your stream immediately though.
 Create a DataStream from an Array
 
 **Kind**: static method of [<code>DataStream</code>](#DataStream)  
+**Test**: test/methods/data-stream-fromarray.js  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | arr | <code>Array</code> | list of chunks |
 
-**Example**  
-```js
-[../samples/data-stream-fromarray.js](../samples/data-stream-fromarray.js)
-```
 <a name="DataStream.fromIterator"></a>
 
 ### DataStream:fromIterator(iter) : DataStream
@@ -516,15 +468,12 @@ Create a DataStream from an Iterator
 Doesn't end the stream until it reaches end of the iterator.
 
 **Kind**: static method of [<code>DataStream</code>](#DataStream)  
+**Test**: test/methods/data-stream-fromiterator.js  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | iter | <code>Iterator</code> | the iterator object |
 
-**Example**  
-```js
-[../samples/data-stream-fromiterator.js](../samples/data-stream-fromiterator.js)
-```
 <a name="MapCallback"></a>
 
 ## MapCallback : Promise | *
