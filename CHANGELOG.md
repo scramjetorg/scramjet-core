@@ -3,9 +3,15 @@
 
 This is the last intended minor API change to `scramjet-core` before the v5 series.
 
+## Scramjet Core 4.16.16 - 4.16.16: From fixes
+
 * 700c9d2 - Use unpipe in while when data is no longer needed.
 * b410644 - Fixes the case when a transform is pushed onto a stream with standard transform
+* 9b9ff16 - Dependencies update.
 
+## Scramjet Core 4.16.15 - 4.16.15: JSDoc fixes
+
+* 9bb1eff - Docs update
 * 9b9ff16 - Dependencies update.
 * 4b7cb13 - Fix ts.d documentation base
 * 14fb6d4 - cleanup package-lock.json
