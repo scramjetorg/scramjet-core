@@ -117,6 +117,9 @@ module.exports = {
 
         },
         async testAsyncIterable(test) {
+            if (!Symbol.asyncIterator)
+                return test.done();
+
             const x = DataStream.from({
                 [Symbol.asyncIterator]: () => ({
                     x: 0,
