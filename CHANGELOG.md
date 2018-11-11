@@ -3,6 +3,8 @@
 
 This is the last intended minor API change to `scramjet-core` before the v5 series.
 
+* 30d4b96 - Add error handling for iterator functions in read
+
 ## Scramjet Core 4.16.16 - 4.16.16: From fixes
 
 * 700c9d2 - Use unpipe in while when data is no longer needed.
