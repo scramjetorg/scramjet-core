@@ -44,7 +44,7 @@
   "license": "MIT",
   "devDependencies": {
     "dmd": "^3.0.13",
-    "eslint": "^5.9.0",
+    "eslint": "^5.10.0",
     "eslint-config-defaults": "^9.0.0",
     "eslint-plugin-node": "^8.0.0",
     "fancy-log": "^1.3.3",
@@ -54,7 +54,7 @@
     "jsdoc-api": "^4.0.3",
     "jsdoc-parse": "^3.0.1",
     "nodeunit-tape-compat": "^1.3.2",
-    "scramjet": "^4.18.17",
+    "scramjet": "^4.18.18",
     "tape": "^4.9.1"
   }
 }
