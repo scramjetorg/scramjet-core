@@ -486,7 +486,7 @@ Each following argument will be understood as a transform and can be any of:
 | Param | Type | Description |
 | --- | --- | --- |
 | readable | <code>Array</code> \| <code>Iterable</code> \| <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>String</code> \| <code>Readable</code> | the initial readable argument that is streamable by scramjet.from |
-| ...transforms | <code>AsyncFunction</code> \| <code>function</code> \| <code>Transform</code> | an array of transorms |
+| ...transforms | <code>AsyncFunction</code> \| <code>function</code> \| <code>Transform</code> | an array of transforms |
 
 <a name="DataStream.fromArray"></a>
 
