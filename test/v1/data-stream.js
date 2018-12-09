@@ -1,5 +1,5 @@
 const { DataStream, StringStream } = require(process.env.SCRAMJET_TEST_HOME || "../../");
-const {PassThrough} = require("stream");
+const { Transform, PassThrough } = require("stream");
 
 const getStream = (x = 100) => {
     const ret = new DataStream();
@@ -284,6 +284,127 @@ module.exports = {
 
             test.done();
 
+        }
+    },
+    test_pipeline: {
+        async plumbs_streams(test) {
+            const input = new PassThrough({objectMode: true});
+            input.write(1);
+            input.write(2);
+            input.write(3);
+            input.end(4);
+
+            const stream = DataStream.pipeline(
+                input,
+                new Transform({objectMode: true, transform(chunk, encoding, callback) {
+                    this.push(chunk + 1);
+                    callback();
+                }}),
+                new PassThrough({objectMode: true})
+            );
+
+            test.ok(stream instanceof DataStream, "Is DataStream");
+            test.deepEqual(await stream.toArray(), [2,3,4,5], "Does execute all functions");
+            test.done();
+        },
+        async plumbs_functions(test) {
+            test.expect(2);
+
+            const input = new PassThrough({objectMode: true});
+            input.write(1);
+            input.write(2);
+            input.write(3);
+            input.end(4);
+
+            const stream = DataStream.pipeline(
+                input,
+                async (stream) => stream.pipe(new Transform({objectMode: true, transform(chunk, encoding, callback){
+                    this.push(chunk + 1);
+                    callback();
+                }}))
+            );
+
+            test.ok(stream instanceof DataStream, "Is DataStream");
+            test.deepEqual(await stream.toArray(), [2,3,4,5], "Does execute all functions");
+            test.done();
+        },
+        forwards_errors: {
+            async immediate(test) {
+                test.expect(1);
+
+                const input = new PassThrough({objectMode: true});
+                const output = DataStream.pipeline(
+                    input,
+                    new PassThrough({objectMode: true})
+                );
+
+                input.write(1);
+                input.write(2);
+                input.write(3);
+                input.emit("error", new Error("X marks the spot!"));
+                input.end(4);
+
+                const e = await output.whenError();
+                test.ok(e instanceof Error, "Raises the error");
+
+                test.done();
+            },
+            async late(test) {
+                test.expect(1);
+
+                const input = new PassThrough({objectMode: true});
+                const output = DataStream.pipeline(
+                    input,
+                    new PassThrough({objectMode: true})
+                );
+
+                input.emit("error", new Error("X marks the spot!"));
+                input.write(1);
+                input.write(2);
+                input.write(3);
+                input.end(4);
+
+                const e = await output.whenError();
+                test.ok(e instanceof Error, "Raises the error");
+
+                test.done();
+            },
+            async close(test) {
+                test.expect(1);
+                const input = DataStream.from([1,2,3,4]);
+
+                const errorStream = new PassThrough({objectMode: true});
+                const output = DataStream.pipeline(
+                    input,
+                    errorStream,
+                    new PassThrough({objectMode: true})
+                );
+
+                errorStream.emit("error", new Error("X marks the spot!"));
+
+                const e = await output.whenError();
+                test.ok(e instanceof Error, "Raises the error");
+
+                test.done();
+            },
+            async far(test) {
+                test.expect(1);
+                const input = DataStream.from([1,2,3,4]);
+
+                const errorStream = new PassThrough({objectMode: true});
+                const output = DataStream.pipeline(
+                    input,
+                    new PassThrough({objectMode: true}),
+                    errorStream
+                );
+
+                errorStream.emit("error", new Error("X marks the spot!"));
+
+                const e = await output.whenError();
+                test.ok(e instanceof Error, "Raises the error");
+
+                test.done();
+            }
         }
     },
     test_slice(test) {
