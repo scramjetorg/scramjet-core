@@ -190,3 +190,17 @@ Create StringStream from anything.
 | --- | --- | --- |
 | chunk | <code>String</code> | the transformed chunk |
 
+<a name="pipeline"></a>
+
+## :pipeline(readable, transforms) : StringStream
+Creates a pipeline of streams and returns a scramjet stream.
+
+**Kind**: static function  
+**Returns**: [<code>StringStream</code>](#StringStream) - a new StringStream instance of the resulting pipeline  
+**See**: DataStream.pipeline  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| readable | <code>Array</code> \| <code>Iterable</code> \| <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>String</code> \| <code>Readable</code> | the initial readable argument that is streamable by scramjet.from |
+| transforms | <code>AsyncFunction</code> \| <code>function</code> \| <code>Transform</code> | an array of transforms |
+

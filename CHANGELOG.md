@@ -3,6 +3,17 @@
 
 This is the last intended minor API change to `scramjet-core` before the v5 series.
 
+## Scramjet Core 4.17.0 - 4.17.0: Pipeline
+
+* f4bc86f - Allow creating `pipeline` with a new method.
+* b265321 - Allow usage of `async function` in `use`.
+* f4d59ee - Documentation fix
+* 3ef8c4a - Dependencies update.
+* 93a13fd - Now each version will also be tested with FOSSA for possible license pollution
+
+## Scramjet Core 4.16.17 - 4.16.17: Iterator and AsyncIterator error handling fixes
+
+* 0c32cd3 - Changelog and skip asyncIterable test when not suppported
 * 30d4b96 - Add error handling for iterator functions in read
 
 ## Scramjet Core 4.16.16 - 4.16.16: From fixes
