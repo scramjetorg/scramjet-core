@@ -328,6 +328,28 @@ module.exports = {
             test.deepEqual(await stream.toArray(), [2,3,4,5], "Does execute all functions");
             test.done();
         },
+        async works_on_strings(test) {
+            const input = new PassThrough({encoding: "utf-8"});
+            input.write("{\"x\": 1}\n");
+            input.write("{\"x\": 2}\n");
+            input.end("{\"x\": 3}");
+
+            const stream = StringStream
+                .pipeline(
+                    input,
+                    new PassThrough()
+                );
+
+            test.ok(stream instanceof StringStream, "Should return the same class.");
+
+            const output = stream
+                .split("\n")
+                .parse(JSON.parse)
+            ;
+
+            test.deepEqual(await output.toArray(), [{x:1}, {x:2}, {x:3}], "Handles string input");
+            test.done();
+        },
         forwards_errors: {
             async immediate(test) {
                 test.expect(1);
