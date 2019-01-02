@@ -34,7 +34,10 @@ A simple use case would be:
     * [bufferStream.toStringStream(encoding)](#BufferStream+toStringStream)  <code>StringStream</code>
     * [bufferStream.pop(chars, func)](#BufferStream+pop) ↺ [<code>BufferStream</code>](#BufferStream)
     * [bufferStream.toDataStream(parser)](#BufferStream+toDataStream)  <code>DataStream</code>
+    * [BufferStream:pipeline(readable, transforms)](#BufferStream.pipeline)  [<code>BufferStream</code>](#BufferStream)
     * [BufferStream:from(str, options)](#BufferStream.from)  [<code>BufferStream</code>](#BufferStream)
+    * [BufferStream:ShiftCallback](#BufferStream.ShiftCallback)  <code>function</code>
+    * [BufferStream:ParseCallback](#BufferStream.ParseCallback)  <code>Promise</code>
 
 <a name="new_BufferStream_new"></a>
 
@@ -62,7 +65,7 @@ the given number of bytes.
 | Param | Type | Description |
 | --- | --- | --- |
 | chars | <code>Number</code> | The number of bytes to shift |
-| func | [<code>ShiftCallback</code>](#ShiftCallback) | Function that receives a string of shifted bytes |
+| func | <code>ShiftCallback</code> | Function that receives a string of shifted bytes |
 
 <a name="BufferStream+split"></a>
 
@@ -122,7 +125,7 @@ stream here should already be split or broken up.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| parser | [<code>ParseCallback</code>](#ParseCallback) | The transform function |
+| parser | <code>ParseCallback</code> | The transform function |
 
 <a name="BufferStream+toStringStream"></a>
 
@@ -156,7 +159,7 @@ the given number of bytes.
 | Param | Type | Description |
 | --- | --- | --- |
 | chars | <code>Number</code> | The number of bytes to shift |
-| func | [<code>ShiftCallback</code>](#ShiftCallback) | Function that receives a string of shifted bytes |
+| func | <code>ShiftCallback</code> | Function that receives a string of shifted bytes |
 
 <a name="BufferStream+toDataStream"></a>
 
@@ -172,7 +175,21 @@ stream here should already be split or broken up.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| parser | [<code>ParseCallback</code>](#ParseCallback) | The transform function |
+| parser | <code>ParseCallback</code> | The transform function |
+
+<a name="BufferStream.pipeline"></a>
+
+### BufferStream:pipeline(readable, transforms) : BufferStream
+Creates a pipeline of streams and returns a scramjet stream.
+
+**Kind**: static method of [<code>BufferStream</code>](#BufferStream)  
+**Returns**: [<code>BufferStream</code>](#BufferStream) - a new StringStream instance of the resulting pipeline  
+**See**: DataStream.pipeline  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| readable | <code>Array</code> \| <code>Iterable</code> \| <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>String</code> \| <code>Readable</code> | the initial readable argument that is streamable by scramjet.from |
+| transforms | <code>AsyncFunction</code> \| <code>function</code> \| <code>Transform</code> | Transform functions (as in [DataStream..use](DataStream..use)) or Transform streams (any number of these as consecutive arguments) |
 
 <a name="BufferStream.from"></a>
 
@@ -188,38 +205,24 @@ Create BufferStream from anything.
 | str | <code>Array</code> \| <code>Iterable</code> \| <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>Readable</code> | argument to be turned into new stream |
 | options | <code>StreamOptions</code> \| <code>Writable</code> |  |
 
-<a name="ShiftCallback"></a>
+<a name="BufferStream.ShiftCallback"></a>
 
-## ShiftCallback : function
+### BufferStream:ShiftCallback : function
 Shift callback
 
-**Kind**: global typedef  
+**Kind**: static typedef of [<code>BufferStream</code>](#BufferStream)  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | shifted | <code>Buffer</code> | shifted bytes |
 
-<a name="ParseCallback"></a>
+<a name="BufferStream.ParseCallback"></a>
 
-## ParseCallback : Promise
-**Kind**: global typedef  
+### BufferStream:ParseCallback : Promise
+**Kind**: static typedef of [<code>BufferStream</code>](#BufferStream)  
 **Returns**: <code>Promise</code> - the promise should be resolved with the parsed object  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | chunk | <code>Buffer</code> | the transformed chunk |
-
-<a name="pipeline"></a>
-
-## :pipeline(readable, transforms) : BufferStream
-Creates a pipeline of streams and returns a scramjet stream.
-
-**Kind**: static function  
-**Returns**: [<code>BufferStream</code>](#BufferStream) - a new StringStream instance of the resulting pipeline  
-**See**: DataStream.pipeline  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| readable | <code>Array</code> \| <code>Iterable</code> \| <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>String</code> \| <code>Readable</code> | the initial readable argument that is streamable by scramjet.from |
-| transforms | <code>AsyncFunction</code> \| <code>function</code> \| <code>Transform</code> | an array of transorms |
 

@@ -25,7 +25,10 @@ StringStream.fromString()
     * [stringStream.pop(bytes, func)](#StringStream+pop) ↺
     * [StringStream:SPLIT_LINE](#StringStream.SPLIT_LINE)
     * [StringStream:fromString(str, encoding)](#StringStream.fromString)  [<code>StringStream</code>](#StringStream)
+    * [StringStream:pipeline(readable, transforms)](#StringStream.pipeline)  [<code>StringStream</code>](#StringStream)
     * [StringStream:from(str, options)](#StringStream.from)  [<code>StringStream</code>](#StringStream)
+    * [StringStream:ShiftCallback](#StringStream.ShiftCallback)  <code>function</code>
+    * [StringStream:ParseCallback](#StringStream.ParseCallback)  <code>Promise</code>
 
 <a name="new_StringStream_new"></a>
 
@@ -52,7 +55,7 @@ the given number of characters.
 | Param | Type | Description |
 | --- | --- | --- |
 | bytes | <code>Number</code> | The number of characters to shift. |
-| func | [<code>ShiftCallback</code>](#ShiftCallback) | Function that receives a string of shifted chars. |
+| func | <code>ShiftCallback</code> | Function that receives a string of shifted chars. |
 
 <a name="StringStream+split"></a>
 
@@ -109,7 +112,7 @@ stream here should already be split.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| parser | [<code>ParseCallback</code>](#ParseCallback) | The transform function |
+| parser | <code>ParseCallback</code> | The transform function |
 
 <a name="StringStream+toDataStream"></a>
 
@@ -132,7 +135,7 @@ the given number of characters.
 | Param | Type | Description |
 | --- | --- | --- |
 | bytes | <code>Number</code> | The number of characters to shift. |
-| func | [<code>ShiftCallback</code>](#ShiftCallback) | Function that receives a string of shifted chars. |
+| func | <code>ShiftCallback</code> | Function that receives a string of shifted chars. |
 
 <a name="StringStream.SPLIT_LINE"></a>
 
@@ -153,6 +156,20 @@ Creates a StringStream and writes a specific string.
 | str | <code>String</code> | the string to push the your stream |
 | encoding | <code>String</code> | optional encoding |
 
+<a name="StringStream.pipeline"></a>
+
+### StringStream:pipeline(readable, transforms) : StringStream
+Creates a pipeline of streams and returns a scramjet stream.
+
+**Kind**: static method of [<code>StringStream</code>](#StringStream)  
+**Returns**: [<code>StringStream</code>](#StringStream) - a new StringStream instance of the resulting pipeline  
+**See**: DataStream.pipeline  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| readable | <code>Array</code> \| <code>Iterable</code> \| <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>String</code> \| <code>Readable</code> | the initial readable argument that is streamable by scramjet.from |
+| transforms | <code>AsyncFunction</code> \| <code>function</code> \| <code>Transform</code> | Transform functions (as in [DataStream..use](DataStream..use)) or Transform streams (any number of these as consecutive arguments) |
+
 <a name="StringStream.from"></a>
 
 ### StringStream:from(str, options) : StringStream
@@ -171,36 +188,22 @@ Create StringStream from anything.
 | str | <code>String</code> \| <code>Array</code> \| <code>Iterable</code> \| <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>Readable</code> | argument to be turned into new stream |
 | options | <code>StreamOptions</code> \| <code>Writable</code> |  |
 
-<a name="ShiftCallback"></a>
+<a name="StringStream.ShiftCallback"></a>
 
-## ShiftCallback : function
-**Kind**: global typedef  
+### StringStream:ShiftCallback : function
+**Kind**: static typedef of [<code>StringStream</code>](#StringStream)  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | shifted | <code>String</code> | Popped chars |
 
-<a name="ParseCallback"></a>
+<a name="StringStream.ParseCallback"></a>
 
-## ParseCallback : Promise
-**Kind**: global typedef  
+### StringStream:ParseCallback : Promise
+**Kind**: static typedef of [<code>StringStream</code>](#StringStream)  
 **Returns**: <code>Promise</code> - the promise should be resolved with the parsed object  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | chunk | <code>String</code> | the transformed chunk |
-
-<a name="pipeline"></a>
-
-## :pipeline(readable, transforms) : StringStream
-Creates a pipeline of streams and returns a scramjet stream.
-
-**Kind**: static function  
-**Returns**: [<code>StringStream</code>](#StringStream) - a new StringStream instance of the resulting pipeline  
-**See**: DataStream.pipeline  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| readable | <code>Array</code> \| <code>Iterable</code> \| <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>String</code> \| <code>Readable</code> | the initial readable argument that is streamable by scramjet.from |
-| transforms | <code>AsyncFunction</code> \| <code>function</code> \| <code>Transform</code> | an array of transforms |
 
