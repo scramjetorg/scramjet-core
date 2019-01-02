@@ -3,6 +3,14 @@
 
 This is the last intended minor API change to `scramjet-core` before the v5 series.
 
+## Scramjet Core 4.17.1 - 4.17.1: Pipeline
+
+* 2d54035 - Dependencies update: eslint scramjet tape
+* 83f5587 - Catch errors on failed stream.push
+* c451de9 - Fix documentation
+* c44cd96 - Add safety wrappers for scramjet modules
+* 811bfb9 - Fix documentation and ts definition of some methods
+
 ## Scramjet Core 4.17.0 - 4.17.0: Pipeline
 
 * f4bc86f - Allow creating `pipeline` with a new method.
