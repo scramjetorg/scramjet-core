@@ -54,6 +54,12 @@ await (DataStream.from(aStream) // create a DataStream
     * [DataStream:pipeline(readable, ...transforms)](#DataStream.pipeline)  [<code>DataStream</code>](#DataStream)
     * [DataStream:fromArray(arr)](#DataStream.fromArray)  [<code>DataStream</code>](#DataStream)
     * [DataStream:fromIterator(iter)](#DataStream.fromIterator)  [<code>DataStream</code>](#DataStream)
+    * [DataStream:MapCallback](#DataStream.MapCallback)  <code>Promise</code> \| <code>\*</code>
+    * [DataStream:FilterCallback](#DataStream.FilterCallback)  <code>Promise</code> \| <code>Boolean</code>
+    * [DataStream:ReduceCallback](#DataStream.ReduceCallback)  <code>Promise</code> \| <code>\*</code>
+    * [DataStream:DoCallback](#DataStream.DoCallback) ⇄ <code>function</code>
+    * [DataStream:IntoCallback](#DataStream.IntoCallback) ⇄ <code>\*</code>
+    * [DataStream:TeeCallback](#DataStream.TeeCallback)  <code>function</code>
 
 <a name="new_DataStream_new"></a>
 
@@ -85,7 +91,7 @@ can be surpressed by chaining `.tap()` after `.map()`.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| func | [<code>MapCallback</code>](#MapCallback) | The function that creates the new object |
+| func | <code>MapCallback</code> | The function that creates the new object |
 | Clazz | <code>Class</code> | (optional) The class to be mapped to. |
 
 <a name="DataStream+filter"></a>
@@ -104,7 +110,7 @@ and will not be pushed to the output of the stream. Otherwise the item will not 
 
 | Param | Type | Description |
 | --- | --- | --- |
-| func | [<code>FilterCallback</code>](#FilterCallback) | The function that filters the object |
+| func | <code>FilterCallback</code> | The function that filters the object |
 
 <a name="DataStream+reduce"></a>
 
@@ -124,7 +130,7 @@ it's much slower than parallel functions.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| func | [<code>ReduceCallback</code>](#ReduceCallback) | The into object will be passed as the  first argument, the data object from the stream as the second. |
+| func | <code>ReduceCallback</code> | The into object will be passed as the  first argument, the data object from the stream as the second. |
 | into | <code>Object</code> | Any object passed initially to the transform function |
 
 <a name="DataStream+do"></a>
@@ -140,7 +146,7 @@ has no impact on the streamed data (except for possile mutation of the chunk its
 
 | Param | Type | Description |
 | --- | --- | --- |
-| func | [<code>DoCallback</code>](#DoCallback) | the async function |
+| func | <code>DoCallback</code> | the async function |
 
 <a name="DataStream+into"></a>
 
@@ -159,7 +165,7 @@ It returns the DataStream passed as the second argument.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| func | [<code>IntoCallback</code>](#IntoCallback) | the method that processes incoming chunks |
+| func | <code>IntoCallback</code> | the method that processes incoming chunks |
 | into | [<code>DataStream</code>](#DataStream) | the DataStream derived class |
 
 <a name="DataStream+use"></a>
@@ -261,7 +267,7 @@ Creates a duplicate stream instance and passes it to the callback.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| func | [<code>TeeCallback</code>](#TeeCallback) \| <code>Writable</code> | The duplicate stream will be passed as first argument. |
+| func | <code>TeeCallback</code> \| <code>Writable</code> | The duplicate stream will be passed as first argument. |
 
 <a name="DataStream+each"></a>
 
@@ -276,7 +282,7 @@ Warning: this resumes the stream!
 
 | Param | Type | Description |
 | --- | --- | --- |
-| func | [<code>MapCallback</code>](#MapCallback) | a callback called for each chunk. |
+| func | <code>MapCallback</code> | a callback called for each chunk. |
 
 <a name="DataStream+while"></a>
 
@@ -291,7 +297,7 @@ Stops reading and emits end as soon as it ends.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| func | [<code>FilterCallback</code>](#FilterCallback) | The condition check |
+| func | <code>FilterCallback</code> | The condition check |
 
 <a name="DataStream+until"></a>
 
@@ -306,7 +312,7 @@ Works opposite of while.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| func | [<code>FilterCallback</code>](#FilterCallback) | The condition check |
+| func | <code>FilterCallback</code> | The condition check |
 
 <a name="DataStream+catch"></a>
 
@@ -370,7 +376,7 @@ Creates a BufferStream
 
 | Param | Type | Description |
 | --- | --- | --- |
-| serializer | [<code>MapCallback</code>](#MapCallback) | A method that converts chunks to buffers |
+| serializer | <code>MapCallback</code> | A method that converts chunks to buffers |
 
 <a name="DataStream+stringify"></a>
 
@@ -384,7 +390,7 @@ Creates a StringStream
 
 | Param | Type | Description |
 | --- | --- | --- |
-| serializer | [<code>MapCallback</code>](#MapCallback) | A method that converts chunks to strings |
+| serializer | <code>MapCallback</code> | A method that converts chunks to strings |
 
 <a name="DataStream+toArray"></a>
 
@@ -421,7 +427,7 @@ Creates a BufferStream
 
 | Param | Type | Description |
 | --- | --- | --- |
-| serializer | [<code>MapCallback</code>](#MapCallback) | A method that converts chunks to buffers |
+| serializer | <code>MapCallback</code> | A method that converts chunks to buffers |
 
 <a name="DataStream+toStringStream"></a>
 
@@ -435,7 +441,7 @@ Creates a StringStream
 
 | Param | Type | Description |
 | --- | --- | --- |
-| serializer | [<code>MapCallback</code>](#MapCallback) | A method that converts chunks to strings |
+| serializer | <code>MapCallback</code> | A method that converts chunks to strings |
 
 <a name="DataStream.from"></a>
 
@@ -456,7 +462,20 @@ passed again to `from` and piped to the initially returned stream. Any addtional
 passed as arguments to the function.
 
 If a `String` is passed, scramjet will attempt to resolve it as a module and use the outcome
-as an argument to `from` as in the Function case described above.
+as an argument to `from` as in the Function case described above. For more information see [modules.md](modules.md)
+
+A simple example from a generator:
+
+```javascript
+DataStream
+  .from(function* () {
+     while(x < 100) yield x++;
+  })
+  .each(console.log)
+  // 0
+  // 1...
+  // 99
+```
 
 **Kind**: static method of [<code>DataStream</code>](#DataStream)  
 
@@ -486,7 +505,7 @@ Each following argument will be understood as a transform and can be any of:
 | Param | Type | Description |
 | --- | --- | --- |
 | readable | <code>Array</code> \| <code>Iterable</code> \| <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>String</code> \| <code>Readable</code> | the initial readable argument that is streamable by scramjet.from |
-| ...transforms | <code>AsyncFunction</code> \| <code>function</code> \| <code>Transform</code> | an array of transforms |
+| ...transforms | <code>AsyncFunction</code> \| <code>function</code> \| <code>Transform</code> | Transform functions (as in [DataStream..use](DataStream..use)) or Transform streams (any number of these as consecutive arguments) |
 
 <a name="DataStream.fromArray"></a>
 
@@ -514,20 +533,20 @@ Doesn't end the stream until it reaches end of the iterator.
 | --- | --- | --- |
 | iter | <code>Iterator</code> | the iterator object |
 
-<a name="MapCallback"></a>
+<a name="DataStream.MapCallback"></a>
 
-## MapCallback : Promise | *
-**Kind**: global typedef  
+### DataStream:MapCallback : Promise | *
+**Kind**: static typedef of [<code>DataStream</code>](#DataStream)  
 **Returns**: <code>Promise</code> \| <code>\*</code> - the mapped object  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | chunk | <code>\*</code> | the chunk to be mapped |
 
-<a name="FilterCallback"></a>
+<a name="DataStream.FilterCallback"></a>
 
-## FilterCallback : Promise | Boolean
-**Kind**: global typedef  
+### DataStream:FilterCallback : Promise | Boolean
+**Kind**: static typedef of [<code>DataStream</code>](#DataStream)  
 **Returns**: <code>Promise</code> \| <code>Boolean</code> - information if the object should remain in
                             the filtered stream.  
 
@@ -535,10 +554,10 @@ Doesn't end the stream until it reaches end of the iterator.
 | --- | --- | --- |
 | chunk | <code>\*</code> | the chunk to be filtered or not |
 
-<a name="ReduceCallback"></a>
+<a name="DataStream.ReduceCallback"></a>
 
-## ReduceCallback : Promise | *
-**Kind**: global typedef  
+### DataStream:ReduceCallback : Promise | *
+**Kind**: static typedef of [<code>DataStream</code>](#DataStream)  
 **Returns**: <code>Promise</code> \| <code>\*</code> - accumulator for the next pass  
 
 | Param | Type | Description |
@@ -546,19 +565,19 @@ Doesn't end the stream until it reaches end of the iterator.
 | acc | <code>\*</code> | the accumulator - the object initially passed or returned                by the previous reduce operation |
 | chunk | <code>Object</code> | the stream chunk. |
 
-<a name="DoCallback"></a>
+<a name="DataStream.DoCallback"></a>
 
-## DoCallback : function ⇄
-**Kind**: global typedef  
+### DataStream:DoCallback : function ⇄
+**Kind**: static typedef of [<code>DataStream</code>](#DataStream)  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | chunk | <code>Object</code> | source stream chunk |
 
-<a name="IntoCallback"></a>
+<a name="DataStream.IntoCallback"></a>
 
-## IntoCallback : * ⇄
-**Kind**: global typedef  
+### DataStream:IntoCallback : * ⇄
+**Kind**: static typedef of [<code>DataStream</code>](#DataStream)  
 **Returns**: <code>\*</code> - resolution for the old stream (for flow control only)  
 
 | Param | Type | Description |
@@ -566,10 +585,10 @@ Doesn't end the stream until it reaches end of the iterator.
 | into | <code>\*</code> | stream passed to the into method |
 | chunk | <code>Object</code> | source stream chunk |
 
-<a name="TeeCallback"></a>
+<a name="DataStream.TeeCallback"></a>
 
-## TeeCallback : function
-**Kind**: global typedef  
+### DataStream:TeeCallback : function
+**Kind**: static typedef of [<code>DataStream</code>](#DataStream)  
 
 | Param | Type | Description |
 | --- | --- | --- |
