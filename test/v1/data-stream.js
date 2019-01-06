@@ -523,15 +523,28 @@ module.exports = {
             );
 
     },
-    async test_unorder(test) {
-        const out = await (DataStream
-            .from([1,2,3,4])
-            .setOptions({maxParallel: 2})
-            .unorder(x => x === 1 ? delay(20, x) : x)
-            .toArray());
+    test_unorder: {
+        async async_one(test) {
+            const out = await (DataStream
+                .from([1,2,3,4])
+                .setOptions({maxParallel: 2})
+                .unorder(x => x === 1 ? delay(20, x) : x)
+                .toArray());
 
-        test.deepEqual(out, [2,3,4,1]);
-        test.done();
+            test.deepEqual(out, [2,3,4,1]);
+            test.done();
+        },
+        async inOrder(test) {
+            let i = 0;
+            const out = await (DataStream
+                .from([30,20,15,50,20,10,10,40])
+                .setOptions({maxParallel: 2})
+                .unorder(x => delay(x, i++))
+                .toArray());
+
+            test.deepEqual(out, [1,0,2,4,5,6,3,7]);
+            test.done();
+        }
     },
     test_filter(test) {
         test.expect(4);
