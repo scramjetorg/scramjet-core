@@ -10,6 +10,7 @@ const getStream = (x = 100) => {
     return ret;
 };
 const defer = (x) => new Promise(res => process.nextTick(() => res(x)));
+const delay = (ms, x) => new Promise(res => setTimeout(() => res(x), ms));
 
 module.exports = {
     test_when: {
@@ -521,6 +522,29 @@ module.exports = {
                 (e) => (console.log(e), test.ok(false, "Should not throw error: " + e))
             );
 
+    },
+    test_unorder: {
+        async async_one(test) {
+            const out = await (DataStream
+                .from([1,2,3,4])
+                .setOptions({maxParallel: 2})
+                .unorder(x => x === 1 ? delay(20, x) : x)
+                .toArray());
+
+            test.deepEqual(out, [2,3,4,1]);
+            test.done();
+        },
+        async inOrder(test) {
+            let i = 0;
+            const out = await (DataStream
+                .from([30,20,15,70,20,10,10,60])
+                .setOptions({maxParallel: 2})
+                .unorder(x => delay(x, i++))
+                .toArray());
+
+            test.deepEqual(out, [1,0,2,4,5,6,3,7]);
+            test.done();
+        }
     },
     test_filter(test) {
         test.expect(4);
