@@ -200,7 +200,7 @@ from the command line.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| func | <code>function</code> \| <code>String</code> \| <code>Transform</code> | if passed, the function will be called on self to add an option to inspect the stream in place, while not breaking the transform chain. Alternatively this can be a relative path to a scramjet-module. Lastly it can be a Transform stream. |
+| func | <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>String</code> \| <code>Readable</code> | if passed, the function will be called on self to add an option to inspect the stream in place, while not breaking the transform chain. Alternatively this can be a relative path to a scramjet-module. Lastly it can be a Transform stream. |
 | [...args] | <code>\*</code> | any additional args top be passed to the module |
 
 <a name="DataStream+run"></a>
