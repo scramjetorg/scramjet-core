@@ -11,6 +11,18 @@ This is the last intended minor API change to `scramjet-core` before the v5 seri
 * ac3a6d1 - Fix unorder operation on multiple slots
 * fdb7d94 - Add the unorder method
 
+
+## Scramjet Core 4.18.0 - 4.18.0: Allow usage of generators in use, new unorder method
+
+* 0d22964 - Documentation fixes
+* c25a20f - Fix usage of dataStream.use with generators
+* 99973ad - Pass additional arguments to from in use
+* 5492cfc - Fix tests for unorder
+* c6d7267 - Allow use of anything streamable on dataStream.use
+* 598783d - Fix some documentation entries
+* ac3a6d1 - Fix unorder operation on multiple slots
+* fdb7d94 - Add the unorder method
+
 ## Scramjet Core 4.17.1 - 4.17.1: Pipeline
 
 * 2d54035 - Dependencies update: eslint scramjet tape
