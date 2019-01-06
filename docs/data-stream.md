@@ -27,6 +27,7 @@ await (DataStream.from(aStream) // create a DataStream
     * [dataStream.filter(func)](#DataStream+filter) ↺
     * [dataStream.reduce(func, into)](#DataStream+reduce)
     * [dataStream.do(func)](#DataStream+do) ↺
+    * [dataStream.unorder(func)](#DataStream+unorder)
     * [dataStream.into(func, into)](#DataStream+into) ↺
     * [dataStream.use(func)](#DataStream+use) ↺
     * [dataStream.run()](#DataStream+run)
@@ -52,8 +53,8 @@ await (DataStream.from(aStream) // create a DataStream
     * [dataStream.toStringStream(serializer)](#DataStream+toStringStream) ↺ <code>StringStream</code>
     * [DataStream:from(input, options)](#DataStream.from)  [<code>DataStream</code>](#DataStream)
     * [DataStream:pipeline(readable, ...transforms)](#DataStream.pipeline)  [<code>DataStream</code>](#DataStream)
-    * [DataStream:fromArray(arr)](#DataStream.fromArray)  [<code>DataStream</code>](#DataStream)
-    * [DataStream:fromIterator(iter)](#DataStream.fromIterator)  [<code>DataStream</code>](#DataStream)
+    * [DataStream:fromArray(arr, options)](#DataStream.fromArray)  [<code>DataStream</code>](#DataStream)
+    * [DataStream:fromIterator(iter, options)](#DataStream.fromIterator)  [<code>DataStream</code>](#DataStream)
     * [DataStream:MapCallback](#DataStream.MapCallback)  <code>Promise</code> \| <code>\*</code>
     * [DataStream:FilterCallback](#DataStream.FilterCallback)  <code>Promise</code> \| <code>Boolean</code>
     * [DataStream:ReduceCallback](#DataStream.ReduceCallback)  <code>Promise</code> \| <code>\*</code>
@@ -147,6 +148,22 @@ has no impact on the streamed data (except for possile mutation of the chunk its
 | Param | Type | Description |
 | --- | --- | --- |
 | func | <code>DoCallback</code> | the async function |
+
+<a name="DataStream+unorder"></a>
+
+### dataStream.unorder(func)
+Allows processing items without keeping order
+
+This method useful if you are not concerned about the order in which the
+chunks are being pushed out of the operation. The `maxParallel` option is
+still used for keeping a number of simultaneous number of parallel operations
+that are currently happening.
+
+**Kind**: instance method of [<code>DataStream</code>](#DataStream)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| func | <code>MapCallback</code> | the async function that will be unordered |
 
 <a name="DataStream+into"></a>
 
@@ -289,7 +306,11 @@ Warning: this resumes the stream!
 ### dataStream.while(func) ↺
 Reads the stream while the function outcome is truthy.
 
-Stops reading and emits end as soon as it ends.
+Stops reading and emits end as soon as it finds the first chunk that evaluates
+to false. If you're processing a file until a certain point or you just need to
+confirm existence of some data, you can use it to end the stream before reaching end.
+
+Keep in mind that whatever you piped to the stream will still need to be handled.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -366,7 +387,9 @@ Except for calling overridden method it proxies errors to piped stream.
 <a name="DataStream+bufferify"></a>
 
 ### dataStream.bufferify(serializer) : BufferStream ↺
-Creates a BufferStream
+Creates a BufferStream.
+
+The passed serializer must return a buffer.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -381,7 +404,9 @@ Creates a BufferStream
 <a name="DataStream+stringify"></a>
 
 ### dataStream.stringify(serializer) : StringStream ↺
-Creates a StringStream
+Creates a StringStream.
+
+The passed serializer must return a string.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -417,7 +442,9 @@ Ready for https://github.com/tc39/proposal-async-iteration
 <a name="DataStream+toBufferStream"></a>
 
 ### dataStream.toBufferStream(serializer) : BufferStream ↺
-Creates a BufferStream
+Creates a BufferStream.
+
+The passed serializer must return a buffer.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -432,7 +459,9 @@ Creates a BufferStream
 <a name="DataStream+toStringStream"></a>
 
 ### dataStream.toStringStream(serializer) : StringStream ↺
-Creates a StringStream
+Creates a StringStream.
+
+The passed serializer must return a string.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -509,7 +538,7 @@ Each following argument will be understood as a transform and can be any of:
 
 <a name="DataStream.fromArray"></a>
 
-### DataStream:fromArray(arr) : DataStream
+### DataStream:fromArray(arr, options) : DataStream
 Create a DataStream from an Array
 
 **Kind**: static method of [<code>DataStream</code>](#DataStream)  
@@ -518,10 +547,11 @@ Create a DataStream from an Array
 | Param | Type | Description |
 | --- | --- | --- |
 | arr | <code>Array</code> | list of chunks |
+| options | <code>ScramjetOptions</code> | the read stream options |
 
 <a name="DataStream.fromIterator"></a>
 
-### DataStream:fromIterator(iter) : DataStream
+### DataStream:fromIterator(iter, options) : DataStream
 Create a DataStream from an Iterator
 
 Doesn't end the stream until it reaches end of the iterator.
@@ -532,6 +562,7 @@ Doesn't end the stream until it reaches end of the iterator.
 | Param | Type | Description |
 | --- | --- | --- |
 | iter | <code>Iterator</code> | the iterator object |
+| options | <code>ScramjetOptions</code> | the read stream options |
 
 <a name="DataStream.MapCallback"></a>
 
