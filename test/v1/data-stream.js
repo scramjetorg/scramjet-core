@@ -537,7 +537,7 @@ module.exports = {
         async inOrder(test) {
             let i = 0;
             const out = await (DataStream
-                .from([30,20,15,70,20,10,10,60])
+                .from([50,30,40,140,40,20,15,120])
                 .setOptions({maxParallel: 2})
                 .unorder(x => delay(x, i++))
                 .toArray());
