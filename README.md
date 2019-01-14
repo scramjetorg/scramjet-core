@@ -134,7 +134,7 @@ A simple use case would be:
 * [`bufferStream.toDataStream(parser) : DataStream`](docs/buffer-stream.md#BufferStream+toDataStream) - Parses every buffer to object
 * [`BufferStream:pipeline(readable, transforms) : BufferStream`](docs/buffer-stream.md#BufferStream.pipeline) - Creates a pipeline of streams and returns a scramjet stream.
 * [`BufferStream:from(str, options) : BufferStream`](docs/buffer-stream.md#BufferStream.from) - Create BufferStream from anything.
-* [`BufferStream:ShiftCallback : function`](docs/buffer-stream.md#BufferStream.ShiftCallback) - Shift callback
+* [`BufferStream:ShiftCallback : function`](docs/buffer-stream.md#BufferStream.ShiftCallback) - Shift Function
 * [`BufferStream:ParseCallback : Promise`](docs/buffer-stream.md#BufferStream.ParseCallback) - 
 
 ### DataStream
@@ -167,7 +167,7 @@ await (DataStream.from(aStream) // create a DataStream
 * [`dataStream.into(func, into) ↺`](docs/data-stream.md#DataStream+into) - Allows own implementation of stream chaining.
 * [`dataStream.use(func) ↺`](docs/data-stream.md#DataStream+use) - Calls the passed method in place with the stream as first argument, returns result.
 * [`dataStream.run() ⇄`](docs/data-stream.md#DataStream+run) - Consumes all stream items doing nothing. Resolves when the stream is ended.
-* [`dataStream.tap()`](docs/data-stream.md#DataStream+tap) - Stops merging transform callbacks at the current place in the command chain.
+* [`dataStream.tap()`](docs/data-stream.md#DataStream+tap) - Stops merging transform Functions at the current place in the command chain.
 * [`dataStream.whenRead() ⇄`](docs/data-stream.md#DataStream+whenRead) - Reads a chunk from the stream and resolves the promise when read.
 * [`dataStream.whenWrote(chunk, [...more]) ⇄`](docs/data-stream.md#DataStream+whenWrote) - Writes a chunk to the stream and returns a Promise resolved when more chunks can be written.
 * [`dataStream.whenEnd() ⇄`](docs/data-stream.md#DataStream+whenEnd) - Resolves when stream ends - rejects on uncaught error

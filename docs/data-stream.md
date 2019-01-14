@@ -78,7 +78,7 @@ Create the DataStream.
 Transforms stream objects into new ones, just like Array.prototype.map
 does.
 
-Map takes an argument which is the callback function operating on every element
+Map takes an argument which is the Function function operating on every element
 of the stream. If the function returns a Promise or is an AsyncFunction then the
 stream will await for the outcome of the operation before pushing the data forwards.
 
@@ -106,7 +106,7 @@ can be surpressed by chaining `.tap()` after `.map()`.
 ### dataStream.filter(func) ↺
 Filters object based on the function outcome, just like Array.prototype.filter.
 
-Filter takes a callback argument which should be a Function or an AsyncFunction that
+Filter takes a Function argument which should be a Function or an AsyncFunction that
 will be called on each stream item. If the outcome of the operation is `falsy` (`0`, `''`,
 `false`, `null` or `undefined`) the item will be filtered from subsequent operations
 and will not be pushed to the output of the stream. Otherwise the item will not be affected.
@@ -188,7 +188,7 @@ that are currently happening.
 ### dataStream.into(func, into) ↺
 Allows own implementation of stream chaining.
 
-The async callback is called on every chunk and should implement writes in it's own way. The
+The async Function is called on every chunk and should implement writes in it's own way. The
 resolution will be awaited for flow control. The passed `into` argument is passed as the first
 argument to every call.
 
@@ -230,7 +230,7 @@ Consumes all stream items doing nothing. Resolves when the stream is ended.
 <a name="DataStream+tap"></a>
 
 ### dataStream.tap()
-Stops merging transform callbacks at the current place in the command chain.
+Stops merging transform Functions at the current place in the command chain.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Test**: test/methods/data-stream-tap.js  
@@ -294,7 +294,7 @@ It's much easier to use this in chain than constructing new stream:
 ### dataStream.tee(func) ↺
 Duplicate the stream
 
-Creates a duplicate stream instance and passes it to the callback.
+Creates a duplicate stream instance and passes it to the Function.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -317,7 +317,7 @@ Warning: this resumes the stream!
 
 | Param | Type | Description |
 | --- | --- | --- |
-| func | <code>MapCallback</code> | a callback called for each chunk. |
+| func | <code>MapCallback</code> | a Function called for each chunk. |
 
 <a name="DataStream+while"></a>
 
