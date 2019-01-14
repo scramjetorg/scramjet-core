@@ -34,6 +34,13 @@ module.exports = {
             test.done();
         }
     },
+    test_callee(test) {
+        const {resolveCalleeBlackboxed} = require("../../lib/util/utils");
+        const path = require("path");
+
+        test.equals(resolveCalleeBlackboxed("test"), path.resolve(__dirname, "test"));
+        test.done();
+    },
     test_read: {
         async starve(test) {
             test.expect(2);

@@ -82,6 +82,12 @@ Map takes an argument which is the callback function operating on every element
 of the stream. If the function returns a Promise or is an AsyncFunction then the
 stream will await for the outcome of the operation before pushing the data forwards.
 
+A simple example that turns stream of urls into stream of responses
+
+```javascript
+stream.map(async url => fetch(url));
+```
+
 Multiple subsequent map operations (as well as filter, do, each and other simple ops)
 will be merged together into a single operation to improve performance. Such behavior
 can be surpressed by chaining `.tap()` after `.map()`.
@@ -105,6 +111,12 @@ will be called on each stream item. If the outcome of the operation is `falsy` (
 `false`, `null` or `undefined`) the item will be filtered from subsequent operations
 and will not be pushed to the output of the stream. Otherwise the item will not be affected.
 
+A simple example that filters out non-2xx responses from a stream
+
+```javascript
+stream.filter(({statusCode}) => !(statusCode >= 200 && statusCode < 300));
+```
+
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
 **Test**: test/methods/data-stream-filter.js  
@@ -121,6 +133,12 @@ Reduces the stream into a given accumulator
 Works similarly to Array.prototype.reduce, so whatever you return in the
 former operation will be the first operand to the latter. The result is a
 promise that's resolved with the return value of the last transform executed.
+
+A simple example that sums values from a stream
+
+```javascript
+stream.reduce((acc, {value}) => acc + value);
+```
 
 This method is serial - meaning that any processing on an entry will
 occur only after the previous entry is fully processed. This does mean
