@@ -546,6 +546,115 @@ module.exports = {
             test.done();
         }
     },
+    test_use: {
+        sync(test) {
+            test.expect(4);
+
+            const stream = DataStream.fromArray([1,2,3,4,5,6,7,8,9,10]);
+            const ref = Symbol("test");
+
+            let called = false;
+
+            const out = stream.use(
+                (innerStream, arg) => {
+                    test.equals(stream, innerStream, "Must be called with self as first argument");
+                    test.equals(ref, arg, "Additional arguments must be passed");
+                    called = true;
+                    return arg; // this should throw error
+                },
+                ref
+            );
+
+            test.equals(ref, out, "Must pass return value");
+            test.ok(called, "Must be called and executed synchronously");
+            test.done();
+        },
+        async async(test) {
+            test.expect(5);
+
+            const stream = DataStream.fromArray([1,2,3,4,5,6,7,8,9,10]);
+            const ref = Symbol("test");
+
+            let called = false;
+
+            const out = stream.use(
+                async (innerStream, arg) => {
+                    test.equals(stream, innerStream, "Must be called with self as first argument");
+                    test.equals(ref, arg, "Additional arguments must be passed");
+                    called = true;
+                    await new Promise(res => process.nextTick(res));
+                    return innerStream.map(x => x - 1);
+                },
+                ref
+            );
+
+            test.ok(out instanceof DataStream, "Must return a stream synchonously");
+            test.ok(called, "Must be called and executed synchronously"); // TODO: but rethink this, because why not async before resuming the stream?
+            test.deepEqual(await out.toArray(), [0,1,2,3,4,5,6,7,8,9], "Must carry the items from an async stream");
+            test.done();
+        },
+        async string_simple(test) {
+            test.expect(2);
+
+            const stream = DataStream.fromArray([1,2,3,4,5,6,7,8,9,10]);
+
+            const out = stream.use("../lib/usetest/simple", 2);
+
+            test.ok(out instanceof DataStream, "Must return a stream synchonously");
+            test.deepEqual(await out.toArray(), [3,4,5,6,7,8,9,10,11,12], "Must carry the items from an async stream");
+            test.done();
+        },
+        async string_async(test) {
+            test.expect(2);
+
+            const stream = DataStream.fromArray([1,2,3,4,5,6,7,8,9,10]);
+
+            const out = stream.use("../lib/usetest/async");
+
+            test.ok(out instanceof DataStream, "Must return a stream synchonously");
+            test.deepEqual(await out.toArray(), [2,3,4,5,6,7,8,9,10,11], "Must carry the items from an async stream");
+            test.done();
+        },
+        async generator(test) {
+            test.expect(6);
+
+            const stream = DataStream.fromArray([1,2,3,4,5,6,7,8,9,10]);
+            const ref = Symbol("test");
+
+            let called = false;
+
+            const out = stream.use(
+                function* (innerStream, arg) {
+                    test.equals(stream, innerStream, "Must be called with self as first argument");
+                    test.equals(ref, arg, "Additional arguments must be passed");
+                    called = true;
+
+                    yield Promise.all([
+                        innerStream.whenRead(),
+                        new Promise(res => process.nextTick(res))
+                    ]).then(([x]) => x);
+
+                    innerStream.whenRead().catch(() => 0);
+
+                    yield innerStream.whenRead();
+                    yield innerStream.whenRead();
+                    yield innerStream.whenRead();
+                    yield innerStream.whenRead();
+                    yield innerStream.whenRead();
+                    yield innerStream.whenRead();
+                    yield innerStream.whenRead();
+                    yield innerStream.whenRead();
+                },
+                ref
+            );
+
+            test.ok(out instanceof DataStream, "Must return a stream synchonously");
+            test.ok(!called, "Must not be called and executed synchronously");
+            test.deepEqual(await out.toArray(), [1,3,4,5,6,7,8,9,10], "Must carry the items from an async stream");
+            test.ok(called, "Must be called and executed asynchronously");
+            test.done();
+        }
+    },
     test_filter(test) {
         test.expect(4);
 
