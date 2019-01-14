@@ -32,7 +32,7 @@
     "fix": "eslint --fix",
     "preversion": "gulp prerelease"
   },
-  "homepage": "https://scramjet.eu/",
+  "homepage": "https://www.scramjet.org/",
   "repository": {
     "type": "git",
     "url": "https://github.com/signicode/scramjet-core.git"
