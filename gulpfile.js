@@ -1,9 +1,11 @@
 /* eslint-disable node/no-unpublished-require */
 
+require("source-map-support/register");
+
 const gulp = require("gulp");
 const path = require("path");
 
-const {lint, test_legacy: testLegacy, readme, docs, scm_clean: scmClean} = require("./scripts/tasks");
+const {test_legacy: testLegacy, readme, docs, lint, scm_clean: scmClean} = require("./scripts/tasks");
 
 gulp.task("lint", lint());
 gulp.task("test_legacy", testLegacy("test/v1/*.js"));

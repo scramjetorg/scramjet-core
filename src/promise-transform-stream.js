@@ -41,6 +41,8 @@ const checkOptions = (options) => {
         throw new Error("Scramjet stream can be either Read, Write or Transform");
 };
 
+const getPluginConstructors = () => [];
+
 /**
  * DataStream is the primary stream type for Scramjet. When you parse your
  * stream, just pipe it you can then perform calculations on the data objects
@@ -97,7 +99,7 @@ export class PromiseTransformStream extends Transform {
             return options.referrer.pushTransform(options);
 
 
-        const pluginConstructors = this.constructor[plgctor].get();
+        const pluginConstructors = getPluginConstructors(this.constructor);
         if (pluginConstructors.length) {
             let ret;
             pluginConstructors.find(
@@ -304,7 +306,7 @@ export class PromiseTransformStream extends Transform {
      * @param {Function} callback Error handler (async function)
      * @returns {PromiseTransfromStream} returns self
      *
-     * @example {@link ../samples/data-stream-catch.js}
+     * @test test/methods/data-stream-catch.js
      */
     catch(callback) {
         this._error_handlers.push(callback);
@@ -323,7 +325,7 @@ export class PromiseTransformStream extends Transform {
      * @param {Error} err The thrown error
      * @returns {*} resolved chunk
      *
-     * @example {@link ../samples/data-stream-raise.js}
+     * @test test/methods/data-stream-raise.js
      */
     async raise(err, ...args) {
         return this._error_handlers
@@ -396,7 +398,7 @@ export class PromiseTransformStream extends Transform {
      * @chainable
      * @returns {PromiseTransfromStream} returns self
      *
-     * @example {@link ../samples/data-stream-tap.js}
+     * @test test/methods/data-stream-tap.js
      */
     tap() {
         this._tapped = true;
@@ -444,7 +446,7 @@ export class PromiseTransformStream extends Transform {
      *
      * @meta.noReadme
      * @return {PromiseTransformStream}  an empty instance of the same class.
-     * @example {@link ../samples/data-stream-selfinstance.js}
+     * @test test/methods/data-stream-selfinstance.js
      */
     _selfInstance(...args) {
         return new this.constructor(...args);

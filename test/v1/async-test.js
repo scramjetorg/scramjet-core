@@ -1,6 +1,6 @@
-const getStream = () => {
-    const PromiseTransformStream = require(process.env.SCRAMJET_TEST_HOME || "../../").PromiseTransformStream;
+const PromiseTransformStream = require(process.env.SCRAMJET_TEST_HOME || "../../").PromiseTransformStream;
 
+const getStream = () => {
     const ret = new PromiseTransformStream();
     let cnt = 0;
     for (let i = 0; i < 100; i++)
@@ -36,8 +36,8 @@ module.exports = {
         test.expect(3);
         const a = [];
         getStream()
-            .map(decorateAsynchronously)
-            .each((i) => a.push(i))
+            .pipe(new PromiseTransformStream({promiseTransform: decorateAsynchronously}))
+            .pipe(new PromiseTransformStream({promiseTransform: (i) => a.push(i)}))
             .on(
                 "end",
                 () => {
@@ -65,7 +65,7 @@ module.exports = {
         test.expect(3);
 
         getStream()
-            .map(decorateAsynchronouslyWithError)
+            .pipe(new PromiseTransformStream({promiseTransform: decorateAsynchronouslyWithError}))
             .once("error", (e, chunk) => {
                 test.ok(true, "Should emit error");
                 test.ok(e instanceof Error, "Thrown should be an instance of Error");
@@ -84,7 +84,7 @@ module.exports = {
 
         let z = 0;
         getStream()
-            .map(decorateAsynchronouslyWithLotsOfErrors)
+            .pipe(new PromiseTransformStream({promiseTransform: decorateAsynchronouslyWithLotsOfErrors}))
             .catch((e, chunk) => (z++, chunk))
             .toArray()
             .then(
@@ -105,7 +105,7 @@ module.exports = {
 
         let z = 0;
         getStream()
-            .map(decorateAsynchronouslyWithLotsOfErrors)
+            .pipe(new PromiseTransformStream({promiseTransform: decorateAsynchronouslyWithLotsOfErrors}))
             .catch(() => (z++, undefined))
             .toArray()
             .then(
@@ -125,7 +125,7 @@ module.exports = {
         test.expect(5);
 
         getStream()
-            .map(decorateAsynchronouslyWithError)
+            .pipe(new PromiseTransformStream({promiseTransform: decorateAsynchronouslyWithError}))
             .catch(({cause, chunk}) => {
                 test.equal(cause.message, "Err", "Should pass the error in {cause}");
                 test.equal(chunk.val, 22, "Should fail on the catch 22... chunk...");
@@ -151,7 +151,7 @@ module.exports = {
         let cause1 = null;
 
         getStream()
-            .map(decorateAsynchronouslyWithError)
+            .pipe(new PromiseTransformStream({promiseTransform: decorateAsynchronouslyWithError}))
             .catch(({cause, chunk}) => {
                 test.equal(cause.message, "Err", "Should pass the error in {cause}");
                 test.equal(chunk.val, 22, "Should fail on the catch 22... chunk...");

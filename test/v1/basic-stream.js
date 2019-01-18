@@ -18,6 +18,15 @@ const arr = [
     60, 61, 62, 63, 64, 65, 66, 67, 68, 69
 ];
 
+const fromArray = (arr) => {
+    const ret = new PromiseTransformStream();
+
+    for (const item of arr)
+        ret.write(item);
+    ret.end();
+    return ret;
+};
+
 module.exports = {
     test_pipe: {
         async sync(test) {
@@ -56,7 +65,11 @@ module.exports = {
                 return comp.splice(0, 1);
             }});
             test.ok(stream instanceof PromiseTransformStream, "Stream still implements a PromiseTransformStream");
-            test.deepEqual(await stream.toArray(), arr, "Stream must read the array in sync");
+
+            const ret = [];
+            stream.on("data", (x) => ret.push(x));
+            await stream.whenEnd();
+            test.deepEqual(ret, arr, "Stream must read the array in sync");
             test.done();
         },
         async sync(test) {
@@ -66,7 +79,11 @@ module.exports = {
                 return comp.splice(0, many);
             }});
             test.ok(stream instanceof PromiseTransformStream, "Stream still implements a PromiseTransformStream");
-            test.deepEqual(await stream.toArray(), arr, "Stream must read the array in sync");
+
+            const ret = [];
+            stream.on("data", (x) => ret.push(x));
+            await stream.whenEnd();
+            test.deepEqual(ret, arr, "Stream must read the array in sync");
             test.done();
         },
         async async(test) {
@@ -76,13 +93,17 @@ module.exports = {
                 return new Promise((res) => process.nextTick(() => res(comp.splice(0, many))));
             }});
             test.ok(stream instanceof PromiseTransformStream, "Stream still implements a PromiseTransformStream");
-            test.deepEqual(await stream.toArray(), arr, "Stream must read the array in async");
+
+            const ret = [];
+            stream.on("data", (x) => ret.push(x));
+            await stream.whenEnd();
+            test.deepEqual(ret, arr, "Stream must read the array in async");
             test.done();
         }
     },
     test_write: {
         async sync(test) {
-            const stream = PromiseTransformStream.fromArray([1, 2, 3, 4]);
+            const stream = fromArray([1, 2, 3, 4]);
             const comp = [];
             await stream.pipe(
                 new PromiseTransformStream({
@@ -96,7 +117,7 @@ module.exports = {
             test.done();
         },
         async async(test) {
-            const stream = PromiseTransformStream.fromArray([1, 2, 3, 4]);
+            const stream = fromArray([1, 2, 3, 4]);
             const arr = [];
             await stream.pipe(
                 new PromiseTransformStream({
@@ -130,7 +151,9 @@ module.exports = {
             let ended = false;
             let notDone = true;
 
-            const stream = getStream().each((a) => a);
+            const stream = getStream().pipe(new PromiseTransformStream({
+                promiseTransform: (a) => a
+            }));
 
             stream.on("end", () => {
                 ended = true;
