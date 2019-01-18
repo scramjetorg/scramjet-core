@@ -98,7 +98,7 @@ export class ScramjetOptions extends EventEmitter {
                         writable: true
                     };
 
-                return null;
+                return undefined;
             },
             get(target, key) {
                 if (key in target[_declarations]) {

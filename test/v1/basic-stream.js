@@ -27,6 +27,15 @@ const fromArray = (arr) => {
     return ret;
 };
 
+const toArray = async (stream) => {
+    const ret = [];
+
+    stream.on("data", (x) => ret.push(x));
+
+    await stream.whenEnd();
+    return ret;
+};
+
 module.exports = {
     test_pipe: {
         async sync(test) {
@@ -66,9 +75,7 @@ module.exports = {
             }});
             test.ok(stream instanceof PromiseTransformStream, "Stream still implements a PromiseTransformStream");
 
-            const ret = [];
-            stream.on("data", (x) => ret.push(x));
-            await stream.whenEnd();
+            const ret = await toArray(stream);
             test.deepEqual(ret, arr, "Stream must read the array in sync");
             test.done();
         },
@@ -80,9 +87,7 @@ module.exports = {
             }});
             test.ok(stream instanceof PromiseTransformStream, "Stream still implements a PromiseTransformStream");
 
-            const ret = [];
-            stream.on("data", (x) => ret.push(x));
-            await stream.whenEnd();
+            const ret = await toArray(stream);
             test.deepEqual(ret, arr, "Stream must read the array in sync");
             test.done();
         },
@@ -94,9 +99,7 @@ module.exports = {
             }});
             test.ok(stream instanceof PromiseTransformStream, "Stream still implements a PromiseTransformStream");
 
-            const ret = [];
-            stream.on("data", (x) => ret.push(x));
-            await stream.whenEnd();
+            const ret = await toArray(stream);
             test.deepEqual(ret, arr, "Stream must read the array in async");
             test.done();
         }
@@ -153,7 +156,7 @@ module.exports = {
 
             const stream = getStream().pipe(new PromiseTransformStream({
                 promiseTransform: (a) => a
-            }));
+            })).resume();
 
             stream.on("end", () => {
                 ended = true;

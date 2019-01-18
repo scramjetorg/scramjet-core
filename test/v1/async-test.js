@@ -31,6 +31,15 @@ const decorateAsynchronouslyWithLotsOfErrors = async (chunk) => {
         return decorateAsynchronously(chunk);
 };
 
+const toArray = async (stream) => {
+    const ret = [];
+
+    stream.on("data", (x) => ret.push(x));
+
+    await stream.whenEnd();
+    return ret;
+};
+
 module.exports = {
     test_ok(test) {
         test.expect(3);
@@ -38,6 +47,7 @@ module.exports = {
         getStream()
             .pipe(new PromiseTransformStream({promiseTransform: decorateAsynchronously}))
             .pipe(new PromiseTransformStream({promiseTransform: (i) => a.push(i)}))
+            .resume()
             .on(
                 "end",
                 () => {
@@ -83,10 +93,11 @@ module.exports = {
         test.expect(2);
 
         let z = 0;
-        getStream()
-            .pipe(new PromiseTransformStream({promiseTransform: decorateAsynchronouslyWithLotsOfErrors}))
-            .catch((e, chunk) => (z++, chunk))
-            .toArray()
+        toArray(
+            getStream()
+                .pipe(new PromiseTransformStream({promiseTransform: decorateAsynchronouslyWithLotsOfErrors}))
+                .catch((e, chunk) => (z++, chunk))
+        )
             .then(
                 (ret) => {
                     test.equals(z, 25, "Should call catch on every fourth element");
@@ -104,10 +115,11 @@ module.exports = {
         test.expect(2);
 
         let z = 0;
-        getStream()
-            .pipe(new PromiseTransformStream({promiseTransform: decorateAsynchronouslyWithLotsOfErrors}))
-            .catch(() => (z++, undefined))
-            .toArray()
+        toArray(
+            getStream()
+                .pipe(new PromiseTransformStream({promiseTransform: decorateAsynchronouslyWithLotsOfErrors}))
+                .catch(() => (z++, undefined))
+        )
             .then(
                 (ret) => {
                     test.equals(z, 25, "Should call catch on every fourth element");
@@ -124,13 +136,14 @@ module.exports = {
     test_catch(test) {
         test.expect(5);
 
-        getStream()
-            .pipe(new PromiseTransformStream({promiseTransform: decorateAsynchronouslyWithError}))
-            .catch(({cause, chunk}) => {
-                test.equal(cause.message, "Err", "Should pass the error in {cause}");
-                test.equal(chunk.val, 22, "Should fail on the catch 22... chunk...");
-            })
-            .toArray()
+        toArray(
+            getStream()
+                .pipe(new PromiseTransformStream({promiseTransform: decorateAsynchronouslyWithError}))
+                .catch(({cause, chunk}) => {
+                    test.equal(cause.message, "Err", "Should pass the error in {cause}");
+                    test.equal(chunk.val, 22, "Should fail on the catch 22... chunk...");
+                })
+        )
             .then(
                 (ret) => {
                     test.equals(ret.length, 99, "Should contain all items except one");
@@ -146,36 +159,37 @@ module.exports = {
     },
     test_catch_chaining(test) {
         test.expect(10);
-        const {PromiseTransformStream, errors: {StreamError}} = require(process.env.SCRAMJET_TEST_HOME || "../../");
+        const {PromiseTransformStream, StreamError} = require(process.env.SCRAMJET_TEST_HOME || "../../");
 
         let cause1 = null;
 
-        getStream()
-            .pipe(new PromiseTransformStream({promiseTransform: decorateAsynchronouslyWithError}))
-            .catch(({cause, chunk}) => {
-                test.equal(cause.message, "Err", "Should pass the error in {cause}");
-                test.equal(chunk.val, 22, "Should fail on the catch 22... chunk...");
-                cause1 = cause;
-                throw cause;
-            })
-            .catch((err) => {
-                const {cause, chunk} = err;
+        toArray(
+            getStream()
+                .pipe(new PromiseTransformStream({promiseTransform: decorateAsynchronouslyWithError}))
+                .catch(({cause, chunk}) => {
+                    test.equal(cause.message, "Err", "Should pass the error in {cause}");
+                    test.equal(chunk.val, 22, "Should fail on the catch 22... chunk...");
+                    cause1 = cause;
+                    throw cause;
+                })
+                .catch((err) => {
+                    const {cause, chunk} = err;
 
-                test.ok(err instanceof StreamError, "Should be passing StreamErrors");
-                test.equal(cause1, cause, "Should pass on the same cause");
-                test.equal(chunk.val, 22, "Should pass on the same chunk");
-                throw cause1 = new Error("Err2");
-            })
-            .pipe(new PromiseTransformStream())
-            .catch(({cause}) => {
-                test.equal(cause1, cause, "Should pass the new error");
-                throw cause;
-            })
-            .pipe(new PromiseTransformStream())
-            .catch(({cause}) => {
-                test.equal(cause1, cause, "Should pass the new error");
-            })
-            .toArray()
+                    test.ok(err instanceof StreamError, "Should be passing StreamErrors");
+                    test.equal(cause1, cause, "Should pass on the same cause");
+                    test.equal(chunk.val, 22, "Should pass on the same chunk");
+                    throw cause1 = new Error("Err2");
+                })
+                .pipe(new PromiseTransformStream())
+                .catch(({cause}) => {
+                    test.equal(cause1, cause, "Should pass the new error");
+                    throw cause;
+                })
+                .pipe(new PromiseTransformStream())
+                .catch(({cause}) => {
+                    test.equal(cause1, cause, "Should pass the new error");
+                })
+        )
             .then(
                 (ret) => {
                     test.equals(ret.length, 99, "Should not reject and contain all items except one");
