@@ -1,9 +1,8 @@
+const {MultiTransform} = require("../../");
 
 module.exports = {
     async test_single(test) {
         test.expect(1);
-
-        const {MultiTransform} = require("../../");
 
         const multi = new MultiTransform();
         multi.pushTransform((x) => x + 1);
@@ -13,6 +12,5 @@ module.exports = {
         test.equals(ret, 12, "Should increment value");
 
         test.done();
-
     }
 };
