@@ -14,6 +14,31 @@ const delay = (ms, x) => new Promise(res => setTimeout(() => res(x), ms));
 
 module.exports = {
     test_when: {
+        async read(test) {
+            test.expect(8);
+
+            const stream = DataStream.from([1,2,3,4]);
+
+            let done = false;
+            stream.whenEnd().then(() => done = true);
+
+            console.log("read 0", stream.name);
+            test.equals(1, await stream.whenRead(1), "Should read items");
+            test.equals(2, await stream.whenRead(1), "Should read items");
+            test.equals(3, await stream.whenRead(1), "Should read items");
+            console.log("read 3");
+
+            test.equals(4, await stream.whenRead(1), "Should read last item");
+            console.log("read 4");
+            test.ok(!done, "Should not be done.");
+
+            test.equals(undefined, await stream.whenRead(1), "Should not read past end, but should return.");
+            test.equals(undefined, await stream.whenRead(1), "Can be read forever, but returns undefined.");
+            test.ok(done, "Should be done.");
+
+            test.done();
+
+        },
         end(test) {
             test.expect(2);
 
