@@ -3,6 +3,8 @@
 
 This is the last intended minor API change to `scramjet-core` before the v5 series.
 
+* 9c1c5c3 - Lots of spelling fixes across all documentation.
+
 ## Scramjet Core 4.18.5: Fix whenRead/ing past end.
 
 * 2832be4 - Dependencies update.
@@ -34,30 +36,6 @@ This is the last intended minor API change to `scramjet-core` before the v5 seri
 
 * 2832be4 - Dependencies update.
 * 95e9fe3 - Fix for #33, new tests for whenRead
-
-## Scramjet Core 4.18.4: Fix operation of createTransformModule and createReadModule
-
-* 4fa120f - Fix module creation methods.
-
-## Scramjet Core 4.18.3: chore: Fixes wording in docs
-
-* 95af4d8 - Fix docs
-* b0d6b4f - Fix wording as mentioned in #26
-
-## Scramjet Core 4.18.2: Fixes pipeline and use operation on String and Buffer streams
-
-* ce35809 - Update docs
-* 5415ca1 - Some documentation
-* 7daf1fc - Fix lint issue
-* 7db797d - Dependencies update.
-* 13ae597 - Fix and extend coverage for use command with strings
-* bb705dc - Fix pipeline method on string and buffer streams
-* fc8edc3 - Dependencies update.
-
-## Scramjet Core 4.18.1: Dependencies update
-
-* 67d959b - Fix unorder test not to break down
-* 75b2159 - Dependencies update
 
 ## Scramjet Core 4.18.0 - 4.18.0: Allow usage of generators in use, new unorder method
 

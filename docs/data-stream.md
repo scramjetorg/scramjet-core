@@ -23,7 +23,7 @@ await (DataStream.from(aStream) // create a DataStream
 
 * [DataStream](#DataStream)  <code>stream.PassThrough</code>
     * [new DataStream(opts)](#new_DataStream_new)
-    * [dataStream.map(func, Clazz)](#DataStream+map) ↺
+    * [dataStream.map(func, ClassType)](#DataStream+map) ↺
     * [dataStream.filter(func)](#DataStream+filter) ↺
     * [dataStream.reduce(func, into)](#DataStream+reduce)
     * [dataStream.do(func)](#DataStream+do) ↺
@@ -53,8 +53,8 @@ await (DataStream.from(aStream) // create a DataStream
     * [dataStream.toStringStream(serializer)](#DataStream+toStringStream) ↺ <code>StringStream</code>
     * [DataStream:from(input, options)](#DataStream.from)  [<code>DataStream</code>](#DataStream)
     * [DataStream:pipeline(readable, ...transforms)](#DataStream.pipeline)  [<code>DataStream</code>](#DataStream)
-    * [DataStream:fromArray(arr, options)](#DataStream.fromArray)  [<code>DataStream</code>](#DataStream)
-    * [DataStream:fromIterator(iter, options)](#DataStream.fromIterator)  [<code>DataStream</code>](#DataStream)
+    * [DataStream:fromArray(array, options)](#DataStream.fromArray)  [<code>DataStream</code>](#DataStream)
+    * [DataStream:fromIterator(iterator, options)](#DataStream.fromIterator)  [<code>DataStream</code>](#DataStream)
     * [DataStream:MapCallback](#DataStream.MapCallback)  <code>Promise</code> \| <code>\*</code>
     * [DataStream:FilterCallback](#DataStream.FilterCallback)  <code>Promise</code> \| <code>Boolean</code>
     * [DataStream:ReduceCallback](#DataStream.ReduceCallback)  <code>Promise</code> \| <code>\*</code>
@@ -74,7 +74,7 @@ Create the DataStream.
 
 <a name="DataStream+map"></a>
 
-### dataStream.map(func, Clazz) ↺
+### dataStream.map(func, ClassType) ↺
 Transforms stream objects into new ones, just like Array.prototype.map
 does.
 
@@ -89,8 +89,8 @@ stream.map(async url => fetch(url));
 ```
 
 Multiple subsequent map operations (as well as filter, do, each and other simple ops)
-will be merged together into a single operation to improve performance. Such behavior
-can be surpressed by chaining `.tap()` after `.map()`.
+will be merged together into a single operation to improve performance. Such behaviour
+can be suppressed by chaining `.tap()` after `.map()`.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -99,7 +99,7 @@ can be surpressed by chaining `.tap()` after `.map()`.
 | Param | Type | Description |
 | --- | --- | --- |
 | func | <code>MapCallback</code> | The function that creates the new object |
-| Clazz | <code>Class</code> | (optional) The class to be mapped to. |
+| ClassType | <code>Class</code> | (optional) The class to be mapped to. |
 
 <a name="DataStream+filter"></a>
 
@@ -137,7 +137,7 @@ promise that's resolved with the return value of the last transform executed.
 A simple example that sums values from a stream
 
 ```javascript
-stream.reduce((acc, {value}) => acc + value);
+stream.reduce((accumulator, {value}) => accumulator + value);
 ```
 
 This method is serial - meaning that any processing on an entry will
@@ -155,10 +155,10 @@ it's much slower than parallel functions.
 <a name="DataStream+do"></a>
 
 ### dataStream.do(func) ↺
-Perform an asynchroneous operation without changing or resuming the stream.
+Perform an asynchronous operation without changing or resuming the stream.
 
 In essence the stream will use the call to keep the backpressure, but the resolving value
-has no impact on the streamed data (except for possile mutation of the chunk itself)
+has no impact on the streamed data (except for possible mutation of the chunk itself)
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -219,7 +219,7 @@ from the command line.
 | Param | Type | Description |
 | --- | --- | --- |
 | func | <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>String</code> \| <code>Readable</code> | if passed, the function will be called on self to add an option to inspect the stream in place, while not breaking the transform chain. Alternatively this can be a relative path to a scramjet-module. Lastly it can be a Transform stream. |
-| [...args] | <code>\*</code> | any additional args top be passed to the module |
+| [...parameters] | <code>\*</code> | any additional parameters top be passed to the module |
 
 <a name="DataStream+run"></a>
 
@@ -505,7 +505,7 @@ Depending on type:
 * `Iterable`s iterator will be used as a source for streams
 
 You can also pass a `Function` or `AsyncFunction` that will be executed and it's outcome will be
-passed again to `from` and piped to the initially returned stream. Any addtional arguments will be
+passed again to `from` and piped to the initially returned stream. Any additional arguments will be
 passed as arguments to the function.
 
 If a `String` is passed, scramjet will attempt to resolve it as a module and use the outcome
@@ -556,7 +556,7 @@ Each following argument will be understood as a transform and can be any of:
 
 <a name="DataStream.fromArray"></a>
 
-### DataStream:fromArray(arr, options) : DataStream
+### DataStream:fromArray(array, options) : DataStream
 Create a DataStream from an Array
 
 **Kind**: static method of [<code>DataStream</code>](#DataStream)  
@@ -564,12 +564,12 @@ Create a DataStream from an Array
 
 | Param | Type | Description |
 | --- | --- | --- |
-| arr | <code>Array</code> | list of chunks |
+| array | <code>Array</code> | list of chunks |
 | options | <code>ScramjetOptions</code> | the read stream options |
 
 <a name="DataStream.fromIterator"></a>
 
-### DataStream:fromIterator(iter, options) : DataStream
+### DataStream:fromIterator(iterator, options) : DataStream
 Create a DataStream from an Iterator
 
 Doesn't end the stream until it reaches end of the iterator.
@@ -579,7 +579,7 @@ Doesn't end the stream until it reaches end of the iterator.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| iter | <code>Iterator</code> | the iterator object |
+| iterator | <code>Iterator</code> | the iterator object |
 | options | <code>ScramjetOptions</code> | the read stream options |
 
 <a name="DataStream.MapCallback"></a>
@@ -611,7 +611,7 @@ Doesn't end the stream until it reaches end of the iterator.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| acc | <code>\*</code> | the accumulator - the object initially passed or returned                by the previous reduce operation |
+| accumulator | <code>\*</code> | the accumulator - the object initially passed or returned                by the previous reduce operation |
 | chunk | <code>Object</code> | the stream chunk. |
 
 <a name="DataStream.DoCallback"></a>
