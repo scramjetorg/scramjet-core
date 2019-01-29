@@ -3,6 +3,8 @@
 
 This is the last intended minor API change to `scramjet-core` before the v5 series.
 
+* 9c1c5c3 - Lots of spelling fixes across all documentation.
+
 ## Scramjet Core 4.18.5: Fix whenRead/ing past end.
 
 * 2832be4 - Dependencies update.
