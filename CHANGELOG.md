@@ -3,6 +3,15 @@
 
 This is the last intended minor API change to `scramjet-core` before the v5 series.
 
+## Scramjet Core 4.19.0: All and race
+
+* 3508bdb - New methods all and race
+* 8dc4711 - Use scramjet rules for eslint
+
+## Scramjet Core 4.18.6: Spelling fixes and documentation updates
+
+* bc6a4c3 - Dependencies update.
+* 93cc7ce - Changelog update
 * 9c1c5c3 - Lots of spelling fixes across all documentation.
 
 ## Scramjet Core 4.18.5: Fix whenRead/ing past end.
