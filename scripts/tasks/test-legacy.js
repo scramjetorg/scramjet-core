@@ -1,5 +1,5 @@
 const gulp = require("gulp");
-const DataStream = require("scramjet");
+const DataStream = require("../../");
 const nodeunit = require("nodeunit");
 const {promisify} = require("util");
 

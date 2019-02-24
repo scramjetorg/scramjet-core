@@ -1,5 +1,5 @@
 const gulp = require("gulp");
-const {DataStream} = require("scramjet");
+const {DataStream} = require("../../");
 const {jsdoc2md} = require("../lib/util");
 const rename = require("gulp-rename");
 const log = require("fancy-log");
