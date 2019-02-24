@@ -1,0 +1,328 @@
+"use strict";
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+/** @ignore */
+const scramjet = require(".");
+/** @ignore */
+
+
+const SPLIT_LINE = /\r\n?|\n/g;
+/**
+ * A stream of string objects for further transformation on top of DataStream.
+ *
+ * Example:
+ *
+ * ```javascript
+ * StringStream.fromString()
+ * ```
+ *
+ * @extends DataStream
+ * @borrows StringStream#shift as StringStream#pop
+ */
+
+class StringStream extends scramjet.DataStream {
+  /**
+   * Constructs the stream with the given encoding
+   *
+   * @param {String} encoding the encoding to use
+   * @param {ScramjetOptions} options scramjet stream options
+   * @return {StringStream}  the created data stream
+   *
+   * @test test/methods/string-stream-constructor.js
+   */
+  constructor(encoding, options) {
+    super(typeof encoding === "string" ? options : encoding);
+    this.buffer = "";
+    this.encoding = typeof encoding === "string" ? encoding : "utf8";
+  }
+  /**
+   * @callback ShiftCallback
+   * @memberof StringStream.
+   * @param {String} shifted Popped chars
+   */
+
+  /**
+   * Shifts given length of chars from the original stream
+   *
+   * Works the same way as {@see DataStream.shift}, but in this case extracts
+   * the given number of characters.
+   *
+   * @chainable
+   * @memberof StringStream
+   * @param {Number} bytes The number of characters to shift.
+   * @param {ShiftCallback} func Function that receives a string of shifted chars.
+   *
+   * @test test/methods/string-stream-shift.js
+   */
+
+
+  shift(bytes, func) {
+    const ret = "";
+
+    const str = this.tap()._selfInstance({
+      referrer: this
+    });
+
+    let offs = 0;
+
+    const chunkHandler = chunk => {
+      const length = Math.min(bytes - offs, chunk.length);
+      chunk.substr(0, length);
+      offs += length;
+
+      if (length >= bytes) {
+        unHook().then(() => {
+          str.write(chunk.slice(length));
+          this.pipe(str);
+        });
+      }
+    };
+
+    const endHandler = (...args) => {
+      if (ret.length < bytes) {
+        unHook();
+      }
+
+      str.end(...args);
+    };
+
+    const errorHandler = str.emit.bind(str, "error");
+
+    const unHook = () => {
+      this.removeListener("data", chunkHandler);
+      this.removeListener("end", endHandler);
+      this.removeListener("error", errorHandler);
+      return Promise.resolve(ret).then(func);
+    };
+
+    this.on("data", chunkHandler);
+    this.on("end", endHandler);
+    this.on("error", errorHandler);
+    return str;
+  }
+  /**
+   * A handy split by line regex to quickly get a line-by-line stream
+   */
+
+
+  static get SPLIT_LINE() {
+    return SPLIT_LINE;
+  }
+  /**
+   * Splits the string stream by the specified RegExp or string
+   *
+   * @chainable
+   * @param  {RegExp|String} splitter What to split by
+   *
+   * @test test/methods/string-stream-split.js
+   */
+
+
+  split(splitter) {
+    if (splitter instanceof RegExp || typeof splitter === "string") {
+      return this.tap().pipe(this._selfInstance({
+        transform(chunk, encoding, callback) {
+          this.buffer += chunk.toString(this.encoding);
+          const newChunks = this.buffer.split(splitter);
+
+          while (newChunks.length > 1) {
+            this.push(newChunks.shift());
+          }
+
+          this.buffer = newChunks[0];
+          callback();
+        },
+
+        flush(callback) {
+          this.push(this.buffer);
+          this.buffer = "";
+          callback();
+        },
+
+        referrer: this
+      }));
+    } else if (splitter instanceof Function) {
+      return this.tap().pipe(new this.constructor({
+        transform: splitter,
+        referrer: this
+      }));
+    }
+  }
+  /**
+   * Finds matches in the string stream and streams the match results
+   *
+   * @chainable
+   * @param  {RegExp} matcher A function that will be called for every
+   *                             stream chunk.
+   *
+   * @test test/methods/string-stream-match.js
+   */
+
+
+  match(matcher) {
+    if (matcher instanceof RegExp) {
+      const replaceRegex = matcher.source.search(/\((?!\?)/g) > -1 ? new RegExp("[\\s\\S]*?" + matcher.source, (matcher.ignoreCase ? "i" : "") + (matcher.multiline ? "m" : "") + (matcher.unicode ? "u" : "") + "g") : new RegExp("[\\s\\S]*?(" + matcher.source + ")", (matcher.ignoreCase ? "i" : "") + (matcher.multiline ? "m" : "") + (matcher.unicode ? "u" : "") + "g");
+      return this.tap().pipe(this._selfInstance({
+        transform(chunk, encoding, callback) {
+          this.buffer = (this.buffer || "") + chunk.toString("utf-8");
+          this.buffer = this.buffer.replace(replaceRegex, (...match) => {
+            this.push(match.slice(1, match.length - 2).join(""));
+            return "";
+          });
+          callback();
+        },
+
+        referrer: this
+      }));
+    }
+
+    throw new Error("Matcher must be a RegExp!");
+  }
+  /**
+   * Transforms the StringStream to BufferStream
+   *
+   * Creates a buffer stream from the given string stream. Still it returns a
+   * DataStream derivative and isn't the typical node.js stream so you can do
+   * all your transforms when you like.
+   *
+   * @meta.noReadme
+   * @chainable
+   * @return {BufferStream}  The converted stream.
+   *
+   * @test test/methods/string-stream-tobufferstream.js
+   */
+
+
+  toBufferStream() {
+    return this.tap().map(str => Buffer.from(str, this.encoding), new scramjet.BufferStream({
+      referrer: this
+    }));
+  }
+  /**
+   * @meta.noReadme
+   * @ignore
+   */
+
+
+  toStringStream(encoding) {
+    if (encoding) return this.tap().pipe(this._selfInstance(encoding, {
+      referrer: this
+    }));else return this;
+  }
+  /**
+   * @callback ParseCallback
+   * @memberof StringStream.
+   * @param {String} chunk the transformed chunk
+   * @return {Promise}  the promise should be resolved with the parsed object
+   */
+
+  /**
+    * Parses every string to object
+    *
+    * The method MUST parse EVERY string into a single object, so the string
+    * stream here should already be split.
+    *
+    * @chainable
+    * @param  {ParseCallback} parser The transform function
+    * @return {DataStream}  The parsed objects stream.
+    *
+    * @test test/methods/string-stream-parse.js
+    */
+
+
+  parse(parser, OtherStream) {
+    return this.tap().map(parser, OtherStream || scramjet.DataStream);
+  }
+  /**
+   * Alias for {@link StringStream#parse}
+   * @memberof StringStream#
+   * @method toDataStream
+   */
+
+  /**
+    * @meta.noReadme
+    * @ignore
+    */
+
+
+  _transform(chunk, encoding, callback) {
+    this.push(chunk.toString(this.encoding));
+    return callback();
+  }
+  /**
+   * Creates a StringStream and writes a specific string.
+   *
+   * @param  {String} stream   the string to push the your stream
+   * @param  {String} encoding optional encoding
+   * @return {StringStream}          new StringStream.
+   */
+
+
+  static fromString(stream, encoding) {
+    const st = new this(encoding || "utf-8");
+    st.end(stream);
+    return st;
+  }
+  /**
+   * Creates a pipeline of streams and returns a scramjet stream.
+   *
+   * @see DataStream.pipeline
+   * @static
+   * @param {Array|Iterable|AsyncGeneratorFunction|GeneratorFunction|AsyncFunction|Function|String|Readable} readable the initial readable argument that is streamable by scramjet.from
+   * @param {AsyncFunction|Function|Transform} transforms Transform functions (as in {@link DataStream..use}) or Transform streams (any number of these as consecutive arguments)
+   *
+   * @returns {StringStream} a new StringStream instance of the resulting pipeline
+   */
+
+
+  static pipeline(...args) {
+    return scramjet.DataStream.pipeline.call(this, ...args);
+  }
+  /**
+   * Create StringStream from anything.
+   *
+   * @see DataStream.from
+   * @see module:scramjet.from
+   *
+   * @param {String|Array|Iterable|AsyncGeneratorFunction|GeneratorFunction|AsyncFunction|Function|Readable} source argument to be turned into new stream
+   * @param {StreamOptions|Writable} options
+   * @return {StringStream}          new StringStream.
+   */
+
+
+  static from(source, options, ...args) {
+    try {
+      return scramjet.DataStream.from.call(this, source, options, ...args);
+    } catch (e) {
+      if (typeof source === "string") {
+        return this.fromString(source);
+      }
+
+      throw e;
+    }
+  }
+
+  static fromIterator(iterator, options) {
+    return new this("utf-8", Object.assign({}, options, {
+      parallelRead() {
+        return _asyncToGenerator(function* () {
+          const read = yield iterator.next();
+
+          if (read.done) {
+            return read.value ? [yield read.value, null] : [null];
+          } else {
+            return [yield read.value];
+          }
+        })();
+      }
+
+    }));
+  }
+
+}
+
+StringStream.prototype.pop = StringStream.prototype.shift;
+module.exports = StringStream;
