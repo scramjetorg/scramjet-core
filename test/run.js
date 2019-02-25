@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { DataStream } = require("scramjet");
+const { DataStream } = require("../");
 const path = require("path");
 
 DataStream
