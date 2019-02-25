@@ -5,7 +5,7 @@ const {promisify} = require("util");
 
 module.exports = function testLegacy(src, cfg = {reporter: "default", reporterOpts: {}}) {
     const reporter = nodeunit.reporters[cfg.reporter] || require(cfg.reporter);
-    const cache = Object.keys(require.cache).reduce((acc, k) => (acc[k] = true, acc));
+    const cache = Object.keys(require.cache).reduce((acc, k) => (acc[k] = true, acc), {});
 
     return () => DataStream.from(gulp.src(src))
         .map(file => file.path)

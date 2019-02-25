@@ -15,7 +15,7 @@ module.exports = function testLegacy(src, cfg = {
 }) {
   const reporter = nodeunit.reporters[cfg.reporter] || require(cfg.reporter);
 
-  const cache = Object.keys(require.cache).reduce((acc, k) => (acc[k] = true, acc));
+  const cache = Object.keys(require.cache).reduce((acc, k) => (acc[k] = true, acc), {});
   return () => DataStream.from(gulp.src(src)).map(file => file.path).toArray().then(files => promisify(reporter.run)(files, cfg.reporterOpts)).then(() => {
     // Delete any modules that were added to the require cache
     Object.keys(require.cache).filter(function (k) {
