@@ -2,7 +2,7 @@ const dmd = require("dmd");
 const jsdoc = require("jsdoc-api");
 const jsdocParse = require("jsdoc-parse");
 
-const promisify = require("util").promisify && (
+const promisify = require("util").promisify || (
     (fn) =>
         (...a) =>
             new Promise(
