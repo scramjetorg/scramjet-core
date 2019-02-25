@@ -1,7 +1,7 @@
 const gulp = require("gulp");
 const DataStream = require("../../");
 const nodeunit = require("nodeunit");
-const {promisify} = require("util");
+const {promisify} = require("../lib/util");
 
 module.exports = function testLegacy(src, cfg = {reporter: "default", reporterOpts: {}}) {
     const reporter = nodeunit.reporters[cfg.reporter] || require(cfg.reporter);

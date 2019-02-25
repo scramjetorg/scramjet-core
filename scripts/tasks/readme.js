@@ -1,5 +1,4 @@
-const {jsdoc2md} = require("../lib/util");
-const {promisify} = require("util");
+const {jsdoc2md, promisify} = require("../lib/util");
 const fs = require("fs");
 
 module.exports = (config, target) => {
