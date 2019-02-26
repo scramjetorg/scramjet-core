@@ -5,7 +5,7 @@ const scramjet = require(process.env.SCRAMJET_TEST_HOME || "../../");
 module.exports = {
   test_plugin(test) {
     test.ok(typeof scramjet.plugin === "function", "Must expose 'plugin'");
-    test.done();
+    test.end();
   },
 
   test_BufferStream(test) {
@@ -13,7 +13,7 @@ module.exports = {
     let stream;
     test.doesNotThrow(() => stream = new scramjet.BufferStream(), Error, "Must be able to construct 'BufferStream' with no args");
     test.ok(stream instanceof scramjet.PromiseTransformStream, "Must extend 'PromiseTransformStream'");
-    test.done();
+    test.end();
   },
 
   test_DataStream(test) {
@@ -21,7 +21,7 @@ module.exports = {
     let stream;
     test.doesNotThrow(() => stream = new scramjet.DataStream(), Error, "Must be able to construct 'DataStream' with no args");
     test.ok(stream instanceof scramjet.PromiseTransformStream, "Must extend 'PromiseTransformStream'");
-    test.done();
+    test.end();
   },
 
   test_StringStream(test) {
@@ -29,24 +29,24 @@ module.exports = {
     let stream;
     test.doesNotThrow(() => stream = new scramjet.StringStream(), Error, "Must be able to construct 'StringStream' with no args");
     test.ok(stream instanceof scramjet.PromiseTransformStream, "Must extend 'PromiseTransformStream'");
-    test.done();
+    test.end();
   },
 
   test_MultiStream(test) {
     test.ok(typeof scramjet.MultiStream === "function", "Must expose ctor for 'MultiStream'");
     test.doesNotThrow(() => new scramjet.MultiStream(), Error, "Must be able to construct 'MultiStream' with no args");
-    test.done();
+    test.end();
   },
 
   test_PromiseTransformStream(test) {
     test.ok(typeof scramjet.PromiseTransformStream === "function", "Must expose ctor for 'PromiseTransformStream' with no args");
     test.doesNotThrow(() => new scramjet.PromiseTransformStream(), Error, "Must be able to construct 'PromiseTransformStream'");
-    test.done();
+    test.end();
   },
 
   test_API(test) {
     test.ok(typeof scramjet.API === "function", "Must expose 'API'");
-    test.done();
+    test.end();
   }
 
 };

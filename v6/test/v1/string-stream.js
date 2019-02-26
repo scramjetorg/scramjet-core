@@ -24,31 +24,32 @@ const getStream = arr => {
 
 module.exports = {
   test_pipe(test) {
-    test.expect(2);
+    test.plan(2);
     const firstChunk = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do ";
     const stream = getStream([firstChunk, "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut ", "enim ad minim veniam, quis nostrud exercitation ullamco laboris ", "nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in ", "reprehenderit in voluptate velit esse cillum dolore eu fugiat ", "nulla pariatur. Excepteur sint occaecat cupidatat non proident, ", "sunt in culpa qui officia deserunt mollit anim id est laborum."]).pipe(new StringStream());
     test.ok(stream instanceof DataStream, "Extends data stream");
     stream.once("data", item => {
       test.equals(item, firstChunk, "Reads chunks in order and intact");
-      test.done();
+      test.end();
     });
+    return stream.run();
   },
 
   test_split: {
     string(test) {
-      test.expect(4);
+      test.plan(4);
       const orgStream = getStream(["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do ", "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut ", "enim ad minim veniam, quis nostrud exercitation ullamco laboris ", "nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in ", "reprehenderit in voluptate velit esse cillum dolore eu fugiat ", "nulla pariatur. Excepteur sint occaecat cupidatat non proident, ", "sunt in culpa qui officia deserunt mollit anim id est laborum."]).pipe(new StringStream());
       let stream;
       test.doesNotThrow(() => stream = orgStream.split(" "), null, "Should not throw on split by string");
       let spaces = 0;
       test.ok(stream instanceof StringStream, "Should return a StringStream");
-      stream.reduce((acc, item) => {
+      return stream.reduce((acc, item) => {
         if (item.indexOf(" ") >= 0) spaces++;
         return acc + 1;
       }, 0).then(res => {
         test.equals(69, res, "Should split by every occurence of that string");
         test.equals(spaces, 0, "The splitting string should not occur in items");
-        test.done();
+        test.end();
       });
     },
 
@@ -58,27 +59,27 @@ module.exports = {
       test.doesNotThrow(() => stream = orgStream.split(/[ ,.]+/), null, "Should not throw on split by regex");
       let spaces = 0;
       test.ok(stream instanceof StringStream, "Should return a StringStream");
-      stream.reduce((acc, item) => {
+      return stream.reduce((acc, item) => {
         if (item.indexOf(" ") >= 0 || item.indexOf(",") >= 0 || item.indexOf(".") >= 0) spaces++;
         return acc + 1;
       }, 0).then(res => {
         test.equals(70, res, "Should split by every occurence of that string");
         test.equals(spaces, 0, "The splitting string should not occur in items");
-        test.done();
+        test.end();
       });
     }
 
   },
 
   test_match(test) {
-    test.expect(3);
+    test.plan(3);
     const orgStream = getStream(["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do ", "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut ", "enim ad minim veniam, quis nostrud exercitation ullamco laboris ", "nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in ", "reprehenderit in voluptate velit esse cillum dolore eu fugiat ", "nulla pariatur. Excepteur sint occaecat cupidatat non proident, ", "sunt in culpa qui officia deserunt mollit anim id est laborum."]).pipe(new StringStream());
     let stream;
     test.doesNotThrow(() => stream = orgStream.match(/\b(\w{4})[^\w]/g), null, "Should not throw on match by regex");
     test.ok(stream instanceof DataStream, "Should return a DataStream");
-    stream.reduce((acc, item) => acc + ":" + item, "").then(res => {
+    return stream.reduce((acc, item) => acc + ":" + item, "").then(res => {
       test.equals(":amet:elit:enim:quis:nisi:Duis:aute:esse:sint:sunt:anim", res, "Should return a string with all four letter words");
-      test.done();
+      test.end();
     });
   },
 
@@ -97,10 +98,10 @@ module.exports = {
     z.ttt = "ye";
     stream.ttt = "okok";
     test.ok(stream instanceof DataStream, "Should return data stream");
-    stream.reduce((acc, data) => (acc.push(data), acc), []).then(data => {
+    return stream.reduce((acc, data) => (acc.push(data), acc), []).then(data => {
       test.equals(data[0].symbol, "AAL", "Data should be parsed according to the function");
       test.strictEqual(data[1].price, 110.06, "Data should be parsed according to the function");
-      test.done();
+      test.end();
     });
   }
 

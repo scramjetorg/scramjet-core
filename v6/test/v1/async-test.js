@@ -72,59 +72,63 @@ function () {
 
 module.exports = {
   test_ok(test) {
-    test.expect(3);
-    const a = [];
-    getStream().map(decorateAsynchronously).each(i => a.push(i)).on("end", () => {
-      test.ok(a[0].ref, "called asynchronous map");
-      test.equals(a.length, 100, "accumulated all items");
-      test.ok(a[0].val === 0 && a[1].val === 1 && a[2].val === 2 && a[3].val === 3, "Order should be preserved " + JSON.stringify(a[3]));
-      test.done();
-    }).on("error", e => test.ok(false, "should not fail! " + e));
+    return _asyncToGenerator(function* () {
+      test.plan(3);
+      const a = [];
+      return getStream().map(decorateAsynchronously).each(i => a.push(i)).on("end", () => {
+        test.ok(a[0].ref, "called asynchronous map");
+        test.equals(a.length, 100, "accumulated all items");
+        test.ok(a[0].val === 0 && a[1].val === 1 && a[2].val === 2 && a[3].val === 3, "Order should be preserved " + JSON.stringify(a[3]));
+        test.end();
+      }).on("error", e => test.ok(false, "should not fail! " + e)).run();
+    })();
   },
 
   test_err(test) {
-    if (process.env.TRAVIS === "true") return test.done();
-    test.expect(3);
-    getStream().map(decorateAsynchronouslyWithError).once("error", (e, chunk) => {
-      test.ok(true, "Should emit error");
-      test.ok(e instanceof Error, "Thrown should be an instance of Error");
-      test.equals(chunk.val, 22, "Should error on and pass catch 22... I mean chunk...");
-      test.done();
-    }).once("end", () => {
-      test.fail("Should not end!");
-      test.done();
-    });
+    return _asyncToGenerator(function* () {
+      if (process.env.TRAVIS === "true") return test.end();
+      test.plan(3);
+      return getStream().map(decorateAsynchronouslyWithError).once("error", (e, chunk) => {
+        test.ok(true, "Should emit error");
+        test.ok(e instanceof Error, "Thrown should be an instance of Error");
+        test.equals(chunk.val, 22, "Should error on and pass catch 22... I mean chunk...");
+        test.end();
+      }).once("end", () => {
+        test.fail("Should not end!");
+        test.end();
+      }).run();
+    })();
   },
 
   test_error_flow(test) {
-    test.expect(2);
+    test.plan(2);
     let z = 0;
-    getStream().map(decorateAsynchronouslyWithLotsOfErrors).catch((e, chunk) => (z++, chunk)).toArray().then(ret => {
+    return getStream().map(decorateAsynchronouslyWithLotsOfErrors).catch((e, chunk) => (z++, chunk)).toArray().then(ret => {
       test.equals(z, 25, "Should call catch on every fourth element");
       test.equals(ret.length, 100, "Should contain all elements");
-      test.done();
+      test.end();
     }, err => {
       test.fail(err, "Should not throw");
-      test.done();
+      test.end();
     });
   },
 
   test_error_filtering(test) {
-    test.expect(2);
+    test.plan(2);
     let z = 0;
-    getStream().map(decorateAsynchronouslyWithLotsOfErrors).catch(() => (z++, undefined)).toArray().then(ret => {
+    return getStream().map(decorateAsynchronouslyWithLotsOfErrors).catch(() => (z++, undefined)).toArray().then(ret => {
       test.equals(z, 25, "Should call catch on every fourth element");
       test.equals(ret.length, 75, "Should contain all elements");
-      test.done();
+      test.end();
     }, err => {
       test.fail(err, "Should not throw");
-      test.done();
+      test.end();
     });
   },
 
   test_catch(test) {
-    test.expect(5);
-    getStream().map(decorateAsynchronouslyWithError).catch(({
+    test.plan(5);
+    return getStream().map(decorateAsynchronouslyWithError).catch(({
       cause,
       chunk
     }) => {
@@ -134,17 +138,17 @@ module.exports = {
       test.equals(ret.length, 99, "Should contain all items except one");
       test.equals(ret[21].val, 21, "Should preserver order of elements (part 1)");
       test.equals(ret[22].val, 23, "Should preserver order of elements (part 2)");
-      test.done();
+      test.end();
     }, err => {
       test.fail(err);
-      test.done();
+      test.end();
     });
   },
 
   test_catch_chaining(test) {
-    test.expect(10);
+    test.plan(10);
     let cause1 = null;
-    getStream().map(decorateAsynchronouslyWithError).catch(({
+    return getStream().map(decorateAsynchronouslyWithError).catch(({
       cause,
       chunk
     }) => {
@@ -172,10 +176,10 @@ module.exports = {
       test.equals(ret.length, 99, "Should not reject and contain all items except one");
       test.equals(ret[21].val, 21, "Should preserver order of elements (part 1)");
       test.equals(ret[22].val, 23, "Should preserver order of elements (part 2)");
-      test.done();
+      test.end();
     }, err => {
       test.fail(err);
-      test.done();
+      test.end();
     });
   }
 

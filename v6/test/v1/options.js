@@ -31,7 +31,7 @@ module.exports = {
           value: 1
         });
       });
-      test.done();
+      test.end();
     },
 
     chained(test) {
@@ -63,7 +63,7 @@ module.exports = {
           value: 6
         });
       });
-      test.done();
+      test.end();
     }
 
   },
@@ -84,7 +84,7 @@ module.exports = {
       }, "Does not throw on standard operations");
       test.throws(() => a.options.undef = 1, "Shoud throw on setter of undeclared item");
       test.throws(() => a.options.undef, "Shoud throw on getter of undeclared item");
-      test.done();
+      test.end();
     },
 
     inherited(test) {
@@ -95,7 +95,7 @@ module.exports = {
         b.options.option1 = 6;
         test.equals(b.options.option1, 6, "'option1' setters and getters should work");
       }, "Does not throw on standard operations");
-      test.done();
+      test.end();
     },
 
     chained(test) {
@@ -121,7 +121,7 @@ module.exports = {
         test.equals(c.options.option7, 9, "'option7' setters on A should be readable from B");
         test.equals(c.options.option8, 6, "'option8' setters on B should not affect A");
       }, "Does not throw on standard operations");
-      test.done();
+      test.end();
     }
 
   }

@@ -42,7 +42,7 @@ const _require$plugin = require(process.env.SCRAMJET_TEST_HOME || "../../").plug
 
 module.exports = {
   test_plugin(test) {
-    test.expect(7);
+    test.plan(7);
     cnt = 0;
     const stream = DataStream.fromArray([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     const stream2 = new StringStream({
@@ -55,7 +55,7 @@ module.exports = {
     test.equals(stream.test, xSymbol, "DataStream must have the plugin getter");
     test.equals(cnt, 2, "DataStream constructor must be called before StringStream");
     stream.addX(test);
-    test.done();
+    test.end();
   }
 
 };

@@ -68,65 +68,65 @@ const transforms = {
 
 const tests = {
   entry_count: (errorStream, transform, test) => {
-    test.expect(1);
+    test.plan(1);
     const ref = {
       thrown: {}
     };
-    errorStream(ref).use(transform, ref).catch(() => undefined).toArray().then(arr => test.equals(arr.length, 99, "Should contain one less item"), () => test.ok(false, "Should not reject if error was handled")).then(() => test.done());
+    return errorStream(ref).use(transform, ref).catch(() => undefined).toArray().then(arr => test.equals(arr.length, 99, "Should contain one less item"), () => test.ok(false, "Should not reject if error was handled")).then(() => test.end());
   },
   in_promise: (errorStream, transform, test) => {
-    test.expect(2);
+    test.plan(2);
     const ref = {
       thrown: {}
     };
-    errorStream(ref).use(transform, ref).run().catch(e => {
+    return errorStream(ref).use(transform, ref).run().catch(e => {
       test.equals(e.cause, ref.thrown, "Should throw the wrapped error");
       test.equals(e.cause.message, "Eight and fourty", "Should convey the message");
-    }).then(() => test.done());
+    }).then(() => test.end());
   },
   in_catch: (errorStream, transform, test) => {
-    test.expect(2);
+    test.plan(2);
     const ref = {
       thrown: {}
     };
-    errorStream(ref).use(transform, ref).catch(e => {
+    return errorStream(ref).use(transform, ref).catch(e => {
       test.equals(e.cause, ref.thrown, "Should throw the wrapped error");
       test.equals(e.cause.message, "Eight and fourty", "Should convey the message");
-    }).run().catch(() => test.ok(false, "Must not call catch if error already caught")).then(() => test.done());
+    }).run().catch(() => test.ok(false, "Must not call catch if error already caught")).then(() => test.end());
   },
   in_handler: (errorStream, transform, test) => {
-    test.expect(1);
+    test.plan(1);
     const ref = {
       thrown: {}
     };
-    errorStream(ref).use(transform, ref).run().then(() => test.ok(false, "Should not resolve if error was unhandled"), () => test.ok(true, "Must not call catch if error already caught")).then(() => test.done());
+    return errorStream(ref).use(transform, ref).run().then(() => test.ok(false, "Should not resolve if error was unhandled"), () => test.ok(true, "Must not call catch if error already caught")).then(() => test.end());
   }
 }; // ------- Other cases -------
 
 const otherTests = {
   failing_iterator_accessor(test) {
-    test.expect(2);
+    test.plan(2);
     let thrown;
-    DataStream.from({
+    return DataStream.from({
       [Symbol.iterator]: function () {
         throw thrown = new Error("Not even one");
       }
     }).run().catch(e => {
       test.equals(e.cause, thrown, "Should throw the wrapped error");
       test.equals(e.cause.message, "Not even one", "Should convey the message");
-    }).then(() => test.done());
+    }).then(() => test.end());
   },
 
   failing_generator(test) {
-    test.expect(2);
+    test.plan(2);
     let thrown;
-    DataStream.from(function* () {
+    return DataStream.from(function* () {
       yield 1;
       throw thrown = new Error("All but one");
     }).run().catch(e => {
       test.equals(e.cause, thrown, "Should throw the wrapped error");
       test.equals(e.cause.message, "All but one", "Should convey the message");
-    }).then(() => test.done());
+    }).then(() => test.end());
   }
 
 }; // ------- Output -------

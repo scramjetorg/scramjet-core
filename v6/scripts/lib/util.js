@@ -10,6 +10,8 @@ const jsdoc = require("jsdoc-api");
 
 const jsdocParse = require("jsdoc-parse");
 
+const promisify = require("util").promisify || (fn => (...a) => new Promise((s, j) => fn(...a, (e, ...v) => e ? j(e) : s(...v))));
+
 const jsdoc2md =
 /*#__PURE__*/
 function () {
@@ -34,5 +36,6 @@ function () {
 }();
 
 module.exports = {
-  jsdoc2md
+  jsdoc2md,
+  promisify
 };

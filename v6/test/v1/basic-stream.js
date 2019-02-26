@@ -12,7 +12,7 @@ module.exports = {
   test_pipe: {
     sync(test) {
       return _asyncToGenerator(function* () {
-        test.expect(1);
+        test.plan(1);
         const input = arr.slice();
         const output = arr.slice();
         const src = new DataStream({
@@ -34,7 +34,7 @@ module.exports = {
 
         })).pipe(tgt).whenFinished();
         test.deepEqual(output, [0, 1], "All chunks but two removed");
-        test.done();
+        test.end();
       })();
     }
 
@@ -47,13 +47,13 @@ module.exports = {
     const path = require("path");
 
     test.equals(resolveCalleeBlackboxed("test"), path.resolve(__dirname, "test"));
-    test.done();
+    test.end();
   },
 
   test_read: {
     starve(test) {
       return _asyncToGenerator(function* () {
-        test.expect(2);
+        test.plan(2);
         const comp = arr.slice();
         const stream = new DataStream({
           promiseRead() {
@@ -63,13 +63,13 @@ module.exports = {
         });
         test.ok(stream instanceof DataStream, "Stream still implements a DataStream");
         test.deepEqual((yield stream.toArray()), arr, "Stream must read the array in sync");
-        test.done();
+        test.end();
       })();
     },
 
     sync(test) {
       return _asyncToGenerator(function* () {
-        test.expect(2);
+        test.plan(2);
         const comp = arr.slice();
         const stream = new DataStream({
           parallelRead(many) {
@@ -79,13 +79,13 @@ module.exports = {
         });
         test.ok(stream instanceof DataStream, "Stream still implements a DataStream");
         test.deepEqual((yield stream.toArray()), arr, "Stream must read the array in sync");
-        test.done();
+        test.end();
       })();
     },
 
     async(test) {
       return _asyncToGenerator(function* () {
-        test.expect(2);
+        test.plan(2);
         const comp = arr.slice();
         const stream = new DataStream({
           promiseRead(many) {
@@ -97,7 +97,7 @@ module.exports = {
         });
         test.ok(stream instanceof DataStream, "Stream still implements a DataStream");
         test.deepEqual((yield stream.toArray()), arr, "Stream must read the array in async");
-        test.done();
+        test.end();
       })();
     }
 
@@ -118,7 +118,7 @@ module.exports = {
 
         })).whenFinished();
         test.deepEqual(comp, [1, 2, 3, 4], "Should write all chunks in order");
-        test.done();
+        test.end();
       })();
     },
 
@@ -138,7 +138,7 @@ module.exports = {
 
         })).whenFinished();
         test.deepEqual(arr, [1, 2, 3, 4], "Should write all chunks in order");
-        test.done();
+        test.end();
       })();
     }
 
@@ -146,13 +146,13 @@ module.exports = {
   test_transform: {
     sync(test) {
       // TODO: Implement tests here.
-      test.done();
+      test.end();
     },
 
     async(test) {
       return _asyncToGenerator(function* () {
         // TODO: Implement tests here.
-        test.done();
+        test.end();
       })();
     }
 
