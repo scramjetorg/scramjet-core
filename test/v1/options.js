@@ -22,7 +22,7 @@ module.exports = {
                 ScramjetOptions.declare(A, "option1");
                 ScramjetOptions.declare(A, "option2", {value: 1});
             });
-            test.done();
+            test.end();
         },
         chained(test) {
             test.doesNotThrow(() => {
@@ -37,7 +37,7 @@ module.exports = {
 
                 ScramjetOptions.declare(B, "option8", {chained: false, value: 6});
             });
-            test.done();
+            test.end();
         }
     },
     test_read: {
@@ -57,7 +57,7 @@ module.exports = {
             }, "Does not throw on standard operations");
             test.throws(() => a.options.undef = 1, "Shoud throw on setter of undeclared item");
             test.throws(() => a.options.undef, "Shoud throw on getter of undeclared item");
-            test.done();
+            test.end();
         },
         inherited(test) {
             const b = new B();
@@ -69,7 +69,7 @@ module.exports = {
                 test.equals(b.options.option1, 6, "'option1' setters and getters should work");
             }, "Does not throw on standard operations");
 
-            test.done();
+            test.end();
         },
         chained(test) {
             const a = new A();
@@ -102,7 +102,7 @@ module.exports = {
 
             }, "Does not throw on standard operations");
 
-            test.done();
+            test.end();
         }
     }
 };

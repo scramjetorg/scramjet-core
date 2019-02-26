@@ -36,7 +36,7 @@ module.exports = {
             ));
         }, null, "MultiStream can be constructed a list of streams");
         test.ok(new MultiStream() instanceof EventEmitter, "MultiStream extends EventEmitter");
-        test.done();
+        test.end();
     },
     test_mux(test) {
         const streams = [
@@ -55,12 +55,12 @@ module.exports = {
                 test.equals(arr.length, 20, "Accumulates all chunks from both streams");
                 test.notEqual(arr.indexOf(11), -1, "Contains chunks from first stream");
                 test.notEqual(arr.indexOf(21), -1, "Contains chunks from second stream");
-                test.done();
+                test.end();
             }
         );
     },
     test_mux_nowarn(test) {
-        test.expect(1);
+        test.plan(1);
         const streams = [
             getStream(10, 10, 1),
             getStream(20, 10, 1),
@@ -85,15 +85,15 @@ module.exports = {
         });
 
         const mux = new MultiStream(streams).mux();
-        mux.run().then(
+        return mux.run().then(
             () => {
                 test.equals(noWarnings, 0, "should not warn on multiple event emitters");
-                test.done();
+                test.end();
             }
         );
     },
     test_mux_cmp(test) {
-        test.expect(5);
+        test.plan(5);
 
         const streams = [
             getStream(10, 10, 3),   // [10, 13, 16, 19, 22, 25, 28, 31, 34, 37]
@@ -112,7 +112,7 @@ module.exports = {
             (reason) => console.log("Unhandled rejection: " + (reason && reason.stack), test.fail(1, "Unhandled rejection"))
         );
 
-        mux.reduce(
+        return mux.reduce(
             (acc, item) => (acc.push(item.val), acc),
             []
         ).then(
@@ -122,63 +122,51 @@ module.exports = {
                 test.equals(arr[5], 22, "Stream items must be merged in");
                 test.equals(arr.length, 30, "All items should be consumed");
                 test.equals(arr[14], 31, "Stream added after calling constructor should be taken into account");
-                test.done();
+                test.end();
             }
         ).catch(
             (reason) => console.log("Thrown: " + reason.stack, test.fail(1, "Unhandled rejection"))
         );
     },
     test_map(test) {
-        test.expect(3);
+        test.plan(2);
         const streams = [1,3,5].map((n) => getStream(n, 3));
-        test.doesNotThrow(() => {
-            new MultiStream(streams)
-                .map(
-                    (stream) => stream.map((n) => n.val + 1)
-                )
-                .then(
-                    (ms) => {
-                        test.ok(ms instanceof MultiStream, "Returns MultiStream (async)");
-                        return accumulate(ms.mux());
-                    }
-                )
-                .then((acc) => {
-                    test.equals(acc.join(""), "246357468", "Outputs the mapped MultiStream");
-                    test.done();
-                })
-                .catch((e) => {
-                    test.fail(e, "Does not reject the promise");
-                    test.done();
-                });
-        }, null, "Does not throw error");
+        return new MultiStream(streams)
+            .map(
+                (stream) => stream.map((n) => n.val + 1)
+            )
+            .then(
+                (ms) => {
+                    test.ok(ms instanceof MultiStream, "Returns MultiStream (async)");
+                    return accumulate(ms.mux());
+                }
+            )
+            .then((acc) => {
+                test.equals(acc.join(""), "246357468", "Outputs the mapped MultiStream");
+                test.end();
+            });
     },
     test_filter(test) {
-        test.expect(3);
+        test.plan(2);
         const streams = [1,2,3].map((n) => getStream(n, 3));
-        test.doesNotThrow(() => {
-            new MultiStream(streams)
-                .filter(
-                    (stream) => stream.init % 2
+        return new MultiStream(streams)
+            .filter(
+                (stream) => stream.init % 2
+            )
+            .then(
+                (ms) => ms.map(
+                    (stream) => stream.map((n) => n.val + 1)
                 )
-                .then(
-                    (ms) => ms.map(
-                        (stream) => stream.map((n) => n.val + 1)
-                    )
-                )
-                .then(
-                    (ms) => {
-                        test.ok(ms instanceof MultiStream, "Returns MultiStream (async)");
-                        return accumulate(ms.mux());
-                    }
-                )
-                .then((acc) => {
-                    test.equals(acc.join(""), "243546", "Outputs the mapped MultiStream");
-                    test.done();
-                })
-                .catch((e) => {
-                    test.fail(e, "Does not reject the promise");
-                    test.done();
-                });
-        }, null, "Does not throw error");
+            )
+            .then(
+                (ms) => {
+                    test.ok(ms instanceof MultiStream, "Returns MultiStream (async)");
+                    return accumulate(ms.mux());
+                }
+            )
+            .then((acc) => {
+                test.equals(acc.join(""), "243546", "Outputs the mapped MultiStream");
+                test.end();
+            });
     }
 };

@@ -30,7 +30,7 @@ const {DataStream, StringStream, staticValue} = require(process.env.SCRAMJET_TES
 
 module.exports = {
     test_plugin(test) {
-        test.expect(7);
+        test.plan(7);
         cnt = 0;
 
         const stream = DataStream.fromArray([1,2,3,4,5,6,7,8,9,10]);
@@ -44,6 +44,6 @@ module.exports = {
         test.equals(cnt, 2, "DataStream constructor must be called before StringStream");
         stream.addX(test);
 
-        test.done();
+        test.end();
     }
 };

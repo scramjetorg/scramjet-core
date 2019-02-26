@@ -18,7 +18,7 @@ const getStream = (arr) => {
 
 module.exports = {
     test_pipe(test) {
-        test.expect(2);
+        test.plan(2);
 
         const firstChunk = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do ";
         const stream = getStream([
@@ -35,13 +35,14 @@ module.exports = {
 
         stream.once("data", (item) => {
             test.equals(item, firstChunk, "Reads chunks in order and intact");
-            test.done();
+            test.end();
         });
 
+        return stream.run();
     },
     test_split: {
         string(test) {
-            test.expect(4);
+            test.plan(4);
 
             const orgStream = getStream([
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do ",
@@ -59,7 +60,7 @@ module.exports = {
 
             test.ok(stream instanceof StringStream, "Should return a StringStream");
 
-            stream.reduce((acc, item) => {
+            return stream.reduce((acc, item) => {
                 if (item.indexOf(" ") >= 0)
                     spaces++;
                 return acc + 1;
@@ -67,9 +68,10 @@ module.exports = {
                 (res) => {
                     test.equals(69, res, "Should split by every occurence of that string");
                     test.equals(spaces, 0, "The splitting string should not occur in items");
-                    test.done();
+                    test.end();
                 }
             );
+
         },
         regex(test) {
             const orgStream = getStream([
@@ -88,7 +90,7 @@ module.exports = {
 
             test.ok(stream instanceof StringStream, "Should return a StringStream");
 
-            stream.reduce((acc, item) => {
+            return stream.reduce((acc, item) => {
                 if (item.indexOf(" ") >= 0 || item.indexOf(",") >= 0 || item.indexOf(".") >= 0)
                     spaces++;
                 return acc + 1;
@@ -96,13 +98,13 @@ module.exports = {
                 (res) => {
                     test.equals(70, res, "Should split by every occurence of that string");
                     test.equals(spaces, 0, "The splitting string should not occur in items");
-                    test.done();
+                    test.end();
                 }
             );
         }
     },
     test_match(test) {
-        test.expect(3);
+        test.plan(3);
 
         const orgStream = getStream([
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do ",
@@ -119,11 +121,11 @@ module.exports = {
 
         test.ok(stream instanceof DataStream, "Should return a DataStream");
 
-        stream.reduce((acc, item) => acc + ":" + item, "").then(
+        return stream.reduce((acc, item) => acc + ":" + item, "").then(
             (res) => {
                 test.equals(":amet:elit:enim:quis:nisi:Duis:aute:esse:sint:sunt:anim", res,
                     "Should return a string with all four letter words");
-                test.done();
+                test.end();
             }
         );
 
@@ -176,7 +178,7 @@ module.exports = {
         stream.ttt = "okok";
 
         test.ok(stream instanceof DataStream, "Should return data stream");
-        stream
+        return stream
             .reduce(
                 (acc, data) => (acc.push(data), acc), []
             )
@@ -184,7 +186,7 @@ module.exports = {
                 (data) => {
                     test.equals(data[0].symbol, "AAL", "Data should be parsed according to the function");
                     test.strictEqual(data[1].price, 110.06, "Data should be parsed according to the function");
-                    test.done();
+                    test.end();
                 });
 
     }

@@ -55,7 +55,7 @@
     "jsdoc": "^3.5.5",
     "jsdoc-api": "^4.0.3",
     "jsdoc-parse": "^3.0.1",
-    "nodeunit": "^0.11.3",
-    "tape": "^4.9.2"
+    "tape": "^4.10.1",
+    "tape-promise": "^4.0.0"
   }
 }
