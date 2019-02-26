@@ -1,7 +1,5 @@
 "use strict";
 
-require("core-js/modules/es6.promise");
-
 const DataStream = require(process.env.SCRAMJET_TEST_HOME || "../").DataStream;
 
 const defer = (ms = 20) => new Promise(res => setTimeout(res, ms));

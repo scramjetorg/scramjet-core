@@ -5,7 +5,16 @@ module.exports = (
     src = "lib/**/*.js",
     dest = "lib-6/",
     options = {
-        presets: [["@babel/preset-env", {"targets": {node: "6.0.0"}, "useBuiltIns": "usage"}]]
+        presets: [
+            [
+                "@babel/preset-env",
+                {
+                    "targets": {node: "6.0.0"},
+                    "useBuiltIns": "usage",
+                    "exclude": ["es6.promise"]
+                }
+            ]
+        ]
     }
 ) => () =>
     gulp.src(src)

@@ -4,8 +4,6 @@ require("core-js/modules/es7.object.entries");
 
 require("core-js/modules/es6.array.from");
 
-require("core-js/modules/es6.promise");
-
 require("core-js/modules/web.dom.iterable");
 
 require("core-js/modules/es7.symbol.async-iterator");

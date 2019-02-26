@@ -3,7 +3,7 @@
 const gulp = require("gulp");
 const path = require("path");
 
-const ver = process.version.slice(1).split(".");
+const ver = (process.env.FORCE_NODE_VERSION || process.version).slice(1).split(".");
 const base = +ver[0] > 8 && +ver[1] > 3 ? "./" : "./v6/";
 const {transpile, lint, test_legacy, readme, docs, scm_clean}
     = require(base + "scripts/tasks");

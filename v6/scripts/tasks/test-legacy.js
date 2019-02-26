@@ -1,7 +1,5 @@
 "use strict";
 
-require("core-js/modules/es6.promise");
-
 const path = require("path");
 
 const gulp = require("gulp");

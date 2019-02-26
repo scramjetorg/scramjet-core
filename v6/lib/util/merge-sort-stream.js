@@ -8,8 +8,6 @@ require("core-js/modules/es6.symbol");
 
 require("core-js/modules/web.dom.iterable");
 
-require("core-js/modules/es6.promise");
-
 require("core-js/modules/es6.weak-map");
 
 require("core-js/modules/es6.map");
