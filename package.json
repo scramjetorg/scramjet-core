@@ -57,5 +57,8 @@
     "jsdoc-parse": "^3.0.1",
     "tape": "^4.10.1",
     "tape-promise": "^4.0.0"
+  },
+  "optionalDependencies": {
+    "core-js": "^2.6.5"
   }
 }

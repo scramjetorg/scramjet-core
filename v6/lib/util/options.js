@@ -1,5 +1,11 @@
 "use strict";
 
+require("core-js/modules/es6.map");
+
+require("core-js/modules/es7.symbol.async-iterator");
+
+require("core-js/modules/es6.symbol");
+
 const _require = require("events"),
       EventEmitter = _require.EventEmitter;
 

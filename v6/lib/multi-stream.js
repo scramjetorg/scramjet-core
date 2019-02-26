@@ -1,5 +1,11 @@
 "use strict";
 
+require("core-js/modules/es6.promise");
+
+require("core-js/modules/es7.symbol.async-iterator");
+
+require("core-js/modules/es6.symbol");
+
 /** @ignore */
 const OUT = Symbol("OUT");
 /** @ignore */

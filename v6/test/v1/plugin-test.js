@@ -1,5 +1,9 @@
 "use strict";
 
+require("core-js/modules/es7.symbol.async-iterator");
+
+require("core-js/modules/es6.symbol");
+
 let xSymbol = Symbol("x");
 let cnt = 0;
 

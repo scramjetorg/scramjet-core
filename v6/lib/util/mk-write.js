@@ -1,5 +1,7 @@
 "use strict";
 
+require("core-js/modules/es6.promise");
+
 const _require = require("./stream-errors"),
       StreamError = _require.StreamError;
 /**

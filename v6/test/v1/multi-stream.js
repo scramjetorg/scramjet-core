@@ -1,5 +1,7 @@
 "use strict";
 
+require("core-js/modules/es6.promise");
+
 const _require = require(process.env.SCRAMJET_TEST_HOME || "../../"),
       MultiStream = _require.MultiStream,
       DataStream = _require.DataStream;
