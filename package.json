@@ -1,6 +1,6 @@
 {
   "name": "scramjet-core",
-  "version": "4.19.0",
+  "version": "4.19.1",
   "description": "A pluggable minimal version of Scramjet that focuses only on stream transform and exposes only core features",
   "main": "index.js",
   "directories": {
@@ -46,7 +46,7 @@
     "@babel/core": "^7.3.3",
     "@babel/preset-env": "^7.3.1",
     "dmd": "^3.0.13",
-    "eslint": "^5.14.1",
+    "eslint": "^5.15.1",
     "eslint-config-scramjet": "^1.0.1",
     "fancy-log": "^1.3.3",
     "gulp": "^4.0.0",
