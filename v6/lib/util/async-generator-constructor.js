@@ -20,7 +20,7 @@ _AsyncGenerator.prototype.return = function (arg) { return this._invoke("return"
 
 function _AwaitValue(value) { this.wrapped = value; }
 
-// eslint-disable-next-line node/no-unsupported-features/es-syntax
-module.exports = Object.getPrototypeOf(
-/*#__PURE__*/
-_wrapAsyncGenerator(function* () {})).constructor;
+if (process.version.split(".") < 10) module.exports = {};else // eslint-disable-next-line node/no-unsupported-features/es-syntax
+  module.exports = Object.getPrototypeOf(
+  /*#__PURE__*/
+  _wrapAsyncGenerator(function* () {})).constructor;
