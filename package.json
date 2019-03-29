@@ -64,7 +64,6 @@
     "rollup": "^1.1.0",
     "rollup-plugin-cleanup": "^3.1.0",
     "rollup-plugin-node-resolve": "^4.0.0",
-    "scramjet": "^4.20.3",
     "source-map-support": "^0.5.10",
     "tape": "^4.9.2",
     "through2": "^3.0.1"

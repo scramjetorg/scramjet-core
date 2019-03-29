@@ -1,17 +1,19 @@
 const gulp = require("gulp");
-const {DataStream} = require("scramjet");
 const {jsdoc2md} = require("../lib/util");
 const rename = require("gulp-rename");
 const log = require("fancy-log");
+const through2 = require("through2");
 
 module.exports = (source, jd2mdConfig, dest) => {
     return function makeDocs() {
-        return DataStream.from(gulp.src(source))
-            .map(async (file) => {
-                const output = await jsdoc2md(Object.assign({}, jd2mdConfig, {newLine: "\n", files: [file.path]}));
-                file.contents = Buffer.from(output);
-                return file;
-            })
+        return gulp.src(source)
+            .pipe(
+                through2((file, _, done) => jsdoc2md(
+                    Object.assign({}, jd2mdConfig, {newLine: "\n", files: [file.path]})
+                )
+                    .then((output) => (file.contents = Buffer.from(output), file))
+                    .then(done)
+                ))
             .on("error", function(err) {
                 log.error("jsdoc2md failed", err.stack);
             })

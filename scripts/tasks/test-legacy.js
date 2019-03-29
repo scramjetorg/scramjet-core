@@ -23,21 +23,24 @@ const runner = (options) => {
         cache[k] = true;
     });
 
-    return through2.obj(function(file, enc, done) {
-        files.push(file.path);
-        done();
-    }, function(done) {
-        reporter.run(files, reporterOpts, function(err) {
-            // Delete any modules that were added to the require cache
-            Object.keys(require.cache).filter(function(k) {
-                return !cache[k];
-            }).forEach(function(k) {
-                delete require.cache[k];
-            });
+    return through2.obj(
+        function(file, enc, done) {
+            files.push(file.path);
+            done();
+        },
+        function(done) {
+            reporter.run(files, reporterOpts, function(err) {
+                // Delete any modules that were added to the require cache
+                Object.keys(require.cache).filter(function(k) {
+                    return !cache[k];
+                }).forEach(function(k) {
+                    delete require.cache[k];
+                });
 
-            done(err);
-        });
-    });
+                done(err);
+            });
+        }
+    );
 };
 
 module.exports = function testLegacy(src) {
