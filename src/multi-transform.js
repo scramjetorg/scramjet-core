@@ -4,6 +4,16 @@
 
 export class MultiTransform {
 
+    /**
+     * @typedef MultiTransformOptions
+     * @prop {number} [maxParallel=32] max parallel
+     * @prop {boolean} [followOrder=true] should order of resolutions be preserved?
+     */
+
+    /**
+     *
+     * @param {MultiTransformOptions} [options] parallelization options
+     */
     constructor(options) {
         this._seq = 0;
         this.transforms = {};
@@ -13,7 +23,8 @@ export class MultiTransform {
 
     get options() {
         return {
-            maxParallel: this._maxParallel
+            maxParallel: this._maxParallel,
+            followOrder: this._followOrder
         };
     }
 
@@ -42,7 +53,7 @@ export class MultiTransform {
         return {idx};
     }
 
-    _rebuildFIFO(transforms) {
+    _rebuildFIFO(transforms, processing) {
         const breakPoints = new WeakMap();
         async function breakpointAdvanced(prevReference, currentReference, number) {
             const ref = breakPoints.get(prevReference);
@@ -57,7 +68,9 @@ export class MultiTransform {
         }
 
         let currentReference = {};
-        return (chunk) => {
+        let currFullResolution = Promise.resolve();
+
+        return async (chunk) => {
             if (!transforms.length)
                 return chunk;
 
@@ -66,7 +79,10 @@ export class MultiTransform {
             currentReference = {};
             breakPoints.set(currentReference, []);
 
-            return transforms
+            // keep the previous promise reference
+            const prevFullResolution = currFullResolution;
+
+            currFullResolution = transforms
                 .reduce(
                     (prev, {transform, hook, trap}) => {
                         // if there's no need to hold up here, just continue with the transform
@@ -79,7 +95,7 @@ export class MultiTransform {
                             async (argument) => transform(_argument = argument)
                         );
 
-                        // Breakpoint is where the transform result must come
+                        // Breakpoint is where the transform result must come in order
                         const currentBreakPoint = breakPoint++;
                         // if we need the output we need to sig
                         if (hook) out = out
@@ -87,7 +103,7 @@ export class MultiTransform {
                                 await breakpointAdvanced(prevReference, currentReference, currentBreakPoint),
                                 argument
                             ))
-                            .then((argument) => hook(argument, chunk));
+                            .then(async (argument) => (await hook(argument, chunk), argument));
 
                         // if an error occurs somewhere along the lines.
                         // it's up to the implementation to handle all transforms between current
@@ -102,10 +118,16 @@ export class MultiTransform {
                     // this is the initial promise
                     Promise.resolve(chunk)
                 )
+                .then(
+                    // await previous item to be resolved
+                    (x) => prevFullResolution.then(() => x)
+                )
                 .catch(
-                    // empty resolution is resolved with empty item
+                    // empty rejection is resolved with empty item
                     (err) => err && Promise.reject(err)
                 );
+
+            return currFullResolution;
         };
     }
 
