@@ -42,7 +42,7 @@ will only operate on a single transform stream that evaluates all three transfor
     * [:DataStream](#module_scramjet.DataStream)
     * [:MultiStream](#module_scramjet.MultiStream)
     * [:StringStream](#module_scramjet.StringStream)
-    * [:from(stream)](#module_scramjet.from)  <code>DataStream</code>
+    * [:from(input, [options])](#module_scramjet.from)  <code>DataStream</code>
     * [:fromArray(args)](#module_scramjet.fromArray)  <code>DataStream</code>
     * [:createTransformModule(transform, options, ...initialArgs)](#module_scramjet.createTransformModule)
     * [:createReadModule(anything, options, ...initialArgs)](#module_scramjet.createReadModule)
@@ -106,14 +106,16 @@ Provides a lazy-load accessor to StringStream
 **See**: [string-stream.md](string-stream.md)  
 <a name="module_scramjet.from"></a>
 
-### scramjet:from(stream) : DataStream
+### scramjet:from(input, [options]) : DataStream
 Creates a DataStream that's piped from the passed readable.
 
 **Kind**: static method of [<code>scramjet</code>](#module_scramjet)  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| stream | <code>Array</code> \| <code>Iterable</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>Readable</code> | and node.js readable stream (`objectMode: true` is advised) |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| input | <code>Array</code> \| <code>Iterable</code> \| <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>String</code> \| <code>Readable</code> |  | argument to be turned into new stream |
+| [options] | <code>DataStreamOptions</code> \| <code>Writable</code> | <code>{}</code> | options for creation of a new stream or the target stream |
+| [...args] | <code>\*</code> |  | additional arguments for the stream - will be passed to the function or generator |
 
 <a name="module_scramjet.fromArray"></a>
 

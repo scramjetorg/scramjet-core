@@ -186,7 +186,7 @@ Create StringStream from anything.
 | Param | Type | Description |
 | --- | --- | --- |
 | source | <code>String</code> \| <code>Array</code> \| <code>Iterable</code> \| <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>Readable</code> | argument to be turned into new stream |
-| options | <code>StreamOptions</code> \| <code>Writable</code> |  |
+| options | <code>DataStreamOptions</code> \| <code>Writable</code> |  |
 
 <a name="StringStream.ShiftCallback"></a>
 
