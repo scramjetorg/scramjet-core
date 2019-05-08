@@ -3,6 +3,15 @@
 
 This is the last intended minor API change to `scramjet-core` before the v5 series.
 
+## Scramjet Core 4.21.0: More Generators
+
+* 923044a - Allow usage of iterators in MultiStream, add default serializer in stringify
+* e8717c4 - Dependencies update.
+
+## Scramjet Core 4.20.0: Fix optional arguments definitions for TypeScript
+
+* 8421494 - Dependencies update, fix optional arguments for TypeScript.
+
 ## Scramjet Core 4.19.0: All and race
 
 * 3508bdb - New methods all and race

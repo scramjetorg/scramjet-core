@@ -48,11 +48,11 @@ await (DataStream.from(aStream) // create a DataStream
     * [dataStream.raise(err)](#DataStream+raise)
     * [dataStream.pipe(to, options)](#DataStream+pipe) ↺ <code>Writable</code>
     * [dataStream.bufferify(serializer)](#DataStream+bufferify) ↺ <code>BufferStream</code>
-    * [dataStream.stringify(serializer)](#DataStream+stringify) ↺ <code>StringStream</code>
+    * [dataStream.stringify([serializer])](#DataStream+stringify) ↺ <code>StringStream</code>
     * [dataStream.toArray([initial])](#DataStream+toArray) ⇄ <code>Array</code>
     * [dataStream.toGenerator()](#DataStream+toGenerator)  <code>Iterable.&lt;Promise.&lt;\*&gt;&gt;</code>
     * [dataStream.toBufferStream(serializer)](#DataStream+toBufferStream) ↺ <code>BufferStream</code>
-    * [dataStream.toStringStream(serializer)](#DataStream+toStringStream) ↺ <code>StringStream</code>
+    * [dataStream.toStringStream([serializer])](#DataStream+toStringStream) ↺ <code>StringStream</code>
     * [DataStream:from(input, [options])](#DataStream.from)  [<code>DataStream</code>](#DataStream)
     * [DataStream:pipeline(readable, ...transforms)](#DataStream.pipeline)  [<code>DataStream</code>](#DataStream)
     * [DataStream:fromArray(array, [options])](#DataStream.fromArray)  [<code>DataStream</code>](#DataStream)
@@ -461,10 +461,11 @@ The passed serializer must return a buffer.
 
 <a name="DataStream+stringify"></a>
 
-### dataStream.stringify(serializer) : StringStream ↺
+### dataStream.stringify([serializer]) : StringStream ↺
 Creates a StringStream.
 
-The passed serializer must return a string.
+The passed serializer must return a string. If no serializer is passed chunks
+toString method will be used.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -473,7 +474,7 @@ The passed serializer must return a string.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| serializer | <code>MapCallback</code> | A method that converts chunks to strings |
+| [serializer] | <code>MapCallback</code> | A method that converts chunks to strings |
 
 <a name="DataStream+toArray"></a>
 
@@ -516,10 +517,11 @@ The passed serializer must return a buffer.
 
 <a name="DataStream+toStringStream"></a>
 
-### dataStream.toStringStream(serializer) : StringStream ↺
+### dataStream.toStringStream([serializer]) : StringStream ↺
 Creates a StringStream.
 
-The passed serializer must return a string.
+The passed serializer must return a string. If no serializer is passed chunks
+toString method will be used.
 
 **Kind**: instance method of [<code>DataStream</code>](#DataStream)  
 **Chainable**  
@@ -528,7 +530,7 @@ The passed serializer must return a string.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| serializer | <code>MapCallback</code> | A method that converts chunks to strings |
+| [serializer] | <code>MapCallback</code> | A method that converts chunks to strings |
 
 <a name="DataStream.from"></a>
 
