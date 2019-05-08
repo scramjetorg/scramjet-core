@@ -184,11 +184,11 @@ await (DataStream.from(aStream) // create a DataStream
 * [`dataStream.raise(err) ⇄`](docs/data-stream.md#DataStream+raise) - Executes all error handlers and if none resolves, then emits an error.
 * [`dataStream.pipe(to, options) : Writable ↺`](docs/data-stream.md#DataStream+pipe) - Override of node.js Readable pipe.
 * [`dataStream.bufferify(serializer) : BufferStream ↺`](docs/data-stream.md#DataStream+bufferify) - Creates a BufferStream.
-* [`dataStream.stringify(serializer) : StringStream ↺`](docs/data-stream.md#DataStream+stringify) - Creates a StringStream.
+* [`dataStream.stringify([serializer]) : StringStream ↺`](docs/data-stream.md#DataStream+stringify) - Creates a StringStream.
 * [`dataStream.toArray([initial]) : Array ⇄`](docs/data-stream.md#DataStream+toArray) - Aggregates the stream into a single Array
 * [`dataStream.toGenerator() : Iterable.<Promise.<*>>`](docs/data-stream.md#DataStream+toGenerator) - Returns an async generator
 * [`dataStream.toBufferStream(serializer) : BufferStream ↺`](docs/data-stream.md#DataStream+toBufferStream) - Creates a BufferStream.
-* [`dataStream.toStringStream(serializer) : StringStream ↺`](docs/data-stream.md#DataStream+toStringStream) - Creates a StringStream.
+* [`dataStream.toStringStream([serializer]) : StringStream ↺`](docs/data-stream.md#DataStream+toStringStream) - Creates a StringStream.
 * [`DataStream:from(input, [options]) : DataStream`](docs/data-stream.md#DataStream.from) - Returns a DataStream from pretty much anything sensibly possible.
 * [`DataStream:pipeline(readable, ...transforms) : DataStream`](docs/data-stream.md#DataStream.pipeline) - Creates a pipeline of streams and returns a scramjet stream.
 * [`DataStream:fromArray(array, [options]) : DataStream`](docs/data-stream.md#DataStream.fromArray) - Create a DataStream from an Array
@@ -203,6 +203,8 @@ await (DataStream.from(aStream) // create a DataStream
 ### MultiStream
 
 An object consisting of multiple streams than can be refined or muxed.
+
+The idea behind a MultiStream is being able to mux and demux streams when needed.
 
 [Detailed MultiStream docs here](docs/multi-stream.md)
 
