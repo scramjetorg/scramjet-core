@@ -43,7 +43,7 @@
   "author": "Signicode / Michał Czapracki <cz@signicode.com>",
   "license": "MIT",
   "devDependencies": {
-    "dmd": "^3.0.13",
+    "dmd": "^4.0.0",
     "eslint": "^5.16.0",
     "eslint-config-scramjet": "^1.0.4",
     "fancy-log": "^1.3.3",
