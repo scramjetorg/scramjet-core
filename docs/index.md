@@ -43,6 +43,7 @@ will only operate on a single transform stream that evaluates all three transfor
     * [:plugin(mixin)](#module_scramjet.plugin)  <code>ScramjetPlugin</code>
     * [:API(version)](#module_scramjet.API)  <code>ScramjetPlugin</code>
     * [~CreateModuleOptions](#module_scramjet..CreateModuleOptions)
+    * [~ScramjetErrors](#module_scramjet..ScramjetErrors)
     * [~StreamMixin](#module_scramjet..StreamMixin)  <code>Object</code>
     * [~ScramjetPlugin](#module_scramjet..ScramjetPlugin)  <code>Object</code>
 
@@ -139,6 +140,16 @@ Options for createModule
 | Name | Type | Description |
 | --- | --- | --- |
 | StreamClass | <code>DataStream</code> | defines what class should the module assume |
+
+<a name="module_scramjet..ScramjetErrors"></a>
+
+### scramjet~ScramjetErrors
+**Kind**: inner typedef of [<code>scramjet</code>](#module_scramjet)  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| StreamError | <code>function</code> | stream error class |
 
 <a name="module_scramjet..StreamMixin"></a>
 

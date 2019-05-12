@@ -99,7 +99,7 @@ Note that:
 
 The quick reference of the exposed classes:
 
-### :BufferStream
+### ~BufferStream
 A facilitation stream created for easy splitting or parsing buffers.
 
 Useful for working on built-in Node.js streams from files, parsing binary formats etc.
@@ -118,7 +118,7 @@ A simple use case would be:
      ]);
 ```
 
-[Detailed :BufferStream docs here](docs/buffer-stream.md)
+[Detailed ~BufferStream docs here](docs/buffer-stream.md)
 
 **Most popular methods:**
 
@@ -131,7 +131,7 @@ A simple use case would be:
 * [`BufferStream:pipeline(readable, transforms) : BufferStream`](docs/buffer-stream.md#module_scramjet.BufferStream.pipeline) - Creates a pipeline of streams and returns a scramjet stream.
 * [`BufferStream:from(stream, options) : BufferStream`](docs/buffer-stream.md#module_scramjet.BufferStream.from) - Create BufferStream from anything.
 
-### :DataStream
+### ~DataStream
 DataStream is the primary stream type for Scramjet. When you parse your
 stream, just pipe it you can then perform calculations on the data objects
 streamed through your flow.
@@ -147,7 +147,7 @@ await (DataStream.from(aStream) // create a DataStream
     .run());                    // wait until end
 ```
 
-[Detailed :DataStream docs here](docs/data-stream.md)
+[Detailed ~DataStream docs here](docs/data-stream.md)
 
 **Most popular methods:**
 
@@ -182,12 +182,14 @@ await (DataStream.from(aStream) // create a DataStream
 * [`dataStream.toGenerator() : Generator.<Promise.<any>>`](docs/data-stream.md#module_scramjet.DataStream+toGenerator) - Returns an async generator
 * [`dataStream.toBufferStream(serializer) : BufferStream ↺`](docs/data-stream.md#module_scramjet.DataStream+toBufferStream) - Creates a BufferStream.
 * [`dataStream.toStringStream([serializer]) : StringStream ↺`](docs/data-stream.md#module_scramjet.DataStream+toStringStream) - Creates a StringStream.
+* [`dataStream.toBufferStream(serializer) : BufferStream ↺`](docs/data-stream.md#module_scramjet.DataStream+toBufferStream) - Creates a BufferStream.
+* [`dataStream.toStringStream([serializer]) : StringStream ↺`](docs/data-stream.md#module_scramjet.DataStream+toStringStream) - Creates a StringStream.
 * [`DataStream:from(input, [options]) : DataStream`](docs/data-stream.md#module_scramjet.DataStream.from) - Returns a DataStream from pretty much anything sensibly possible.
 * [`DataStream:pipeline(readable, ...transforms) : DataStream`](docs/data-stream.md#module_scramjet.DataStream.pipeline) - Creates a pipeline of streams and returns a scramjet stream.
 * [`DataStream:fromArray(array, [options]) : DataStream`](docs/data-stream.md#module_scramjet.DataStream.fromArray) - Create a DataStream from an Array
 * [`DataStream:fromIterator(iterator, [options]) : DataStream`](docs/data-stream.md#module_scramjet.DataStream.fromIterator) - Create a DataStream from an Iterator
 
-### :MultiStream
+### ~MultiStream
 An object consisting of multiple streams than can be refined or muxed.
 
 The idea behind a MultiStream is being able to mux and demux streams when needed.
@@ -202,7 +204,7 @@ new MultiStream(function*(){ yield* streams; })
  .mux();
 ```
 
-[Detailed :MultiStream docs here](docs/multi-stream.md)
+[Detailed ~MultiStream docs here](docs/multi-stream.md)
 
 **Most popular methods:**
 
@@ -217,7 +219,7 @@ new MultiStream(function*(){ yield* streams; })
 * [`multiStream.add(stream)`](docs/multi-stream.md#module_scramjet.MultiStream+add) - Adds a stream to the MultiStream
 * [`multiStream.remove(stream)`](docs/multi-stream.md#module_scramjet.MultiStream+remove) - Removes a stream from the MultiStream
 
-### :StringStream
+### ~StringStream
 A stream of string objects for further transformation on top of DataStream.
 
 Example:
@@ -226,7 +228,7 @@ Example:
 StringStream.fromString()
 ```
 
-[Detailed :StringStream docs here](docs/string-stream.md)
+[Detailed ~StringStream docs here](docs/string-stream.md)
 
 **Most popular methods:**
 
