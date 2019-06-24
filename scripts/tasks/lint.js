@@ -2,11 +2,12 @@ const {CLIEngine} = require("eslint");
 const path = require("path");
 const log = require("fancy-log");
 
-module.exports = (files = ["**/*.js"]) => (cb) => {
+module.exports = (files = ["**/*.js"], options = {}) => (cb) => {
     const report = new CLIEngine({
         reportUnusedDisableDirectives: 1,
         cache: true,
-        cwd: path.resolve(__dirname, "../../")
+        cwd: process.env.SCRAMJET_TEST_HOME || path.resolve(__dirname, "../../"),
+        ...options
     }).executeOnFiles(files);
 
     for (let file of report.results) {
