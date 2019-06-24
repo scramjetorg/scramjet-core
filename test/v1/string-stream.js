@@ -202,7 +202,7 @@ Object.keys(dataStreamTests).forEach(
             };
         }
         for (var id in dataStreamTests[key]) {
-            if (dataStreamTests[key].hasOwnProperty(id))
+            if (Object.prototype.hasOwnProperty.call(dataStreamTests[key], id))
                 (module.exports[key] = module.exports[key] || {})["superclass_"+id] = dataStreamTests[key][id];
         }
 

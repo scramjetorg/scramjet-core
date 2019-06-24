@@ -9,6 +9,7 @@ module.exports = (source, jd2mdConfig, dest) => {
         return DataStream.from(gulp.src(source))
             .map(async (file) => {
                 const output = await jsdoc2md(Object.assign({}, jd2mdConfig, { newLine: "\n", files: [file.path] }));
+                // eslint-disable-next-line require-atomic-updates
                 file.contents = Buffer.from(output);
                 return file;
             })
