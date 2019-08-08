@@ -53,8 +53,8 @@
     "jsdoc": "^3.6.3",
     "jsdoc-api": "^5.0.2",
     "jsdoc-parse": "^3.0.1",
-    "nodeunit-tape-compat": "^1.3.25",
-    "scramjet": "^4.25.5",
+    "nodeunit-tape-compat": "^1.3.26",
+    "scramjet": "^4.25.6",
     "tape": "^4.11.0"
   }
 }
