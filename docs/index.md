@@ -42,8 +42,8 @@ will only operate on a single transform stream that evaluates all three transfor
     * [:createReadModule(anything, options, ...initialArgs)](#module_scramjet.createReadModule)  <code>function</code>
     * [:plugin(mixin)](#module_scramjet.plugin)  <code>ScramjetPlugin</code>
     * [:API(version)](#module_scramjet.API)  <code>ScramjetPlugin</code>
-    * [~CreateModuleOptions](#module_scramjet..CreateModuleOptions)
-    * [~ScramjetErrors](#module_scramjet..ScramjetErrors)
+    * [~CreateModuleOptions](#module_scramjet..CreateModuleOptions)  <code>Object</code>
+    * [~ScramjetErrors](#module_scramjet..ScramjetErrors)  <code>Object</code>
     * [~StreamMixin](#module_scramjet..StreamMixin)  <code>Object</code>
     * [~ScramjetPlugin](#module_scramjet..ScramjetPlugin)  <code>Object</code>
 
@@ -131,7 +131,7 @@ Gets an API version (this may be important for future use)
 
 <a name="module_scramjet..CreateModuleOptions"></a>
 
-### scramjet~CreateModuleOptions
+### scramjet~CreateModuleOptions : Object
 Options for createModule
 
 **Kind**: inner typedef of [<code>scramjet</code>](#module_scramjet)  
@@ -143,7 +143,9 @@ Options for createModule
 
 <a name="module_scramjet..ScramjetErrors"></a>
 
-### scramjet~ScramjetErrors
+### scramjet~ScramjetErrors : Object
+Scramjet Error classes
+
 **Kind**: inner typedef of [<code>scramjet</code>](#module_scramjet)  
 **Properties**
 
