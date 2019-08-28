@@ -5,7 +5,7 @@ const log = require("fancy-log");
 module.exports = (files = ["**/*.js"], options = {}) => (cb) => {
     const report = new CLIEngine({
         reportUnusedDisableDirectives: 1,
-        cache: true,
+        cache: false,
         cwd: process.env.SCRAMJET_TEST_HOME || path.resolve(__dirname, "../../"),
         ...options
     }).executeOnFiles(files);
