@@ -218,6 +218,7 @@ new MultiStream(function*(){ yield* streams; })
 * [`multiStream.mux([comparator], [ClassType]) : DataStream`](docs/multi-stream.md#module_scramjet.MultiStream+mux) - Muxes the streams into a single one
 * [`multiStream.add(stream)`](docs/multi-stream.md#module_scramjet.MultiStream+add) - Adds a stream to the MultiStream
 * [`multiStream.remove(stream)`](docs/multi-stream.md#module_scramjet.MultiStream+remove) - Removes a stream from the MultiStream
+* [`MultiStream:from(streams, [StreamClass]) : MultiStream`](docs/multi-stream.md#module_scramjet.MultiStream.from) - Constructs MultiStream from any number of streams-likes
 
 ### ~StringStream
 A stream of string objects for further transformation on top of DataStream.
@@ -232,7 +233,7 @@ StringStream.fromString()
 
 **Most popular methods:**
 
-* `new StringStream(encoding)` - Constructs the stream with the given encoding
+* `new StringStream([encoding], [options])` - Constructs the stream with the given encoding
 * [`stringStream.shift(bytes, func) ↺`](docs/string-stream.md#module_scramjet.StringStream+shift) - Shifts given length of chars from the original stream
 * [`stringStream.split(splitter) ↺`](docs/string-stream.md#module_scramjet.StringStream+split) - Splits the string stream by the specified RegExp or string
 * [`stringStream.match(matcher) ↺`](docs/string-stream.md#module_scramjet.StringStream+match) - Finds matches in the string stream and streams the match results
@@ -242,7 +243,7 @@ StringStream.fromString()
 * [`StringStream:SPLIT_LINE`](docs/string-stream.md#module_scramjet.StringStream.SPLIT_LINE) - A handy split by line regex to quickly get a line-by-line stream
 * [`StringStream:fromString(stream, encoding) : StringStream`](docs/string-stream.md#module_scramjet.StringStream.fromString) - Creates a StringStream and writes a specific string.
 * [`StringStream:pipeline(readable, transforms) : StringStream`](docs/string-stream.md#module_scramjet.StringStream.pipeline) - Creates a pipeline of streams and returns a scramjet stream.
-* [`StringStream:from(source, options) : StringStream`](docs/string-stream.md#module_scramjet.StringStream.from) - Create StringStream from anything.
+* [`StringStream:from(source, [options]) : StringStream`](docs/string-stream.md#module_scramjet.StringStream.from) - Create StringStream from anything.
 
 
 
