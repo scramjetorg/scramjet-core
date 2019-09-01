@@ -122,13 +122,13 @@ A simple use case would be:
 
 **Most popular methods:**
 
-* `new BufferStream(opts)` - Creates the BufferStream
+* `new BufferStream([opts])` - Creates the BufferStream
 * [`bufferStream.shift(chars, func) : BufferStream ↺`](docs/buffer-stream.md#module_scramjet.BufferStream+shift) - Shift given number of bytes from the original stream
 * [`bufferStream.split(splitter) : BufferStream ↺`](docs/buffer-stream.md#module_scramjet.BufferStream+split) - Splits the buffer stream into buffer objects
 * [`bufferStream.breakup(number) : BufferStream ↺`](docs/buffer-stream.md#module_scramjet.BufferStream+breakup) - Breaks up a stream apart into chunks of the specified length
-* [`bufferStream.stringify(encoding) : StringStream`](docs/buffer-stream.md#module_scramjet.BufferStream+stringify) - Creates a string stream from the given buffer stream
+* [`bufferStream.stringify([encoding]) : StringStream`](docs/buffer-stream.md#module_scramjet.BufferStream+stringify) - Creates a string stream from the given buffer stream
 * [`bufferStream.parse(parser) : DataStream`](docs/buffer-stream.md#module_scramjet.BufferStream+parse) - Parses every buffer to object
-* [`BufferStream:pipeline(readable, transforms) : BufferStream`](docs/buffer-stream.md#module_scramjet.BufferStream.pipeline) - Creates a pipeline of streams and returns a scramjet stream.
+* [`BufferStream:pipeline(readable) : BufferStream`](docs/buffer-stream.md#module_scramjet.BufferStream.pipeline) - Creates a pipeline of streams and returns a scramjet stream.
 * [`BufferStream:from(stream, options) : BufferStream`](docs/buffer-stream.md#module_scramjet.BufferStream.from) - Create BufferStream from anything.
 
 ### ~DataStream
@@ -151,7 +151,7 @@ await (DataStream.from(aStream) // create a DataStream
 
 **Most popular methods:**
 
-* `new DataStream(opts)` - Create the DataStream.
+* `new DataStream([opts])` - Create the DataStream.
 * [`dataStream.map(func, [ClassType]) ↺`](docs/data-stream.md#module_scramjet.DataStream+map) - Transforms stream objects into new ones, just like Array.prototype.map
 * [`dataStream.filter(func) ↺`](docs/data-stream.md#module_scramjet.DataStream+filter) - Filters object based on the function outcome, just like Array.prototype.filter.
 * [`dataStream.reduce(func, into) ⇄`](docs/data-stream.md#module_scramjet.DataStream+reduce) - Reduces the stream into a given accumulator
@@ -162,7 +162,7 @@ await (DataStream.from(aStream) // create a DataStream
 * [`dataStream.into(func, into) ↺`](docs/data-stream.md#module_scramjet.DataStream+into) - Allows own implementation of stream chaining.
 * [`dataStream.use(func) ↺`](docs/data-stream.md#module_scramjet.DataStream+use) - Calls the passed method in place with the stream as first argument, returns result.
 * [`dataStream.run() ⇄`](docs/data-stream.md#module_scramjet.DataStream+run) - Consumes all stream items doing nothing. Resolves when the stream is ended.
-* [`dataStream.tap()`](docs/data-stream.md#module_scramjet.DataStream+tap) - Stops merging transform Functions at the current place in the command chain.
+* [`dataStream.tap() ↺`](docs/data-stream.md#module_scramjet.DataStream+tap) - Stops merging transform Functions at the current place in the command chain.
 * [`dataStream.whenRead() ⇄`](docs/data-stream.md#module_scramjet.DataStream+whenRead) - Reads a chunk from the stream and resolves the promise when read.
 * [`dataStream.whenWrote(chunk, [...more]) ⇄`](docs/data-stream.md#module_scramjet.DataStream+whenWrote) - Writes a chunk to the stream and returns a Promise resolved when more chunks can be written.
 * [`dataStream.whenEnd() ⇄`](docs/data-stream.md#module_scramjet.DataStream+whenEnd) - Resolves when stream ends - rejects on uncaught error
@@ -175,7 +175,7 @@ await (DataStream.from(aStream) // create a DataStream
 * [`dataStream.until(func) ↺`](docs/data-stream.md#module_scramjet.DataStream+until) - Reads the stream until the function outcome is truthy.
 * [`dataStream.catch(callback) ↺`](docs/data-stream.md#module_scramjet.DataStream+catch) - Provides a way to catch errors in chained streams.
 * [`dataStream.raise(err) ⇄`](docs/data-stream.md#module_scramjet.DataStream+raise) - Executes all error handlers and if none resolves, then emits an error.
-* [`dataStream.pipe(to, options) : Writable ↺`](docs/data-stream.md#module_scramjet.DataStream+pipe) - Override of node.js Readable pipe.
+* [`dataStream.pipe(to, [options]) : Writable ↺`](docs/data-stream.md#module_scramjet.DataStream+pipe) - Override of node.js Readable pipe.
 * [`dataStream.bufferify(serializer) : BufferStream ↺`](docs/data-stream.md#module_scramjet.DataStream+bufferify) - Creates a BufferStream.
 * [`dataStream.stringify([serializer]) : StringStream ↺`](docs/data-stream.md#module_scramjet.DataStream+stringify) - Creates a StringStream.
 * [`dataStream.toArray([initial]) : Array.<any> ⇄`](docs/data-stream.md#module_scramjet.DataStream+toArray) - Aggregates the stream into a single Array
@@ -185,7 +185,7 @@ await (DataStream.from(aStream) // create a DataStream
 * [`dataStream.toBufferStream(serializer) : BufferStream ↺`](docs/data-stream.md#module_scramjet.DataStream+toBufferStream) - Creates a BufferStream.
 * [`dataStream.toStringStream([serializer]) : StringStream ↺`](docs/data-stream.md#module_scramjet.DataStream+toStringStream) - Creates a StringStream.
 * [`DataStream:from(input, [options]) : DataStream`](docs/data-stream.md#module_scramjet.DataStream.from) - Returns a DataStream from pretty much anything sensibly possible.
-* [`DataStream:pipeline(readable, ...transforms) : DataStream`](docs/data-stream.md#module_scramjet.DataStream.pipeline) - Creates a pipeline of streams and returns a scramjet stream.
+* [`DataStream:pipeline(readable) : DataStream`](docs/data-stream.md#module_scramjet.DataStream.pipeline) - Creates a pipeline of streams and returns a scramjet stream.
 * [`DataStream:fromArray(array, [options]) : DataStream`](docs/data-stream.md#module_scramjet.DataStream.fromArray) - Create a DataStream from an Array
 * [`DataStream:fromIterator(iterator, [options]) : DataStream`](docs/data-stream.md#module_scramjet.DataStream.fromIterator) - Create a DataStream from an Iterator
 
@@ -208,7 +208,7 @@ new MultiStream(function*(){ yield* streams; })
 
 **Most popular methods:**
 
-* `new MultiStream(streams, options)` - Crates an instance of MultiStream with the specified stream list
+* `new MultiStream(streams, [options])` - Crates an instance of MultiStream with the specified stream list
 * [`multiStream.streams : Array`](docs/multi-stream.md#module_scramjet.MultiStream+streams) - Array of all streams
 * [`multiStream.source : DataStream`](docs/multi-stream.md#module_scramjet.MultiStream+source) - Source of the MultiStream.
 * [`multiStream.length : number`](docs/multi-stream.md#module_scramjet.MultiStream+length) - Returns the current stream length
@@ -238,7 +238,7 @@ StringStream.fromString()
 * [`stringStream.split(splitter) ↺`](docs/string-stream.md#module_scramjet.StringStream+split) - Splits the string stream by the specified RegExp or string
 * [`stringStream.match(matcher) ↺`](docs/string-stream.md#module_scramjet.StringStream+match) - Finds matches in the string stream and streams the match results
 * [`stringStream.toBufferStream() : BufferStream ↺`](docs/string-stream.md#module_scramjet.StringStream+toBufferStream) - Transforms the StringStream to BufferStream
-* [`stringStream.parse(parser) : DataStream ↺`](docs/string-stream.md#module_scramjet.StringStream+parse) - Parses every string to object
+* [`stringStream.parse(parser, StreamClass) : DataStream ↺`](docs/string-stream.md#module_scramjet.StringStream+parse) - Parses every string to object
 * [`stringStream.toDataStream()`](docs/string-stream.md#module_scramjet.StringStream+toDataStream) - Alias for {@link StringStream#parse}
 * [`StringStream:SPLIT_LINE`](docs/string-stream.md#module_scramjet.StringStream.SPLIT_LINE) - A handy split by line regex to quickly get a line-by-line stream
 * [`StringStream:fromString(stream, encoding) : StringStream`](docs/string-stream.md#module_scramjet.StringStream.fromString) - Creates a StringStream and writes a specific string.
