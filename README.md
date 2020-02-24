@@ -129,7 +129,7 @@ A simple use case would be:
 * [`bufferStream.stringify([encoding]) : StringStream`](docs/buffer-stream.md#module_scramjet.BufferStream+stringify) - Creates a string stream from the given buffer stream
 * [`bufferStream.parse(parser) : DataStream`](docs/buffer-stream.md#module_scramjet.BufferStream+parse) - Parses every buffer to object
 * [`BufferStream:pipeline(readable) : BufferStream`](docs/buffer-stream.md#module_scramjet.BufferStream.pipeline) - Creates a pipeline of streams and returns a scramjet stream.
-* [`BufferStream:from(stream, options) : BufferStream`](docs/buffer-stream.md#module_scramjet.BufferStream.from) - Create BufferStream from anything.
+* [`BufferStream:from(stream, [options]) : BufferStream`](docs/buffer-stream.md#module_scramjet.BufferStream.from) - Create BufferStream from anything.
 
 ### ~DataStream
 DataStream is the primary stream type for Scramjet. When you parse your
