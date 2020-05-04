@@ -5,7 +5,7 @@ const getStream = (x = 100) => {
     const ret = new DataStream();
     let cnt = 0;
     for (let i = 0; i < x; i++)
-        ret.write({val: cnt++});
+        ret.write({ val: cnt++ });
     process.nextTick(() => ret.end());
     return ret;
 };
@@ -17,7 +17,7 @@ module.exports = {
         async read(test) {
             test.expect(8);
 
-            const stream = DataStream.from([1,2,3,4]);
+            const stream = DataStream.from([1, 2, 3, 4]);
 
             let done = false;
             stream.whenEnd().then(() => done = true);
@@ -52,21 +52,22 @@ module.exports = {
                 await (stream.whenEnd());
                 notDone = false;
                 test.ok(ended, "Stream is ended");
-                test.done();
             })()
                 .catch(
                     (err) => {
                         test.ok(false, "Should not throw: " + err.stack);
                     }
                 )
-            ;
+                .then(
+                    () => test.done()
+                );
 
             test.ok(notDone, "Does not resolve before the stream ends");
         }
     },
     test_from: {
         async noOptions(test) {
-            const x = new PassThrough({objectMode: true});
+            const x = new PassThrough({ objectMode: true });
             x.write(1);
             x.write(2);
             x.end(3);
@@ -74,7 +75,7 @@ module.exports = {
             const z = await DataStream.from(x)
                 .toArray();
 
-            test.deepEqual([1,2,3], z, "Should be the same as the stream");
+            test.deepEqual([1, 2, 3], z, "Should be the same as the stream");
             test.done();
         },
         async subClass(test) {
@@ -89,15 +90,15 @@ module.exports = {
             test.done();
         },
         async typeArray(test) {
-            const arr = [1,2,3];
+            const arr = [1, 2, 3];
 
             const z = DataStream.from(arr);
             test.ok(z instanceof DataStream, "Should return the called class");
-            test.deepEqual(await z.toArray(), [1,2,3], "Should work on type Array");
+            test.deepEqual(await z.toArray(), [1, 2, 3], "Should work on type Array");
             test.done();
         },
         async typeDataStream(test) {
-            const x = DataStream.from(["1","2","3"]);
+            const x = DataStream.from(["1", "2", "3"]);
             const y = DataStream.from(x);
             const z = StringStream.from(x);
             const u = DataStream.from(z);
@@ -107,19 +108,19 @@ module.exports = {
             test.notStrictEqual(x, z, "Should not return the same stream as derived type");
             test.notStrictEqual(x, u, "Should not return the same stream as ancestor type");
 
-            test.deepEqual(await u.toArray(), ["1","2","3"], "Should pipe, but not convert the stream.");
+            test.deepEqual(await u.toArray(), ["1", "2", "3"], "Should pipe, but not convert the stream.");
 
             test.done();
         },
         async typeGenerator(test) {
-            const x = DataStream.from(function*(){
+            const x = DataStream.from(function* () {
                 yield 1;
                 yield 2;
                 return 3;
             });
 
             test.ok(x instanceof DataStream, "Should return the called class");
-            test.deepEqual(await x.toArray(), [1,2,3], "Return data as generated.");
+            test.deepEqual(await x.toArray(), [1, 2, 3], "Return data as generated.");
 
             test.done();
         },
@@ -129,7 +130,7 @@ module.exports = {
                 const x = DataStream.from(generator);
 
                 test.ok(x instanceof DataStream, "Should return the called class");
-                test.deepEqual(await x.toArray(), [1,2,3], "Return data as generated.");
+                test.deepEqual(await x.toArray(), [1, 2, 3], "Return data as generated.");
 
                 test.done();
             } catch (e) {
@@ -148,14 +149,14 @@ module.exports = {
                     x: 0,
                     async next() {
                         await defer();
-                        if (this.x < 3) return {value: ++this.x, done: false};
-                        return {done: true};
+                        if (this.x < 3) return { value: ++this.x, done: false };
+                        return { done: true };
                     }
                 })
             });
 
             test.ok(x instanceof DataStream, "Should return the called class");
-            test.deepEqual(await x.toArray(), [1,2,3], "Return data as generated.");
+            test.deepEqual(await x.toArray(), [1, 2, 3], "Return data as generated.");
 
             test.done();
         },
@@ -164,56 +165,56 @@ module.exports = {
                 [Symbol.iterator]: () => ({
                     x: 0,
                     next() {
-                        if (this.x < 3) return {value: ++this.x, done: false};
-                        return {done: true};
+                        if (this.x < 3) return { value: ++this.x, done: false };
+                        return { done: true };
                     }
                 })
             });
 
             test.ok(x instanceof DataStream, "Should return the called class");
-            test.deepEqual(await x.toArray(), [1,2,3], "Return data as generated.");
+            test.deepEqual(await x.toArray(), [1, 2, 3], "Return data as generated.");
 
             test.done();
         },
         async typeFunction(test) {
-            const x = DataStream.from(function() {
-                return [1,2,3];
+            const x = DataStream.from(function () {
+                return [1, 2, 3];
             });
 
             test.ok(x instanceof DataStream, "Should return the called class");
-            test.deepEqual(await x.toArray(), [1,2,3], "Return data as generated.");
+            test.deepEqual(await x.toArray(), [1, 2, 3], "Return data as generated.");
 
             test.done();
         },
         async typeAsyncFunction(test) {
-            const x = DataStream.from(async function() {
+            const x = DataStream.from(async function () {
                 return new Promise(res => process.nextTick(res))
-                    .then(() => [1,2,3]);
+                    .then(() => [1, 2, 3]);
             });
 
             test.ok(x instanceof DataStream, "Should return the called class");
-            test.deepEqual(await x.toArray(), [1,2,3], "Return data as generated.");
+            test.deepEqual(await x.toArray(), [1, 2, 3], "Return data as generated.");
 
             test.done();
         }
     },
     test_options: {
         set(test) {
-            const x = new DataStream({test:1});
+            const x = new DataStream({ test: 1 });
             test.equals(x._options.test, 1, "Option can be set in constructor");
 
-            x.setOptions({test:2, maxParallel: 17});
+            x.setOptions({ test: 2, maxParallel: 17 });
             test.equals(x._options.test, 2, "Any option can be set");
             test.equals(x._options.maxParallel, 17, "Default options can be set at any point");
 
             test.done();
         },
         fromReferrer(test) {
-            const x = new DataStream({test:1});
-            const y = new DataStream({test:3});
+            const x = new DataStream({ test: 1 });
+            const y = new DataStream({ test: 3 });
 
             x.pipe(y);
-            x.setOptions({test:2, maxParallel: 17});
+            x.setOptions({ test: 2, maxParallel: 17 });
 
             test.equals(y._options.referrer, x, "Referrer is set correctly");
             test.equals(x._options.test, 2, "Any option can be set");
@@ -289,29 +290,52 @@ module.exports = {
         },
         async stream(test) {
             test.expect(3);
-            const org = DataStream.fromArray([1,2,3,4]);
+            const orgArr = Array.from(Array(33).keys());
 
-            const out1 = org.tee(new DataStream());
-
+            const org = DataStream.fromArray(orgArr);
             const pOrg = org.toArray();
+
+            const out1 = new DataStream();
+            org.tee(out1);
             const pOut1 = out1.toArray();
 
-            const out2 = org.tee(new DataStream());
+            const out2 = new DataStream();
+            org.tee(out2);
             const pOut2 = out2.toArray();
 
             const [aOrg, aOut1, aOut2] = await Promise.all([pOrg, pOut1, pOut2]);
 
-            test.deepEqual(aOrg, [1,2,3,4], "Original stream is not affected");
-            test.deepEqual(aOut1, [1,2,3,4], "Tee'd streams have the right content");
-            test.deepEqual(aOut2, [1,2,3,4], "Tee'd streams have the right content");
+            test.deepEqual(aOrg, orgArr, "Original stream is not affected");
+            test.deepEqual(aOut1, orgArr, "Tee'd streams have the right content");
+            test.deepEqual(aOut2, orgArr, "Tee'd streams have the right content");
 
             test.done();
-
         }
+    },
+    async test_copy(test) {
+        test.expect(3);
+        const orgArr = Array.from(Array(33).keys());
+
+        const org = DataStream.fromArray(orgArr);
+        const pOrg = org.toArray();
+
+        const out1 = org.copy();
+        const pOut1 = out1.toArray();
+
+        const out2 = org.copy();
+        const pOut2 = out2.toArray();
+
+        const [aOrg, aOut1, aOut2] = await Promise.all([pOrg, pOut1, pOut2]);
+
+        test.deepEqual(aOrg, orgArr, "Original stream is not affected");
+        test.deepEqual(aOut1, orgArr, "Copied stream 1 has the right content");
+        test.deepEqual(aOut2, orgArr, "Copied stream 2 has the right content");
+
+        test.done();
     },
     test_pipeline: {
         async plumbs_streams(test) {
-            const input = new PassThrough({objectMode: true});
+            const input = new PassThrough({ objectMode: true });
             input.write(1);
             input.write(2);
             input.write(3);
@@ -319,21 +343,23 @@ module.exports = {
 
             const stream = DataStream.pipeline(
                 input,
-                new Transform({objectMode: true, transform(chunk, encoding, callback) {
-                    this.push(chunk + 1);
-                    callback();
-                }}),
-                new PassThrough({objectMode: true})
+                new Transform({
+                    objectMode: true, transform(chunk, encoding, callback) {
+                        this.push(chunk + 1);
+                        callback();
+                    }
+                }),
+                new PassThrough({ objectMode: true })
             );
 
             test.ok(stream instanceof DataStream, "Is DataStream");
-            test.deepEqual(await stream.toArray(), [2,3,4,5], "Does execute all functions");
+            test.deepEqual(await stream.toArray(), [2, 3, 4, 5], "Does execute all functions");
             test.done();
         },
         async plumbs_functions(test) {
             test.expect(2);
 
-            const input = new PassThrough({objectMode: true});
+            const input = new PassThrough({ objectMode: true });
             input.write(1);
             input.write(2);
             input.write(3);
@@ -341,18 +367,20 @@ module.exports = {
 
             const stream = DataStream.pipeline(
                 input,
-                async (stream) => stream.pipe(new Transform({objectMode: true, transform(chunk, encoding, callback){
-                    this.push(chunk + 1);
-                    callback();
-                }}))
+                async (stream) => stream.pipe(new Transform({
+                    objectMode: true, transform(chunk, encoding, callback) {
+                        this.push(chunk + 1);
+                        callback();
+                    }
+                }))
             );
 
             test.ok(stream instanceof DataStream, "Is DataStream");
-            test.deepEqual(await stream.toArray(), [2,3,4,5], "Does execute all functions");
+            test.deepEqual(await stream.toArray(), [2, 3, 4, 5], "Does execute all functions");
             test.done();
         },
         async works_on_strings(test) {
-            const input = new PassThrough({encoding: "utf-8"});
+            const input = new PassThrough({ encoding: "utf-8" });
             input.write("{\"x\": 1}\n");
             input.write("{\"x\": 2}\n");
             input.end("{\"x\": 3}");
@@ -368,19 +396,19 @@ module.exports = {
             const output = stream
                 .split("\n")
                 .parse(JSON.parse)
-            ;
+                ;
 
-            test.deepEqual(await output.toArray(), [{x:1}, {x:2}, {x:3}], "Handles string input");
+            test.deepEqual(await output.toArray(), [{ x: 1 }, { x: 2 }, { x: 3 }], "Handles string input");
             test.done();
         },
         forwards_errors: {
             async immediate(test) {
                 test.expect(1);
 
-                const input = new PassThrough({objectMode: true});
+                const input = new PassThrough({ objectMode: true });
                 const output = DataStream.pipeline(
                     input,
-                    new PassThrough({objectMode: true})
+                    new PassThrough({ objectMode: true })
                 );
 
                 input.write(1);
@@ -397,10 +425,10 @@ module.exports = {
             async late(test) {
                 test.expect(1);
 
-                const input = new PassThrough({objectMode: true});
+                const input = new PassThrough({ objectMode: true });
                 const output = DataStream.pipeline(
                     input,
-                    new PassThrough({objectMode: true})
+                    new PassThrough({ objectMode: true })
                 );
 
                 input.emit("error", new Error("X marks the spot!"));
@@ -416,13 +444,13 @@ module.exports = {
             },
             async close(test) {
                 test.expect(1);
-                const input = DataStream.from([1,2,3,4]);
+                const input = DataStream.from([1, 2, 3, 4]);
 
-                const errorStream = new PassThrough({objectMode: true});
+                const errorStream = new PassThrough({ objectMode: true });
                 const output = DataStream.pipeline(
                     input,
                     errorStream,
-                    new PassThrough({objectMode: true})
+                    new PassThrough({ objectMode: true })
                 );
 
                 errorStream.emit("error", new Error("X marks the spot!"));
@@ -434,12 +462,12 @@ module.exports = {
             },
             async far(test) {
                 test.expect(1);
-                const input = DataStream.from([1,2,3,4]);
+                const input = DataStream.from([1, 2, 3, 4]);
 
-                const errorStream = new PassThrough({objectMode: true});
+                const errorStream = new PassThrough({ objectMode: true });
                 const output = DataStream.pipeline(
                     input,
-                    new PassThrough({objectMode: true}),
+                    new PassThrough({ objectMode: true }),
                     errorStream
                 );
 
@@ -469,7 +497,7 @@ module.exports = {
                     }
                 ).reduce(
                     (acc, int) => (acc.sum += int.val, acc.cnt++, acc),
-                    {sum: 0, cnt: 0}
+                    { sum: 0, cnt: 0 }
                 ).then(
                     (acc) => {
                         test.equals(acc.cnt, 100, "The method should get all 100 elements in the stream");
@@ -548,12 +576,12 @@ module.exports = {
     test_unorder: {
         async async_one(test) {
             const out = await (DataStream
-                .from([1,2,3,4])
-                .setOptions({maxParallel: 2})
+                .from([1, 2, 3, 4])
+                .setOptions({ maxParallel: 2 })
                 .unorder(x => x === 1 ? delay(20, x) : x)
                 .toArray());
 
-            test.deepEqual(out, [2,3,4,1]);
+            test.deepEqual(out, [2, 3, 4, 1]);
             test.done();
         },
         async inOrder(test) {
@@ -569,11 +597,11 @@ module.exports = {
                     15,
                     120
                 ])
-                .setOptions({maxParallel: 2})
+                .setOptions({ maxParallel: 2 })
                 .unorder(x => delay(x, i++))
                 .toArray());
 
-            test.deepEqual(out, [1,0,2,4,5,6,3,7]);
+            test.deepEqual(out, [1, 0, 2, 4, 5, 6, 3, 7]);
             test.done();
         }
     },
@@ -581,7 +609,7 @@ module.exports = {
         sync(test) {
             test.expect(4);
 
-            const stream = DataStream.fromArray([1,2,3,4,5,6,7,8,9,10]);
+            const stream = DataStream.fromArray([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
             const ref = Symbol("test");
 
             let called = false;
@@ -603,7 +631,7 @@ module.exports = {
         async async(test) {
             test.expect(5);
 
-            const stream = DataStream.fromArray([1,2,3,4,5,6,7,8,9,10]);
+            const stream = DataStream.fromArray([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
             const ref = Symbol("test");
 
             let called = false;
@@ -621,35 +649,35 @@ module.exports = {
 
             test.ok(out instanceof DataStream, "Must return a stream synchonously");
             test.ok(called, "Must be called and executed synchronously"); // TODO: but rethink this, because why not async before resuming the stream?
-            test.deepEqual(await out.toArray(), [0,1,2,3,4,5,6,7,8,9], "Must carry the items from an async stream");
+            test.deepEqual(await out.toArray(), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], "Must carry the items from an async stream");
             test.done();
         },
         async string_simple(test) {
             test.expect(2);
 
-            const stream = DataStream.fromArray([1,2,3,4,5,6,7,8,9,10]);
+            const stream = DataStream.fromArray([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
             const out = stream.use("../lib/usetest/simple", 2);
 
             test.ok(out instanceof DataStream, "Must return a stream synchonously");
-            test.deepEqual(await out.toArray(), [3,4,5,6,7,8,9,10,11,12], "Must carry the items from an async stream");
+            test.deepEqual(await out.toArray(), [3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "Must carry the items from an async stream");
             test.done();
         },
         async string_async(test) {
             test.expect(2);
 
-            const stream = DataStream.fromArray([1,2,3,4,5,6,7,8,9,10]);
+            const stream = DataStream.fromArray([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
             const out = stream.use("../lib/usetest/async");
 
             test.ok(out instanceof DataStream, "Must return a stream synchonously");
-            test.deepEqual(await out.toArray(), [2,3,4,5,6,7,8,9,10,11], "Must carry the items from an async stream");
+            test.deepEqual(await out.toArray(), [2, 3, 4, 5, 6, 7, 8, 9, 10, 11], "Must carry the items from an async stream");
             test.done();
         },
         async generator(test) {
             test.expect(6);
 
-            const stream = DataStream.fromArray([1,2,3,4,5,6,7,8,9,10]);
+            const stream = DataStream.fromArray([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
             const ref = Symbol("test");
 
             let called = false;
@@ -681,7 +709,7 @@ module.exports = {
 
             test.ok(out instanceof DataStream, "Must return a stream synchonously");
             test.ok(!called, "Must not be called and executed synchronously");
-            test.deepEqual(await out.toArray(), [1,3,4,5,6,7,8,9,10], "Must carry the items from an async stream");
+            test.deepEqual(await out.toArray(), [1, 3, 4, 5, 6, 7, 8, 9, 10], "Must carry the items from an async stream");
             test.ok(called, "Must be called and executed asynchronously");
             test.done();
         }
@@ -724,22 +752,22 @@ module.exports = {
     test_fromx: {
         async array(test) {
             test.expect(1);
-            const arr = [1,2,3,4,5,6,7,8,9];
+            const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
             const str = DataStream.fromArray(arr);
             test.deepEqual(await str.toArray(), arr, "Should resolve to the same array");
             test.done();
         },
         async iteratorMap(test) {
             test.expect(4);
-            const iter = (function*(z) {
+            const iter = (function* (z) {
                 while (z++ < 100) yield z;
                 return 100;
             })(1);
 
             const arr = await DataStream.fromIterator(iter)
-                .setOptions({maxParallel: 512})
-                .map(x => x*2)
-                .map(x => x*2)
+                .setOptions({ maxParallel: 512 })
+                .map(x => x * 2)
+                .map(x => x * 2)
                 .toArray();
 
             test.equals(arr[0], 8, "Test some elements...");
@@ -762,7 +790,7 @@ module.exports = {
                 console.error(e.stack);
                 throw e;
             });
-            test.deepEqual(await str.toArray(), [1,2,3,4,5,6,7,8,9], "Should resolve to the same array");
+            test.deepEqual(await str.toArray(), [1, 2, 3, 4, 5, 6, 7, 8, 9], "Should resolve to the same array");
             test.done();
         },
     },
@@ -778,7 +806,7 @@ module.exports = {
                 test.done();
             });
             test.notStrictEqual(orgStream, pipedStream, "Piped stream musn't be the same object");
-            orgStream.end({val: 123});
+            orgStream.end({ val: 123 });
         },
         allows_to_capture(test) {
             test.expect(2);
@@ -786,14 +814,14 @@ module.exports = {
             let err2 = new Error("Hello 2!");
 
             const orgStream = new DataStream()
-                .catch(({cause}) => {
+                .catch(({ cause }) => {
                     test.equals(err, cause, "Should pass the same error");
                     return Promise.reject(err2);
                 });
 
 
             const pipedStream = orgStream.pipe(new DataStream())
-                .catch(({cause}) => {
+                .catch(({ cause }) => {
                     test.equals(err2, cause, "Should pass the error via pipe");
                     orgStream.end({});
                     return true;
@@ -827,12 +855,12 @@ module.exports = {
 
             try {
                 const ret = await (
-                    DataStream.fromArray([0,1,2,3,4])
+                    DataStream.fromArray([0, 1, 2, 3, 4])
                         .use("../lib/modtest")
                         .toArray()
                 );
-                test.deepEqual(ret, [1,2,3,4,5], "Should identify and load the right module, relative to __dirname");
-            } catch(e) {
+                test.deepEqual(ret, [1, 2, 3, 4, 5], "Should identify and load the right module, relative to __dirname");
+            } catch (e) {
                 test.fail("Should not throw: " + e.stack);
             }
 
