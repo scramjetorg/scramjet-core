@@ -289,25 +289,48 @@ module.exports = {
         },
         async stream(test) {
             test.expect(3);
-            const org = DataStream.fromArray([1,2,3,4]);
+            const orgArr = Array.from(Array(33).keys());
 
-            const out1 = org.tee(new DataStream());
-
+            const org = DataStream.fromArray(orgArr);
             const pOrg = org.toArray();
+
+            const out1 = new DataStream();
+            org.tee(out1);
             const pOut1 = out1.toArray();
 
-            const out2 = org.tee(new DataStream());
+            const out2 = new DataStream();
+            org.tee(out2);
             const pOut2 = out2.toArray();
 
             const [aOrg, aOut1, aOut2] = await Promise.all([pOrg, pOut1, pOut2]);
 
-            test.deepEqual(aOrg, [1,2,3,4], "Original stream is not affected");
-            test.deepEqual(aOut1, [1,2,3,4], "Tee'd streams have the right content");
-            test.deepEqual(aOut2, [1,2,3,4], "Tee'd streams have the right content");
+            test.deepEqual(aOrg, orgArr, "Original stream is not affected");
+            test.deepEqual(aOut1, orgArr, "Tee'd streams have the right content");
+            test.deepEqual(aOut2, orgArr, "Tee'd streams have the right content");
 
             test.done();
-
         }
+    },
+    async test_copy(test) {
+        test.expect(3);
+        const orgArr = Array.from(Array(33).keys());
+
+        const org = DataStream.fromArray(orgArr);
+        const pOrg = org.toArray();
+
+        const out1 = org.copy();
+        const pOut1 = out1.toArray();
+
+        const out2 = org.copy();
+        const pOut2 = out2.toArray();
+
+        const [aOrg, aOut1, aOut2] = await Promise.all([pOrg, pOut1, pOut2]);
+
+        test.deepEqual(aOrg, orgArr, "Original stream is not affected");
+        test.deepEqual(aOut1, orgArr, "Tee'd streams have the right content");
+        test.deepEqual(aOut2, orgArr, "Tee'd streams have the right content");
+
+        test.done();
     },
     test_pipeline: {
         async plumbs_streams(test) {
