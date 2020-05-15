@@ -41,7 +41,7 @@
   "engines": {
     "node": ">=8.6.0"
   },
-  "author": "Signicode / Michał Czapracki <cz@signicode.com>",
+  "author": "Scramjet / Michał Czapracki <cz@scramjet.org>",
   "license": "MIT",
   "devDependencies": {
     "dmd": "^5.0.0",
