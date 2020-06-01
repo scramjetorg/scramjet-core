@@ -2,7 +2,7 @@
 
 <a name="module_scramjet"></a>
 
-## scramjet : Object
+## scramjet
 Scramjet main exports expose all the stream classes and a number of methods.
 
 All scramjet streams allow writing, reading or transform modes - currently
@@ -32,9 +32,8 @@ What's worth mentioning - scramjet tries to limit the number of created transfor
 one after another into the same stream class therefore a code `stream.map(transform1).map(transform2).filter(transform3)`
 will only operate on a single transform stream that evaluates all three transforms one after another.
 
-**Extends**: <code>Object</code>  
 
-* [scramjet](#module_scramjet)  <code>Object</code>
+* [scramjet](#module_scramjet)
     * [:errors](#module_scramjet.errors)  <code>ScramjetErrors</code>
     * [:from(input, [options])](#module_scramjet.from)  <code>DataStream</code>
     * [:fromArray(array, [options])](#module_scramjet.fromArray)  <code>DataStream</code>
@@ -42,10 +41,10 @@ will only operate on a single transform stream that evaluates all three transfor
     * [:createReadModule(anything, [options])](#module_scramjet.createReadModule)  <code>function</code>
     * [:plugin(mixin)](#module_scramjet.plugin)  <code>ScramjetPlugin</code>
     * [:API(version)](#module_scramjet.API)  <code>ScramjetPlugin</code>
-    * [~CreateModuleOptions](#module_scramjet..CreateModuleOptions)  <code>Object</code>
-    * [~ScramjetErrors](#module_scramjet..ScramjetErrors)  <code>Object</code>
-    * [~StreamMixin](#module_scramjet..StreamMixin)  <code>Object</code>
-    * [~ScramjetPlugin](#module_scramjet..ScramjetPlugin)  <code>Object</code>
+    * [~CreateModuleOptions](#module_scramjet..CreateModuleOptions)  <code>object</code>
+    * [~ScramjetErrors](#module_scramjet..ScramjetErrors)  <code>object</code>
+    * [~StreamMixin](#module_scramjet..StreamMixin)  <code>object</code>
+    * [~ScramjetPlugin](#module_scramjet..ScramjetPlugin)  <code>object</code>
 
 <a name="module_scramjet.errors"></a>
 
@@ -63,9 +62,9 @@ Creates a DataStream that's piped from the passed readable.
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| input | <code>Array</code> \| <code>Iterable</code> \| <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>String</code> \| <code>Readable</code> |  | argument to be turned into new stream |
+| input | <code>Array</code> \| <code>Iterable.&lt;any&gt;</code> \| <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>string</code> \| <code>Readable</code> |  | argument to be turned into new stream |
 | [options] | <code>DataStreamOptions</code> \| <code>Writable</code> | <code>{}</code> | options for creation of a new stream or the target stream |
-| ...args | <code>\*</code> |  | additional arguments for the stream - will be passed to the function or generator |
+| ...args | <code>Array.&lt;any&gt;</code> |  | additional arguments for the stream - will be passed to the function or generator |
 
 <a name="module_scramjet.fromArray"></a>
 
@@ -91,7 +90,7 @@ Creates a safe wrapper for scramjet transform module. See [Modules documentation
 | --- | --- | --- |
 | transform | <code>UseCallback</code> |  | 
 | [options] | <code>CreateModuleOptions</code> | <code>{}</code> | 
-| ...initialArgs | <code>any</code> |  | 
+| ...initialArgs | <code>Array.&lt;any&gt;</code> |  | 
 
 <a name="module_scramjet.createReadModule"></a>
 
@@ -103,9 +102,9 @@ Creates a safe wrapper for scramjet read module. See [Modules documentation](mod
 
 | Param | Type | Default |
 | --- | --- | --- |
-| anything | <code>Array</code> \| <code>Iterable</code> \| <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>String</code> \| <code>Readable</code> |  | 
+| anything | <code>Array</code> \| <code>Iterable.&lt;any&gt;</code> \| <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>string</code> \| <code>Readable</code> |  | 
 | [options] | <code>CreateModuleOptions</code> | <code>{}</code> | 
-| ...initialArgs | <code>any</code> |  | 
+| ...initialArgs | <code>Array.&lt;any&gt;</code> |  | 
 
 <a name="module_scramjet.plugin"></a>
 
@@ -128,11 +127,11 @@ Gets an API version (this may be important for future use)
 
 | Param | Type | Description |
 | --- | --- | --- |
-| version | <code>Number</code> | The required version (currently only: 1) |
+| version | <code>number</code> | The required version (currently only: 1) |
 
 <a name="module_scramjet..CreateModuleOptions"></a>
 
-### scramjet~CreateModuleOptions : Object
+### scramjet~CreateModuleOptions : object
 Options for createModule
 
 **Kind**: inner typedef of [<code>scramjet</code>](#module_scramjet)  
@@ -144,7 +143,7 @@ Options for createModule
 
 <a name="module_scramjet..ScramjetErrors"></a>
 
-### scramjet~ScramjetErrors : Object
+### scramjet~ScramjetErrors : object
 Scramjet Error classes
 
 **Kind**: inner typedef of [<code>scramjet</code>](#module_scramjet)  
@@ -156,7 +155,7 @@ Scramjet Error classes
 
 <a name="module_scramjet..StreamMixin"></a>
 
-### scramjet~StreamMixin : Object
+### scramjet~StreamMixin : object
 Definition of a single mixin for a specific Scramjet class. Should contain any number of stream methods.
 
 **Kind**: inner typedef of [<code>scramjet</code>](#module_scramjet)  
@@ -168,7 +167,7 @@ Definition of a single mixin for a specific Scramjet class. Should contain any n
 
 <a name="module_scramjet..ScramjetPlugin"></a>
 
-### scramjet~ScramjetPlugin : Object
+### scramjet~ScramjetPlugin : object
 Definition of a plugin in Scramjet
 
 **Kind**: inner typedef of [<code>scramjet</code>](#module_scramjet)  
