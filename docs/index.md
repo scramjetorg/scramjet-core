@@ -77,7 +77,7 @@ Creates a DataStream from an Array
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | array | <code>Array</code> |  | list of chunks |
-| [options] | <code>ScramjetOptions</code> | <code>{}</code> | the read stream options |
+| [options] | <code>DataStreamOptions</code> | <code>{}</code> | the read stream options |
 
 <a name="module_scramjet.createTransformModule"></a>
 
