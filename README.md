@@ -123,7 +123,7 @@ A simple use case would be:
 **Most popular methods:**
 
 * `new BufferStream([opts])` - Creates the BufferStream
-* [`bufferStream.shift(chars, func) : BufferStream ↺`](docs/buffer-stream.md#module_scramjet.BufferStream+shift) - Shift given number of bytes from the original stream
+* [`bufferStream.shift(chars, func) ↺`](docs/buffer-stream.md#module_scramjet.BufferStream+shift) - Shift given number of bytes from the original stream
 * [`bufferStream.split(splitter) : BufferStream ↺`](docs/buffer-stream.md#module_scramjet.BufferStream+split) - Splits the buffer stream into buffer objects
 * [`bufferStream.breakup(number) : BufferStream ↺`](docs/buffer-stream.md#module_scramjet.BufferStream+breakup) - Breaks up a stream apart into chunks of the specified length
 * [`bufferStream.stringify([encoding]) : StringStream`](docs/buffer-stream.md#module_scramjet.BufferStream+stringify) - Creates a string stream from the given buffer stream
@@ -164,7 +164,7 @@ await (DataStream.from(aStream) // create a DataStream
 * [`dataStream.run() ⇄`](docs/data-stream.md#module_scramjet.DataStream+run) - Consumes all stream items doing nothing. Resolves when the stream is ended.
 * [`dataStream.tap() ↺`](docs/data-stream.md#module_scramjet.DataStream+tap) - Stops merging transform Functions at the current place in the command chain.
 * [`dataStream.whenRead() ⇄`](docs/data-stream.md#module_scramjet.DataStream+whenRead) - Reads a chunk from the stream and resolves the promise when read.
-* [`dataStream.whenWrote(chunk, [...more]) ⇄`](docs/data-stream.md#module_scramjet.DataStream+whenWrote) - Writes a chunk to the stream and returns a Promise resolved when more chunks can be written.
+* [`dataStream.whenWrote(chunk) ⇄`](docs/data-stream.md#module_scramjet.DataStream+whenWrote) - Writes a chunk to the stream and returns a Promise resolved when more chunks can be written.
 * [`dataStream.whenEnd() ⇄`](docs/data-stream.md#module_scramjet.DataStream+whenEnd) - Resolves when stream ends - rejects on uncaught error
 * [`dataStream.whenDrained() ⇄`](docs/data-stream.md#module_scramjet.DataStream+whenDrained) - Returns a promise that resolves when the stream is drained
 * [`dataStream.whenError() ⇄`](docs/data-stream.md#module_scramjet.DataStream+whenError) - Returns a promise that resolves (!) when the stream is errors
@@ -213,8 +213,8 @@ new MultiStream(function*(){ yield* streams; })
 * [`multiStream.streams : Array`](docs/multi-stream.md#module_scramjet.MultiStream+streams) - Array of all streams
 * [`multiStream.source : DataStream`](docs/multi-stream.md#module_scramjet.MultiStream+source) - Source of the MultiStream.
 * [`multiStream.length : number`](docs/multi-stream.md#module_scramjet.MultiStream+length) - Returns the current stream length
-* [`multiStream.map(aFunc, rFunc) : MultiStream ↺`](docs/multi-stream.md#module_scramjet.MultiStream+map) - Returns new MultiStream with the streams returned by the transform.
-* [`multiStream.find(...args) : DataStream`](docs/multi-stream.md#module_scramjet.MultiStream+find) - Calls Array.prototype.find on the streams
+* [`multiStream.map(aFunc, rFunc) : Promise.<MultiStream> ↺`](docs/multi-stream.md#module_scramjet.MultiStream+map) - Returns new MultiStream with the streams returned by the transform.
+* [`multiStream.find() : DataStream`](docs/multi-stream.md#module_scramjet.MultiStream+find) - Calls Array.prototype.find on the streams
 * [`multiStream.filter(func) : MultiStream ↺`](docs/multi-stream.md#module_scramjet.MultiStream+filter) - Filters the stream list and returns a new MultiStream with only the
 * [`multiStream.mux([comparator], [ClassType]) : DataStream`](docs/multi-stream.md#module_scramjet.MultiStream+mux) - Muxes the streams into a single one
 * [`multiStream.add(stream)`](docs/multi-stream.md#module_scramjet.MultiStream+add) - Adds a stream to the MultiStream
