@@ -3,6 +3,86 @@
 
 This is the last intended minor API change to `scramjet-core` before the v5 series.
 
+## Scramjet Core 4.27.3: Readme fix attempt
+
+* 6b19f52 - Add npmignore
+* cbce7f0 - Dependencies update
+
+## Scramjet Core 4.27.0: Dependencies update and a small fix
+
+* dddf971 - Docs update
+* 94118b4 - Dependencies update.
+* 5178b4a - Update ts typings
+
+## Scramjet Core 4.26.0: Fix typescript defs and deps upgrade
+
+* 492badc - Fix docs
+* 6c572cc - Dependencies update.
+* 14ad05f - Fix definitions for typescript
+
+## Scramjet Core 4.25.2: Remove support for node v8.x
+
+* 2a582c2 - Dropping support for node v8.x
+* d4364ba - Scramjet is now a startup!
+* 2e1f98c - Dependencies update.
+* 9f4ca07 - Dependencies update.
+
+## Scramjet Core 4.25.0: New copy method
+
+* 6eb2092 - Fix tests and nodeunit
+* 00055e0 - Add new method copy, fix tests for tee
+
+## Scramjet Core 4.24.4: Dependency update
+
+* e0dec30 - Dependencies update.
+
+## Scramjet Core 4.24.3: Dependencies update
+
+* 5381a84 - Dependencies update.
+* d32b15c - Dependencies update.
+
+## Scramjet Core 4.24.2: Dependencies update
+
+* 20b7c5b - Dependencies update.
+
+## Scramjet Core 4.24.1: Dependencies update
+
+* 3c0d932 - Dependencies update.
+* 9b7e09c - Dependencies update.
+
+## Scramjet Core 4.24.0: Fix optional arguments definitions
+
+* 34a1d1c - Fix optional argument definition
+* ecaae81 - Fix optional argument definition
+* 8fc4c62 - Dependencies update.
+* ebdd275 - Remove unnecessary CNAME file
+* 0f412ae - Documentation fixes
+
+## Scramjet Core 4.23.0: MultiStream.from, docs & dependencies update
+
+* 021d6bc - Fix return value
+* b23bcbe - Dependencied update and docs update
+* b83b8f0 - Add MultiStream..from, clarify docs
+
+## Scramjet Core 4.22.7 - Documentation fixes
+
+* 9f7abb7 - Dependencies update.
+* 449879e - Fix docs for ts generation
+* cacd32d - Fix test case on unOrder
+* fe64aa4 - Fix scripts issue making eslint testing only core
+* 52b16ff - Update to work with eslint v6.x
+* 1b007af - Remove breaking changes from DataStream.into
+
+## Scramjet Core 4.22.0: Major jsdoc fixes
+
+* db5256c - Update docs.
+* 877a7ac - Dependencies update.
+* 8d3824e - Fix typos in docs
+* 5827e16 - Add scramjet.ScramjetErrors docs
+* 1db07e1 - Remove docs from core
+* 84c15a9 - Fix documentation for typescript
+* 48dca6b - Fixes for better TypeScript definition and docs
+
 ## Scramjet Core 4.21.0: More Generators
 
 * 923044a - Allow usage of iterators in MultiStream, add default serializer in stringify
