@@ -28,10 +28,6 @@ yarn.lock
 
 ### Special
 
-docs/
-jsdoc2md/
-scripts/
-test/
 gulpfile.js
 .vscode/
 _config.yml
