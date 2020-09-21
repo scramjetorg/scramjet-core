@@ -43,6 +43,14 @@
   },
   "author": "Scramjet Sp z o.o. <open-source@scramjet.org>",
   "license": "MIT",
+  "files": [
+    "LICENSE",
+    "CHANGELOG.md",
+    "README.md",
+    "index.js",
+    "lib",
+    "docs"
+  ],
   "devDependencies": {
     "dmd": "^5.0.2",
     "eslint": "^7.8.1",
