@@ -48,6 +48,7 @@
     "CHANGELOG.md",
     "README.md",
     "index.js",
+    "jsdoc2md",
     "lib",
     "docs",
     "scripts",
