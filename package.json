@@ -49,7 +49,9 @@
     "README.md",
     "index.js",
     "lib",
-    "docs"
+    "docs",
+    "scripts",
+    "test"
   ],
   "devDependencies": {
     "dmd": "^5.0.2",
