@@ -66,6 +66,12 @@ module.exports = {
         }
     },
     test_from: {
+        async fromPromise(test) {
+            const dsp = await DataStream.from(Promise.resolve([1,2,3])).toArray();
+
+            test.deepEqual([1, 2, 3], dsp, "Should be the same as the stream");
+            test.done();
+        },
         async noOptions(test) {
             const x = new PassThrough({ objectMode: true });
             x.write(1);

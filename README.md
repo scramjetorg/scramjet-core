@@ -236,7 +236,7 @@ StringStream.fromString()
 * [`stringStream.split(splitter) ↺`](docs/string-stream.md#module_scramjet.StringStream+split) - Splits the string stream by the specified RegExp or string
 * [`stringStream.match(matcher) ↺`](docs/string-stream.md#module_scramjet.StringStream+match) - Finds matches in the string stream and streams the match results
 * [`stringStream.toBufferStream() : BufferStream ↺`](docs/string-stream.md#module_scramjet.StringStream+toBufferStream) - Transforms the StringStream to BufferStream
-* [`stringStream.parse(parser, StreamClass) : DataStream ↺`](docs/string-stream.md#module_scramjet.StringStream+parse) - Parses every string to object
+* [`stringStream.parse(parser, [StreamClass]) : DataStream ↺`](docs/string-stream.md#module_scramjet.StringStream+parse) - Parses every string to object
 * [`stringStream.toDataStream()`](docs/string-stream.md#module_scramjet.StringStream+toDataStream) - Alias for {@link StringStream#parse}
 * [`StringStream:SPLIT_LINE`](docs/string-stream.md#module_scramjet.StringStream.SPLIT_LINE) - A handy split by line regex to quickly get a line-by-line stream
 * [`StringStream:fromString(stream, encoding) : StringStream`](docs/string-stream.md#module_scramjet.StringStream.fromString) - Creates a StringStream and writes a specific string.
