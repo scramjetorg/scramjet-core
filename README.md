@@ -223,8 +223,11 @@ A stream of string objects for further transformation on top of DataStream.
 
 Example:
 
-```javascript
-StringStream.fromString()
+```js
+StringStream.from(async () => (await fetch('https://example.com/data/article.txt')).text())
+    .lines()
+    .append("\r\n")
+    .pipe(fs.createWriteStream('./path/to/file.txt'))
 ```
 
 [Detailed :StringStream docs here](docs/string-stream.md)
