@@ -28,8 +28,8 @@
     "parser"
   ],
   "scripts": {
-    "test": "gulp test",
-    "lint": "gulp lint",
+    "test": "npx gulp test",
+    "lint": "npx gulp lint",
     "fix": "eslint --fix",
     "preversion": "gulp prerelease"
   },
