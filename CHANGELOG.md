@@ -3,6 +3,62 @@
 
 This is the last intended minor API change to `scramjet-core` before the v5 series.
 
+
+## Scramjet Core 4.31.2: Fix compatibility for nodejs 15.x
+
+* 7cf152a - Fix tests in v15
+* 0c55228 - Dependencies update
+* d021a3c - Docs update
+
+## Scramjet Core 4.30.1: Hotfix from Promise
+
+* a937630 - Hotfix
+* c5e3ef6 - Allow Promise in from, fix declaration of parse
+
+## Scramjet Core 4.29.2: Filtered package contents fix
+
+* 9e34741 - Add missing files
+* b6425e6 - Fix missing files
+* 6a12f76 - Fix docs generation
+* b6ddf71 - Dependencies update.
+* 073352e - Lower package size by removing unneeded items
+
+## Scramjet Core 4.28.3: Dependencies update
+
+* 0e284e7 - Dependencies update.
+
+## Scramjet Core 4.28.2: Dependencies update
+
+* 58f426d - Dependencies update.
+
+## Scramjet Core 4.28.1: Minor test fix and dependencies update
+
+* 3f83c46 - Fix tests to work on faster CPUs
+
+## Scramjet Core 4.28.0: TS Compat: remove pipe from docs
+
+* df8deb6 - Dependencies update.
+* 5be3fc7 - TS Compat: Remove pipe from docs
+
+## Scramjet Core 4.27.8: Dependencies update
+
+* 3515a02 - Dependencies update.
+
+## Scramjet Core 4.27.7: Dependecies update
+
+* 4e29202 - Dependencies update.
+
+## Scramjet Core 4.27.6: Fix npmignore
+
+* e4ec031 - Fix npmignore
+
+## Scramjet Core 4.27.5: Readme fix attempt
+
+
+## Scramjet Core 4.27.4: Readme fix attempt
+
+* 5da2d0d - Changelog update
+
 ## Scramjet Core 4.27.3: Readme fix attempt
 
 * 6b19f52 - Add npmignore
