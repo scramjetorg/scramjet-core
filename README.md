@@ -1,12 +1,12 @@
-[![Master Build Status](https://travis-ci.org/signicode/scramjet-core.svg?branch=master)](https://travis-ci.org/signicode/scramjet-core)
-[![Develop Build Status](https://travis-ci.org/signicode/scramjet-core.svg?branch=develop)](https://travis-ci.org/signicode/scramjet-core)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fsignicode%2Fscramjet-core.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fsignicode%2Fscramjet-core?ref=badge_shield)
-[![Known Vulnerabilities](https://snyk.io/test/github/signicode/scramjet-core/badge.svg)](https://snyk.io/test/github/signicode/scramjet-core)
+[![Master Build Status](https://travis-ci.org/scramjetorg/scramjet-core.svg?branch=master)](https://travis-ci.org/scramjetorg/scramjet-core)
+[![Develop Build Status](https://travis-ci.org/scramjetorg/scramjet-core.svg?branch=develop)](https://travis-ci.org/scramjetorg/scramjet-core)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fscramjetorg%2Fscramjet-core.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fscramjetorg%2Fscramjet-core?ref=badge_shield)
+[![Known Vulnerabilities](https://snyk.io/test/github/scramjetorg/scramjet-core/badge.svg)](https://snyk.io/test/github/scramjetorg/scramjet-core)
 
 Scramjet core
 ===============
 
-This is the minimal, dependency free version of [`scramjet`](https://github.com/signicode/scramjet) used as of Scramjet
+This is the minimal, dependency free version of [`scramjet`](https://github.com/scramjetorg/scramjet) used as of Scramjet
 version 3.0.0 as a base for `scramjet` and scramjet plugins.
 
 Unless you are sure, you should be better off with using the main repo and module.
@@ -255,10 +255,10 @@ Check out the command line interface for simplified scramjet usage with [scramje
 
 As of version 2.0 Scramjet is MIT Licensed.
 
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fsignicode%2Fscramjet-core.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fsignicode%2Fscramjet-core?ref=badge_large)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fscramjetorg%2Fscramjet-core.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fscramjetorg%2Fscramjet-core?ref=badge_large)
 
 ## Help wanted
 
 The project need's your help! There's lots of work to do - transforming and muxing, joining and splitting, browserifying, modularizing, documenting and issuing those issues.
 
-If you want to help and be part of the Scramjet team, please reach out to me, signicode on Github or email me: scramjet@signicode.com.
+If you want to help and be part of the Scramjet team, please reach out to me, scramjetorg on Github or email us: opensource@scramjet.org.
