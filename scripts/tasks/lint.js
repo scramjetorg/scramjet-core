@@ -1,17 +1,22 @@
-const {CLIEngine} = require("eslint");
+const {ESLint} = require("eslint");
 const path = require("path");
 const log = require("fancy-log");
 
-module.exports = (files = ["**/*.js"], options = {}) => (cb) => {
-    const report = new CLIEngine({
-        reportUnusedDisableDirectives: 1,
+module.exports = (files = ["**/*.js"], options = {}) => async (cb) => {
+    const report = await new ESLint({
+        reportUnusedDisableDirectives: "warn",
         cache: false,
         cwd: process.env.SCRAMJET_TEST_HOME || path.resolve(__dirname, "../../"),
         ...options
-    }).executeOnFiles(files);
+    })
+        .lintFiles(files);
 
-    for (let file of report.results) {
+    let warningCount = 0;
+    let errorCount = 0;
+    for (let file of report) {
         if (file.errorCount || file.warningCount) {
+            errorCount += file.errorCount;
+            warningCount += file.warningCount;
             log.error(`Eslint errors in ${file.filePath}:`);
             file.messages.forEach(
                 ({ruleId, message, line}) => log.error(` -> ${file.filePath}:${line} ${message} (${ruleId})`)
@@ -21,12 +26,14 @@ module.exports = (files = ["**/*.js"], options = {}) => (cb) => {
         }
     }
 
-    if (report.fixableErrorCount || report.fixableWarningCount) {
+    if (report.fixableErrorCount || report.fixableWarningCount)
         log.info("Some eslint errors may be fixable, run `npm fix`");
-    }
+    
+    if (warningCount)
+        log.info("Some eslint warnings were found");
 
-    if (report.errorCount || report.warningCount)
+    if (errorCount)
         return cb(new Error("Lint errors or warnings found."));
-
+    
     cb();
 };
