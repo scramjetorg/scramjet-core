@@ -2,7 +2,7 @@
 [![last commit](https://img.shields.io/github/last-commit/scramjetorg/scramjet-core)](https://github.com/scramjetorg/scramjet-core)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fscramjetorg%2Fscramjet-core.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fscramjetorg%2Fscramjet-core?ref=badge_shield)
 [![Known Vulnerabilities](https://snyk.io/test/github/scramjetorg/scramjet-core/badge.svg)](https://snyk.io/test/github/scramjetorg/scramjet-core)
-[![Discord](https://img.shields.io/discord/925384545342201896?label=discord)](https://discord.gg/4EX3jHBe)
+[![Discord](https://img.shields.io/discord/925384545342201896?label=discord)](https://discord.gg/52USU8q7AX)
 
 Scramjet core
 ===============
