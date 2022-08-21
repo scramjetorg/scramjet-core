@@ -3,6 +3,7 @@
 <a name="module_scramjet"></a>
 
 ## scramjet
+
 Scramjet main exports expose all the stream classes and a number of methods.
 
 All scramjet streams allow writing, reading or transform modes - currently
@@ -49,7 +50,7 @@ will only operate on a single transform stream that evaluates all three transfor
 ### scramjet:from(input, [options]) : DataStream
 Creates a DataStream that's piped from the passed readable.
 
-**Kind**: static method of [<code>scramjet</code>](#module_scramjet)  
+**Kind**: static method of [<code>scramjet</code>](#module_scramjet)
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -62,7 +63,7 @@ Creates a DataStream that's piped from the passed readable.
 ### scramjet:fromArray(array, [options]) : DataStream
 Creates a DataStream from an Array
 
-**Kind**: static method of [<code>scramjet</code>](#module_scramjet)  
+**Kind**: static method of [<code>scramjet</code>](#module_scramjet)
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -74,36 +75,36 @@ Creates a DataStream from an Array
 ### scramjet:createTransformModule(transform, [options]) : function
 Creates a safe wrapper for scramjet transform module. See [Modules documentation](modules.md) for more info.
 
-**Kind**: static method of [<code>scramjet</code>](#module_scramjet)  
-**Returns**: <code>function</code> - a scramjet module function  
+**Kind**: static method of [<code>scramjet</code>](#module_scramjet)
+**Returns**: <code>function</code> - a scramjet module function
 
 | Param | Type | Default |
 | --- | --- | --- |
-| transform | <code>UseCallback</code> |  | 
-| [options] | <code>CreateModuleOptions</code> | <code>{}</code> | 
-| ...initialArgs | <code>Array.&lt;any&gt;</code> |  | 
+| transform | <code>UseCallback</code> |  |
+| [options] | <code>CreateModuleOptions</code> | <code>{}</code> |
+| ...initialArgs | <code>Array.&lt;any&gt;</code> |  |
 
 <a name="module_scramjet.createReadModule"></a>
 
 ### scramjet:createReadModule(anything, [options]) : function
 Creates a safe wrapper for scramjet read module. See [Modules documentation](modules.md) for more info.
 
-**Kind**: static method of [<code>scramjet</code>](#module_scramjet)  
-**Returns**: <code>function</code> - a scramjet module function  
+**Kind**: static method of [<code>scramjet</code>](#module_scramjet)
+**Returns**: <code>function</code> - a scramjet module function
 
 | Param | Type | Default |
 | --- | --- | --- |
-| anything | <code>Array</code> \| <code>Iterable.&lt;any&gt;</code> \| <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>string</code> \| <code>Readable</code> |  | 
-| [options] | <code>CreateModuleOptions</code> | <code>{}</code> | 
-| ...initialArgs | <code>Array.&lt;any&gt;</code> |  | 
+| anything | <code>Array</code> \| <code>Iterable.&lt;any&gt;</code> \| <code>AsyncGeneratorFunction</code> \| <code>GeneratorFunction</code> \| <code>AsyncFunction</code> \| <code>function</code> \| <code>string</code> \| <code>Readable</code> |  |
+| [options] | <code>CreateModuleOptions</code> | <code>{}</code> |
+| ...initialArgs | <code>Array.&lt;any&gt;</code> |  |
 
 <a name="module_scramjet.plugin"></a>
 
 ### scramjet:plugin(mixin) : ScramjetPlugin
 Plugs in methods for any of the classes
 
-**Kind**: static method of [<code>scramjet</code>](#module_scramjet)  
-**Test**: test/methods/scramjet-plugin.js  
+**Kind**: static method of [<code>scramjet</code>](#module_scramjet)
+**Test**: test/methods/scramjet-plugin.js
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -114,7 +115,7 @@ Plugs in methods for any of the classes
 ### scramjet:API(version) : ScramjetPlugin
 Gets an API version (this may be important for future use)
 
-**Kind**: static method of [<code>scramjet</code>](#module_scramjet)  
+**Kind**: static method of [<code>scramjet</code>](#module_scramjet)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -125,7 +126,7 @@ Gets an API version (this may be important for future use)
 ### scramjet~CreateModuleOptions : object
 Options for createModule
 
-**Kind**: inner typedef of [<code>scramjet</code>](#module_scramjet)  
+**Kind**: inner typedef of [<code>scramjet</code>](#module_scramjet)
 **Properties**
 
 | Name | Type | Description |
@@ -137,7 +138,7 @@ Options for createModule
 ### scramjet~StreamMixin : object
 Definition of a single mixin for a specific Scramjet class. Should contain any number of stream methods.
 
-**Kind**: inner typedef of [<code>scramjet</code>](#module_scramjet)  
+**Kind**: inner typedef of [<code>scramjet</code>](#module_scramjet)
 **Properties**
 
 | Name | Type | Description |
@@ -149,8 +150,8 @@ Definition of a single mixin for a specific Scramjet class. Should contain any n
 ### scramjet~ScramjetPlugin : object
 Definition of a plugin in Scramjet
 
-**Kind**: inner typedef of [<code>scramjet</code>](#module_scramjet)  
-**Internal**:   
+**Kind**: inner typedef of [<code>scramjet</code>](#module_scramjet)
+**Internal**:
 **Properties**
 
 | Name | Type | Description |
